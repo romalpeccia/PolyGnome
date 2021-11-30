@@ -11,10 +11,33 @@
 #include "Metronome.h"
 #include <JuceHeader.h>
 
+void Metronome::prepareToPlay(double tempSampleRate)
+{
+    sampleRate = tempSampleRate;
+    interval = (60.0 / bpm) * sampleRate;
+    
+    HighResolutionTimer::startTimer(60.0);
+        //abstract method?
+}
+
+void Metronome::hiResTimerCallback()
+{
+    interval = (60.0 / bpm) * sampleRate;
+}
+
 void Metronome::countSamples(int bufferSize)
 {
     totalSamples += bufferSize;
-    DBG(totalSamples);
+    samplesRemaining = totalSamples % interval;
+    //DBG(interval);
+    DBG(samplesRemaining);
+    if (samplesRemaining + bufferSize >= interval)
+    {
+        DBG("CLICK");
+        DBG(totalSamples);
+
+    }
+    
 }
 
 void Metronome::reset() 
@@ -22,7 +45,5 @@ void Metronome::reset()
     totalSamples = 0;
 }
 
-void Metronome::prepareToPlay(double tempSampleRate)
-{
-    sampleRate = tempSampleRate;
-}
+
+
