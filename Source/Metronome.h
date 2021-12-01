@@ -12,19 +12,24 @@
 
 #include <JuceHeader.h>
 
-class Metronome : public juce::HighResolutionTimer
+class Metronome 
 {
     public:
-        void prepareToPlay(double sampleRate);
-        void countSamples(int bufferSize);
+        Metronome();
+
+        void prepareToPlay(double _sampleRate, int samplesPerBlock);
+        void getNextAudioBlock(juce::AudioBuffer<float>& buffer);
         void reset();
-        void hiResTimerCallback() override;
+
 
 
     private:
         int totalSamples = 0; //total samples since start time
         double sampleRate = 0; 
-        int interval; //interval representing one beat click = (60.0 / bpm) * sampleRate
-        double bpm = 120; 
-        int samplesRemaining; // samples processed before beat = totalSamples % interval
+        int beatInterval = 0; //interval representing one beat click = (60.0 / bpm) * sampleRate
+        double bpm = 240; 
+        int samplesProcessed = 0; // samples processed before beat = totalSamples % interval
+
+        juce::AudioFormatManager formatManager;
+        std::unique_ptr <juce::AudioFormatReaderSource> pMetronomeSample =  nullptr ;
 };

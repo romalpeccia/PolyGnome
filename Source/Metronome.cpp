@@ -11,37 +11,80 @@
 #include "Metronome.h"
 #include <JuceHeader.h>
 
-void Metronome::prepareToPlay(double tempSampleRate)
+Metronome::Metronome()
 {
-    sampleRate = tempSampleRate;
-    interval = (60.0 / bpm) * sampleRate;
+
+
+    //load up click file
+    //TODO multiple files
+        formatManager.registerBasicFormats();
+        juce::String dir;
+
+        //TODO don't hardcode this filepath
+        juce::File clickFile("C:/Users/Romal/Desktop/JUCE_PROJECTS/MetroGnome/Samples/rimshot.wav");
+        if (!clickFile.exists())
+        {
+            jassert("file not found");
+        }
+        auto formatReader = formatManager.createReaderFor(clickFile);
+        pMetronomeSample.reset(new juce::AudioFormatReaderSource(formatReader, true));
+    //end load up click file
+}
+
+
+void Metronome::prepareToPlay(double _sampleRate, int samplesPerBlock)
+//preparetoplay should call every time we stop
+{
+    sampleRate = _sampleRate;
+    beatInterval = (60.0 / bpm) * sampleRate;
     
-    HighResolutionTimer::startTimer(60.0);
-        //abstract method?
-}
 
-void Metronome::hiResTimerCallback()
-{
-    interval = (60.0 / bpm) * sampleRate;
-}
-
-void Metronome::countSamples(int bufferSize)
-{
-    totalSamples += bufferSize;
-    samplesRemaining = totalSamples % interval;
-    //DBG(interval);
-    DBG(samplesRemaining);
-    if (samplesRemaining + bufferSize >= interval)
+    if (pMetronomeSample != nullptr)
     {
-        DBG("CLICK");
-        DBG(totalSamples);
-
+        pMetronomeSample->prepareToPlay(samplesPerBlock, sampleRate);
+       // DBG("file loaded");
     }
+
+
+}
+
+void Metronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer)
+{
+    //TODO fix this entire function, seems hacky 
     
+    auto temp = juce::AudioSourceChannelInfo(buffer);
+    //temp.buffer->makeCopyOf(buffer);
+
+
+    auto bufferSize = buffer.getNumSamples();
+
+    totalSamples += bufferSize;
+    samplesProcessed = totalSamples % beatInterval;
+
+
+    if (samplesProcessed + bufferSize >= beatInterval)
+
+    {
+        const auto timeToStartPlaying = beatInterval - samplesProcessed;
+        pMetronomeSample->setNextReadPosition(0); //reset sample to beginning
+
+        for (auto samplenum = 0; samplenum < bufferSize + 1; samplenum++)
+        {
+            if (samplenum == timeToStartPlaying)
+            {
+                pMetronomeSample->getNextAudioBlock(temp);
+            }
+        }
+    }
+    if (pMetronomeSample->getNextReadPosition() != 0)           //if we already started playing and got interupted
+    {
+        pMetronomeSample->getNextAudioBlock(temp);
+    }
 }
 
 void Metronome::reset() 
 {
+
     totalSamples = 0;
 }
 
