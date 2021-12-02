@@ -37,6 +37,6 @@ class Metronome
         //start code for loading multiple files
         //static const int numWAVs = 2;
         //std::array <std::unique_ptr <juce::AudioFormatReaderSource>, numWAVs> pMetronomeSamples;
-        std::unique_ptr <juce::AudioFormatReaderSource> rimShotLow;
-        std::unique_ptr <juce::AudioFormatReaderSource> rimShotHigh;
+        std::unique_ptr <juce::AudioFormatReaderSource> rimShotLow = nullptr;
+        std::unique_ptr <juce::AudioFormatReaderSource> rimShotHigh = nullptr;
 };
