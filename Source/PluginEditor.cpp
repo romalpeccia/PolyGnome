@@ -20,10 +20,7 @@ MetroGnomeAudioProcessorEditor::MetroGnomeAudioProcessorEditor (MetroGnomeAudioP
     playButton.setToggleState(false, juce::NotificationType::dontSendNotification);
     playButton.onClick = [this]() { play(); }; 
     addAndMakeVisible(playButton);
-    stopButton.setRadioGroupId(1);
-    stopButton.setToggleState(true, juce::NotificationType::dontSendNotification);
-    stopButton.onClick = [this]() { stop(); };
-    addAndMakeVisible(stopButton);
+
 
     setSize (400, 300);
 }
@@ -50,7 +47,6 @@ void MetroGnomeAudioProcessorEditor::resized()
 
     juce::FlexBox flexBox;
     flexBox.items.add(juce::FlexItem(50   , 50, playButton));
-    flexBox.items.add(juce::FlexItem(50, 50, stopButton));
     flexBox.performLayout(bounds);
 
 }
@@ -58,12 +54,16 @@ void MetroGnomeAudioProcessorEditor::resized()
 void MetroGnomeAudioProcessorEditor::play()
 {
 
-    audioProcessor.apvts.getRawParameterValue("ON/OFF")->store(true);
-    
-
+    if (audioProcessor.apvts.getRawParameterValue("ON/OFF")->load() == true)
+    {
+        audioProcessor.apvts.getRawParameterValue("ON/OFF")->store(false);
+        audioProcessor.metronome.reset();
+    }
+    else {
+        audioProcessor.apvts.getRawParameterValue("ON/OFF")->store(true);
+    }
 }
 void MetroGnomeAudioProcessorEditor::stop()
 {
-    audioProcessor.apvts.getRawParameterValue("ON/OFF")->store(false);
-    audioProcessor.metronome.reset();
+
 }

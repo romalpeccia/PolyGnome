@@ -24,16 +24,19 @@ class Metronome
 
 
     private:
-        int totalSamples = 0; //total samples since start time, relevant?
+        int totalSamples = 0; //total samples since start time
         double sampleRate = 0; 
         int beatInterval = 0; //interval representing one beat click = (60.0 / bpm) * sampleRate
+        int beatflag = subdivisions;
+
         int subInterval = 0;
+        int subdivisions = 3; // TODO make this value a param
+
+
         int numerator = 4; //TODO make this a param
         int oneflag = numerator; // make this the numerator of the time sig on init
-        int subAmount = 3; // TODO make this value a param
-        //int subflag = 3; // make this subAmount on init
-        int beatflag = subAmount;
-        double bpm = 120; 
+
+        double bpm = 60; 
         int samplesProcessed = 0; // samples processed before beat = totalSamples % interval
 
         juce::AudioFormatManager formatManager;

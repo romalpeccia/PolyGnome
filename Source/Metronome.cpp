@@ -53,8 +53,10 @@ void Metronome::prepareToPlay(double _sampleRate, int samplesPerBlock)
 {
     sampleRate = _sampleRate;
     beatInterval = (60.0 / bpm) * sampleRate;
-    subInterval =  beatInterval/subAmount;
-    oneflag = 4;
+    subInterval =  beatInterval/subdivisions;
+    oneflag = numerator;
+    beatflag = subdivisions;
+    totalSamples = 0;
     if (rimShotLow != nullptr)
     {
         rimShotLow->prepareToPlay(samplesPerBlock, sampleRate);
@@ -83,12 +85,12 @@ void Metronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer)
 
     totalSamples += bufferSize;
     samplesProcessed = totalSamples % beatInterval;
+    auto subSamplesProcessed = totalSamples % subInterval;
 
-
-    /*
-     if (samplesProcessed + bufferSize >= subInterval && beatflag != subAmount)
+    
+     if (subSamplesProcessed + bufferSize >= subInterval && beatflag != subdivisions)
      {
-         const auto timeToStartPlaying = subInterval - totalSamples % subInterval;
+         const auto timeToStartPlaying = subInterval - subSamplesProcessed;
          DBG("SUB");
              rimShotSub->setNextReadPosition(0); //reset sample to beginning
              for (auto samplenum = 0; samplenum < bufferSize + 1; samplenum++)
@@ -99,8 +101,10 @@ void Metronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer)
                  }
              }
              beatflag += 1;
-     }*/
-     if (samplesProcessed + bufferSize >= beatInterval)
+     }
+
+
+     else if (samplesProcessed + bufferSize >= beatInterval)
      {
          const auto timeToStartPlaying = beatInterval - samplesProcessed;
          if (oneflag >= numerator) //check if its the first beat of the bar
