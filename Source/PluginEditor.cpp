@@ -12,6 +12,14 @@
 //==============================================================================
 MetroGnomeAudioProcessorEditor::MetroGnomeAudioProcessorEditor (MetroGnomeAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
+
+ /*,
+    bpmSlider(*audioProcessor.apvts.getParameter("BPM"), ""),
+    subdivisionSlider(*audioProcessor.apvts.getParameter("SUBDIVISION"), ""),
+    numeratorSlider(*audioProcessor.apvts.getParameter("NUMERATOR"), ""),
+    bpmAttachment(audioProcessor.apvts, "BPM",bpmSlider),
+    subdivisionAttachment(audioProcessor.apvts, "SUBDIVISION", subdivisionSlider),
+   numeratorAttachment(audioProcessor.apvts, "NUMERATOR", numeratorSlider)*/
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
@@ -63,7 +71,11 @@ void MetroGnomeAudioProcessorEditor::play()
         audioProcessor.apvts.getRawParameterValue("ON/OFF")->store(true);
     }
 }
-void MetroGnomeAudioProcessorEditor::stop()
-{
+
+
+std::vector<juce::Component*> MetroGnomeAudioProcessorEditor::getComps() {
+    return{
+         &playButton, &bpmSlider, &subdivisionSlider, &numeratorSlider,
+    };
 
 }

@@ -27,13 +27,7 @@ public:
 
 
     void play();
-    void stop();
 
-    enum class PlayState
-    {
-        playing,
-        stopped
-    };
 
 private:
     // This reference is provided as a quick way for your editor to
@@ -41,7 +35,14 @@ private:
     MetroGnomeAudioProcessor& audioProcessor;
     juce::TextButton playButton{ "Play" };
 
+    using APVTS = juce::AudioProcessorValueTreeState;
+    using Attachment = APVTS::SliderAttachment;
+    juce::Slider bpmSlider, subdivisionSlider, numeratorSlider;
+    //juce::ComboBox timeSignatureBox;
 
+   // Attachment bpmAttachment, subdivisionAttachment, numeratorAttachment;
+
+    std::vector<juce::Component*> getComps();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MetroGnomeAudioProcessorEditor)
 };

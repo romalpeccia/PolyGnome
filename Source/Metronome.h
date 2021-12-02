@@ -26,18 +26,19 @@ class Metronome
     private:
         int totalSamples = 0; //total samples since start time
         double sampleRate = 0; 
-        int beatInterval = 0; //interval representing one beat click = (60.0 / bpm) * sampleRate
-        int beatflag = subdivisions;
+        double bpm = 60;
+        int samplesProcessed = 0; // samples processed before beat = totalSamples % interval
 
-        int subInterval = 0;
-        int subdivisions = 3; // TODO make this value a param
+
 
 
         int numerator = 4; //TODO make this a param
         int oneflag = numerator; // make this the numerator of the time sig on init
+        int beatInterval = 0; //interval representing one beat click = (60.0 / bpm) * sampleRate
 
-        double bpm = 60; 
-        int samplesProcessed = 0; // samples processed before beat = totalSamples % interval
+        int subInterval = 0;
+        int subdivisions = 3; // TODO make this value a param
+        int beatflag = subdivisions;
 
         juce::AudioFormatManager formatManager;
 
@@ -49,4 +50,6 @@ class Metronome
         std::unique_ptr <juce::AudioFormatReaderSource> rimShotLow = nullptr;
         std::unique_ptr <juce::AudioFormatReaderSource> rimShotHigh = nullptr;
         std::unique_ptr <juce::AudioFormatReaderSource> rimShotSub = nullptr;
+
+
 };

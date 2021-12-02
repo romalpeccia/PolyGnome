@@ -156,6 +156,8 @@ bool MetroGnomeAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* MetroGnomeAudioProcessor::createEditor()
 {
+    //uncomment first return for generic sliders
+    return new juce::GenericAudioProcessorEditor(*this);
     return new MetroGnomeAudioProcessorEditor (*this);
 }
 
@@ -186,8 +188,17 @@ juce::AudioProcessorValueTreeState::ParameterLayout MetroGnomeAudioProcessor::cr
 
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
 
+    //std::make_unique<juce::AudioParameterFloat>
+    //param name, display name, range, default value
+    //normalisableRange(low, high, stepsize, skew)
+    //skew factor handles the rate at which the slider changes over the range given
 
     layout.add(std::make_unique<juce::AudioParameterBool>("ON/OFF", "On/Off", false ));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("BPM", "bpm", juce::NormalisableRange<float>(1.f, 999.f, 0.1f, 0.25f), 120.f));
+    layout.add(std::make_unique<juce::AudioParameterInt>("SUBDIVISIONS", "Subdivisions", 1, 7 , 1));
+
+
+    layout.add(std::make_unique<juce::AudioParameterInt>("NUMERATOR", "Numerator", 1, 7, 4)   );
 
     return layout;
 

@@ -51,12 +51,10 @@ Metronome::Metronome()
 void Metronome::prepareToPlay(double _sampleRate, int samplesPerBlock)
 //preparetoplay should call every time we start (right before)
 {
+
     sampleRate = _sampleRate;
-    beatInterval = (60.0 / bpm) * sampleRate;
-    subInterval =  beatInterval/subdivisions;
-    oneflag = numerator;
-    beatflag = subdivisions;
-    totalSamples = 0;
+    reset();
+
     if (rimShotLow != nullptr)
     {
         rimShotLow->prepareToPlay(samplesPerBlock, sampleRate);
@@ -88,7 +86,7 @@ void Metronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer)
     auto subSamplesProcessed = totalSamples % subInterval;
 
     
-     if (subSamplesProcessed + bufferSize >= subInterval && beatflag != subdivisions)
+     if (subdivisions > 1 && subSamplesProcessed + bufferSize >= subInterval && beatflag != subdivisions)
      {
          const auto timeToStartPlaying = subInterval - subSamplesProcessed;
          DBG("SUB");
@@ -160,6 +158,14 @@ void Metronome::reset()
 {
 
     totalSamples = 0;
+    //numerator = 
+    //subdivisions =
+    //bpm = 
+    beatInterval = (60.0 / bpm) * sampleRate;
+    subInterval = beatInterval / subdivisions;
+
+    oneflag = numerator;
+    beatflag = subdivisions;
 }
 
 
