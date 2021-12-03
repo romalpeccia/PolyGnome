@@ -61,7 +61,7 @@ public:
     juce::AudioProcessorValueTreeState apvts{ *this, nullptr, "Parameters", createParameterLayout() };
 
 
-    Metronome metronome;
+    Metronome metronome{ &apvts };
 private:
 
 

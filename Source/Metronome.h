@@ -16,11 +16,11 @@ class Metronome
 {
     public:
         Metronome();
-
+        Metronome(juce::AudioProcessorValueTreeState* _apvts);
         void prepareToPlay(double _sampleRate, int samplesPerBlock);
         void getNextAudioBlock(juce::AudioBuffer<float>& buffer);
-        void reset();
-
+        void resetall();
+        void resetparams();
 
 
 
@@ -31,7 +31,7 @@ class Metronome
         int samplesProcessed = 0; // samples processed before beat = totalSamples % interval
 
 
-
+        //make a struct of settings values?
 
         int numerator = 4; //TODO make this a param
         int oneflag = numerator; // make this the numerator of the time sig on init
@@ -52,5 +52,5 @@ class Metronome
         std::unique_ptr <juce::AudioFormatReaderSource> rimShotHigh = nullptr;
         std::unique_ptr <juce::AudioFormatReaderSource> rimShotSub = nullptr;
 
-
+        juce::AudioProcessorValueTreeState* apvts;
 };

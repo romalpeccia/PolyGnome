@@ -13,11 +13,11 @@
 MetroGnomeAudioProcessorEditor::MetroGnomeAudioProcessorEditor (MetroGnomeAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 
- /*,
-    bpmSlider(*audioProcessor.apvts.getParameter("BPM"), ""),
-    subdivisionSlider(*audioProcessor.apvts.getParameter("SUBDIVISION"), ""),
-    numeratorSlider(*audioProcessor.apvts.getParameter("NUMERATOR"), ""),
-    bpmAttachment(audioProcessor.apvts, "BPM",bpmSlider),
+    ,
+    bpmSlider(),
+    subdivisionSlider(),
+   numeratorSlider()
+   /* bpmAttachment(audioProcessor.apvts, "BPM", bpmSlider),
     subdivisionAttachment(audioProcessor.apvts, "SUBDIVISION", subdivisionSlider),
    numeratorAttachment(audioProcessor.apvts, "NUMERATOR", numeratorSlider)*/
 {
@@ -27,7 +27,11 @@ MetroGnomeAudioProcessorEditor::MetroGnomeAudioProcessorEditor (MetroGnomeAudioP
     playButton.setRadioGroupId(1);
     playButton.setToggleState(false, juce::NotificationType::dontSendNotification);
     playButton.onClick = [this]() { play(); }; 
-    addAndMakeVisible(playButton);
+    
+    for (auto* comp : getComps())
+    {
+        addAndMakeVisible(comp);
+    }
 
 
     setSize (400, 300);
@@ -65,7 +69,7 @@ void MetroGnomeAudioProcessorEditor::play()
     if (audioProcessor.apvts.getRawParameterValue("ON/OFF")->load() == true)
     {
         audioProcessor.apvts.getRawParameterValue("ON/OFF")->store(false);
-        audioProcessor.metronome.reset();
+        audioProcessor.metronome.resetall();
     }
     else {
         audioProcessor.apvts.getRawParameterValue("ON/OFF")->store(true);

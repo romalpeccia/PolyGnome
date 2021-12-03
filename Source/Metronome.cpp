@@ -13,8 +13,13 @@
 
 Metronome::Metronome()
 {
+}
 
+Metronome::Metronome(juce::AudioProcessorValueTreeState* _apvts)
+{
 
+    apvts = _apvts;  
+    resetall();
     //load up click file
     //TODO multiple files
         formatManager.registerBasicFormats();
@@ -53,7 +58,7 @@ void Metronome::prepareToPlay(double _sampleRate, int samplesPerBlock)
 {
 
     sampleRate = _sampleRate;
-    reset();
+    resetparams();
 
     if (rimShotLow != nullptr)
     {
@@ -77,6 +82,7 @@ void Metronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer)
     //TODO fix this entire function, seems hacky 
     //TODO cache calculations for less processing?
     //temp because <juce::AudioFormatReaderSource>->getNextAudioBlock expects an AudioSourceChannelInfoObject
+    resetparams();
     auto temp = juce::AudioSourceChannelInfo(buffer);
 
     auto bufferSize = buffer.getNumSamples();
@@ -89,7 +95,7 @@ void Metronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer)
      if (subdivisions > 1 && subSamplesProcessed + bufferSize >= subInterval && beatflag != subdivisions)
      {
          const auto timeToStartPlaying = subInterval - subSamplesProcessed;
-         DBG("SUB");
+         DBG("SUB" << beatflag);
              rimShotSub->setNextReadPosition(0); //reset sample to beginning
              for (auto samplenum = 0; samplenum < bufferSize + 1; samplenum++)
              {
@@ -154,13 +160,12 @@ void Metronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer)
 
 
 
-void Metronome::reset() 
+void Metronome::resetall() 
 {
-
+    numerator = apvts->getRawParameterValue("NUMERATOR")->load();
+    subdivisions = apvts->getRawParameterValue("SUBDIVISIONS")->load();
+    bpm = apvts->getRawParameterValue("BPM")->load();
     totalSamples = 0;
-    //numerator = 
-    //subdivisions =
-    //bpm = 
     beatInterval = (60.0 / bpm) * sampleRate;
     subInterval = beatInterval / subdivisions;
 
@@ -171,4 +176,17 @@ void Metronome::reset()
 
 
 
+void Metronome::resetparams()
+{
+    numerator = apvts->getRawParameterValue("NUMERATOR")->load();
+    subdivisions = apvts->getRawParameterValue("SUBDIVISIONS")->load();
+    bpm = apvts->getRawParameterValue("BPM")->load();
+    beatInterval = (60.0 / bpm) * sampleRate;
+    subInterval = beatInterval / subdivisions;
+
+    //oneflag = numerator;
+    //beatflag = subdivisions;
+
+
+}
 

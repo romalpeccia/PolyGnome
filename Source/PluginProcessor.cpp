@@ -158,7 +158,7 @@ juce::AudioProcessorEditor* MetroGnomeAudioProcessor::createEditor()
 {
     //uncomment first return for generic sliders
     return new juce::GenericAudioProcessorEditor(*this);
-    return new MetroGnomeAudioProcessorEditor (*this);
+   // return new MetroGnomeAudioProcessorEditor (*this);
 }
 
 //==============================================================================

@@ -40,7 +40,7 @@ private:
     juce::Slider bpmSlider, subdivisionSlider, numeratorSlider;
     //juce::ComboBox timeSignatureBox;
 
-   // Attachment bpmAttachment, subdivisionAttachment, numeratorAttachment;
+    //Attachment bpmAttachment, subdivisionAttachment, numeratorAttachment;
 
     std::vector<juce::Component*> getComps();
 
