@@ -60,66 +60,7 @@ private:
     int textHeight = 14;
 };
 
-/*
-struct TimeVisualizerComponent : juce::Component,
-    juce::AudioProcessorParameter::Listener,
-    juce::Timer
-{
-    TimeVisualizerComponent(MetroGnomeAudioProcessor&);
-    ~TimeVisualizerComponent();
-
-    void parameterValueChanged(int parameterIndex, float newValue) override;
-    void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override {}
-    void timerCallback() override;
-    void paint(juce::Graphics& g) override;
-
-    void resized() override;
 
 
-private:
-    MetroGnomeAudioProcessor& audioProcessor;
-    juce::Atomic<bool> parametersChanged{ false };
-
-    //make it an image since it doesnt need to be redrawn
-    juce::Image background;
-
-    //overall response curve GUI area
-    juce::Rectangle<int> getRenderArea();
-    //response curve area
-    juce::Rectangle<int> getAnalysisArea();
-
-};
 
 
-void TimeVisualizerComponent::paint(juce::Graphics& g)
-{
-
-    using namespace juce;
-    g.fillAll(Colours::black);
-
-    g.setColour(Colours::orange);
-    g.drawRoundedRectangle(getRenderArea().toFloat(), 4.f, 1.f);
-    //end making visualizer
-
-}
-
-void TimeVisualizerComponent::resized()
-{
-
-}
-
-
-juce::Rectangle<int> TimeVisualizerComponent::getRenderArea()
-{
-    auto bounds = getLocalBounds();
-    bounds.removeFromTop(12);
-    bounds.removeFromBottom(2);
-    bounds.removeFromLeft(20);
-    bounds.removeFromRight(20);
-
-    return bounds;
-}
-
-juce::Rectangle<int> TimeVisualizerComponent::getAnalysisArea()
-{
-*/

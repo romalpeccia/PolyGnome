@@ -93,7 +93,7 @@ void Metronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer)
 
     
      if (subdivisions > 1 && subSamplesProcessed + bufferSize >= subInterval && beatflag != subdivisions)
-     {
+     {// subdivision logic
          const auto timeToStartPlaying = subInterval - subSamplesProcessed;
          DBG("SUB" << beatflag);
              rimShotSub->setNextReadPosition(0); //reset sample to beginning
@@ -109,10 +109,10 @@ void Metronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer)
 
 
      else if (samplesProcessed + bufferSize >= beatInterval)
-     {
+     { 
          const auto timeToStartPlaying = beatInterval - samplesProcessed;
          if (oneflag >= numerator) //check if its the first beat of the bar
-         {
+         {//first beat logic
              DBG("HIGH");
              rimShotHigh->setNextReadPosition(0); //reset sample to beginning
              for (auto samplenum = 0; samplenum < bufferSize + 1; samplenum++)
@@ -126,7 +126,7 @@ void Metronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer)
          }
          else 
          {
-             //non-one main beat
+             //regular beat logic
              DBG("LOW");
              rimShotLow->setNextReadPosition(0); //reset sample to beginning
              for (auto samplenum = 0; samplenum < bufferSize + 1; samplenum++)

@@ -15,7 +15,7 @@
 //==============================================================================
 /**
 */
-class MetroGnomeAudioProcessorEditor  : public juce::AudioProcessorEditor
+class MetroGnomeAudioProcessorEditor : public juce::AudioProcessorEditor, juce::Timer
 {
 public:
     MetroGnomeAudioProcessorEditor (MetroGnomeAudioProcessor&);
@@ -24,7 +24,9 @@ public:
     //==============================================================================
     void paint (juce::Graphics&) override;
     void resized() override;
-
+    void timerCallback() override {
+        repaint();
+    };
 
     void play();
 
