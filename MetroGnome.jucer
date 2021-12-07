@@ -13,7 +13,10 @@
       <FILE id="J1APeh" name="PluginEditor.cpp" compile="1" resource="0"
             file="Source/PluginEditor.cpp"/>
       <FILE id="HFRAP5" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+      <FILE id="yfM6AJ" name="LookAndFeel.cpp" compile="1" resource="0" file="Source/LookAndFeel.cpp"/>
+      <FILE id="rHbUwg" name="LookAndFeel.h" compile="0" resource="0" file="Source/LookAndFeel.h"/>
     </GROUP>
+    <FILE id="qnzgNY" name="OSRS_gnome.png" compile="0" resource="1" file="Samples/OSRS_gnome.png"/>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>
   <EXPORTFORMATS>

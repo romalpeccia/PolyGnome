@@ -10,7 +10,7 @@
 
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
-
+#include "LookAndFeel.h"
 
 //==============================================================================
 /**
@@ -33,16 +33,26 @@ private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     MetroGnomeAudioProcessor& audioProcessor;
+    //TimeVisualizerComponent timeVisualizer;
+
+
+
+
+    juce::Image logo;
+
+
     juce::TextButton playButton{ "Play" };
 
-    using APVTS = juce::AudioProcessorValueTreeState;
-    using Attachment = APVTS::SliderAttachment;
-    juce::Slider bpmSlider, subdivisionSlider, numeratorSlider;
+
+    using Attachment = juce::AudioProcessorValueTreeState::SliderAttachment;
+    //juce::Slider 
+    RotarySliderWithLabels    bpmSlider, subdivisionSlider, numeratorSlider;
     //juce::ComboBox timeSignatureBox;
 
-    //Attachment bpmAttachment, subdivisionAttachment, numeratorAttachment;
+    Attachment bpmAttachment, subdivisionAttachment, numeratorAttachment;
 
     std::vector<juce::Component*> getComps();
+
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MetroGnomeAudioProcessorEditor)
 };

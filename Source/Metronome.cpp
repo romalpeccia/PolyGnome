@@ -163,7 +163,7 @@ void Metronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer)
 void Metronome::resetall() 
 {
     numerator = apvts->getRawParameterValue("NUMERATOR")->load();
-    subdivisions = apvts->getRawParameterValue("SUBDIVISIONS")->load();
+    subdivisions = apvts->getRawParameterValue("SUBDIVISION")->load();
     bpm = apvts->getRawParameterValue("BPM")->load();
     totalSamples = 0;
     beatInterval = (60.0 / bpm) * sampleRate;
@@ -179,7 +179,7 @@ void Metronome::resetall()
 void Metronome::resetparams()
 {
     numerator = apvts->getRawParameterValue("NUMERATOR")->load();
-    subdivisions = apvts->getRawParameterValue("SUBDIVISIONS")->load();
+    subdivisions = apvts->getRawParameterValue("SUBDIVISION")->load();
     bpm = apvts->getRawParameterValue("BPM")->load();
     beatInterval = (60.0 / bpm) * sampleRate;
     subInterval = beatInterval / subdivisions;

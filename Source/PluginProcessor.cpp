@@ -157,8 +157,8 @@ bool MetroGnomeAudioProcessor::hasEditor() const
 juce::AudioProcessorEditor* MetroGnomeAudioProcessor::createEditor()
 {
     //uncomment first return for generic sliders
-    return new juce::GenericAudioProcessorEditor(*this);
-   // return new MetroGnomeAudioProcessorEditor (*this);
+    //return new juce::GenericAudioProcessorEditor(*this);
+    return new MetroGnomeAudioProcessorEditor (*this);
 }
 
 //==============================================================================
@@ -167,12 +167,20 @@ void MetroGnomeAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
+
+    juce::MemoryOutputStream mos(destData, true);
+    apvts.state.writeToStream(mos);
+
 }
 
 void MetroGnomeAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+    auto tree = juce::ValueTree::readFromData(data, sizeInBytes);
+    if (tree.isValid()) {
+        apvts.replaceState(tree);
+    }
 }
 
 //==============================================================================
@@ -194,7 +202,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout MetroGnomeAudioProcessor::cr
 
     layout.add(std::make_unique<juce::AudioParameterBool>("ON/OFF", "On/Off", false));
     layout.add(std::make_unique<juce::AudioParameterFloat>("BPM", "bpm", juce::NormalisableRange<float>(1.f, 999.f, 0.1f, 0.25f), 120.f));
-    layout.add(std::make_unique<juce::AudioParameterInt>("SUBDIVISIONS", "Subdivisions", 1, 7, 1));
+    layout.add(std::make_unique<juce::AudioParameterInt>("SUBDIVISION", "Subdivision", 1, 7, 1));
 
 
     layout.add(std::make_unique<juce::AudioParameterInt>("NUMERATOR", "Numerator", 1, 7, 4));
