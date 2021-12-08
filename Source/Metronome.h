@@ -36,12 +36,12 @@ class Metronome
 
         //make a struct of settings values?
 
-        int numerator = 4; //TODO make this a param
+        int numerator = 1; //TODO make this a param
         int oneflag = numerator; // make this the numerator of the time sig on init //oneflag signals a first beat of bar when oneflag = numerator
         int beatInterval = 0; //interval representing one beat click = (60.0 / bpm) * sampleRate
 
         int subInterval = 0;
-        int subdivisions = 3; // TODO make this value a param
+        int subdivisions = 1; // TODO make this value a param
         int beatflag = subdivisions; //beatflag keeps count of which subdivision we're on
 
         juce::AudioFormatManager formatManager;

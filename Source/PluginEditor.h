@@ -43,7 +43,7 @@ private:
     juce::Image logo;
 
 
-    juce::TextButton playButton{ "Play" };
+    juce::TextButton playButton{ "Start" };
 
 
     using Attachment = juce::AudioProcessorValueTreeState::SliderAttachment;

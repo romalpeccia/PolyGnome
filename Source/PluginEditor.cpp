@@ -70,32 +70,78 @@ void MetroGnomeAudioProcessorEditor::paint (juce::Graphics& g)
     g.setColour(juce::Colours::white);
    
     
-    //TODO removethis
+    //uncomment for debugging purposes
     g.drawRect(responseArea);
 
 
-    int circleradius = 15;
+    int circleradius = 30;
+    auto Y = responseArea.getCentreY();
+    auto X = responseArea.getX();
     for (int i = 1; i <= audioProcessor.metronome.getNumerator(); i++) {
-
-
+        //loop to draw metronome circles
+         auto circleX = X + i * (circleradius + 5);
+        
         if (audioProcessor.metronome.getoneflag() == i)
         {
             
             if (audioProcessor.metronome.getbeatflag() != 1)
+            {
                 g.setColour(juce::Colours::blue);
+            }
             else
+            {
                 g.setColour(juce::Colours::green);
+            }
+            
+            g.fillEllipse(circleX, Y, circleradius, circleradius);
+            g.setColour(juce::Colours::orange);
+            g.drawText(juce::String(audioProcessor.metronome.getbeatflag()), circleX, Y, circleradius, circleradius, juce::Justification::centred);
         }
         else 
         {
-        g.setColour(juce::Colours::white);
+            g.setColour(juce::Colours::white);
+            g.fillEllipse(circleX, Y, circleradius, circleradius);
         }
-        g.fillEllipse(responseArea.getX() + i * (circleradius+5) , responseArea.getCentreY(), circleradius, circleradius);
 
 
-       // g.draw Text (beatflag)
+        
+ 
     }
+    Y += 50;
+    circleradius = 10;
+    X = responseArea.getX();
+    int subdivisions = audioProcessor.metronome.getSubdivisions();
+    int linewidth = 2;
+    if (subdivisions != 1)
+    {
+        for (int i = 1; i <= subdivisions; i++)
+        {
+            //loop to draw subdivisions
+            X += circleradius*3;            
+            g.setColour(juce::Colours::white);
+            if (subdivisions != i )
+            {
+                g.fillRect(X + circleradius - 3, Y - circleradius - 3, circleradius * 3, linewidth);
+            }
+            g.fillRect(X+circleradius-3 , Y-circleradius-3, linewidth, circleradius*2);
 
+
+            if (audioProcessor.metronome.getbeatflag() == i)
+            {
+                g.setColour(juce::Colours::orange);
+
+            }
+
+
+            g.fillEllipse(X, Y, circleradius, circleradius);
+            // g.fillEllipse(X + (5 * circleradius), Y, circleradius, circleradius);
+            
+            
+
+
+
+        }
+    }
 
 }
 

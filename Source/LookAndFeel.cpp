@@ -134,6 +134,7 @@ juce::Rectangle<int> RotarySliderWithLabels::getSliderBounds() const {
 }
 
 juce::String RotarySliderWithLabels::getDisplayString() const
+// returns the value of the slider param as a string
 {
     if (auto* choiceParam = dynamic_cast<juce::AudioParameterChoice*>(param))
         return choiceParam->getCurrentChoiceName();
