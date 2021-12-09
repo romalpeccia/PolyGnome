@@ -50,7 +50,7 @@ void MetroGnomeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
     auto totalNumOutputChannels = getTotalNumOutputChannels();
     */
      
-    if (apvts.getRawParameterValue("ON/OFF")->load(); == true)
+    if (apvts.getRawParameterValue("ON/OFF")->load() == true)
     {
         metronome.getNextAudioBlock(buffer);
     }

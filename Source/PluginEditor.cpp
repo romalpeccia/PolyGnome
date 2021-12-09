@@ -55,7 +55,6 @@ MetroGnomeAudioProcessorEditor::~MetroGnomeAudioProcessorEditor()
 //==============================================================================
 void MetroGnomeAudioProcessorEditor::paint (juce::Graphics& g)
 {
-    // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (juce::Colours::black);
     g.drawImageAt(logo, 0, 0);
 
@@ -77,11 +76,12 @@ void MetroGnomeAudioProcessorEditor::paint (juce::Graphics& g)
     int circleradius = 30;
     auto Y = responseArea.getCentreY();
     auto X = responseArea.getX();
+    auto ON = audioProcessor.apvts.getRawParameterValue("ON/OFF")->load();
     for (int i = 1; i <= audioProcessor.metronome.getNumerator(); i++) {
         //loop to draw metronome circles
          auto circleX = X + i * (circleradius + 5);
         
-        if (audioProcessor.metronome.getoneflag() == i)
+        if (audioProcessor.metronome.getoneflag() == i && ON)
         {
             
             if (audioProcessor.metronome.getbeatflag() != 1)
@@ -95,19 +95,17 @@ void MetroGnomeAudioProcessorEditor::paint (juce::Graphics& g)
             
             g.fillEllipse(circleX, Y, circleradius, circleradius);
             g.setColour(juce::Colours::orange);
+
             g.drawText(juce::String(audioProcessor.metronome.getbeatflag()), circleX, Y, circleradius, circleradius, juce::Justification::centred);
         }
         else 
         {
             g.setColour(juce::Colours::white);
             g.fillEllipse(circleX, Y, circleradius, circleradius);
-        }
-
-
-        
+        }      
  
     }
-    Y += 50;
+    Y += 100;
     circleradius = 10;
     X = responseArea.getX();
     int subdivisions = audioProcessor.metronome.getSubdivisions();
@@ -126,20 +124,13 @@ void MetroGnomeAudioProcessorEditor::paint (juce::Graphics& g)
             g.fillRect(X+circleradius-3 , Y-circleradius-3, linewidth, circleradius*2);
 
 
-            if (audioProcessor.metronome.getbeatflag() == i)
+            if (audioProcessor.metronome.getbeatflag() == i &&  ON)
             {
                 g.setColour(juce::Colours::orange);
 
             }
-
-
             g.fillEllipse(X, Y, circleradius, circleradius);
             // g.fillEllipse(X + (5 * circleradius), Y, circleradius, circleradius);
-            
-            
-
-
-
         }
     }
 
@@ -151,8 +142,6 @@ void MetroGnomeAudioProcessorEditor::resized()
     // subcomponents in your editor..
 
     juce::Rectangle<int> bounds = getLocalBounds();
-
-
     juce::Rectangle<int> playBounds(100, 100);
     playBounds.removeFromTop(50);
     playBounds.removeFromRight(50);
@@ -161,18 +150,10 @@ void MetroGnomeAudioProcessorEditor::resized()
     flexBox.performLayout(playBounds);
 
     auto responseArea = bounds.removeFromTop(bounds.getHeight() * 0.66);
-    /*
-    
-    visualizer goes here
-    */
-
     bounds.removeFromTop(5);
-
 
     auto lowCutArea = bounds.removeFromLeft(bounds.getWidth() * 0.33);
     auto highCutArea = bounds.removeFromRight(bounds.getWidth() * 0.5);
-
-
 
     bpmSlider.setBounds(lowCutArea);
 
@@ -180,13 +161,6 @@ void MetroGnomeAudioProcessorEditor::resized()
     //every time we remove from bounds, the area of bounds changes 
     //first we remove 1/3 * 1 unit area, then we remove 0.5 * 2/3rd unit area
     numeratorSlider.setBounds(bounds);
-
-
-    
-
-    
-    
-
 }
 
 void MetroGnomeAudioProcessorEditor::play()
@@ -198,6 +172,7 @@ void MetroGnomeAudioProcessorEditor::play()
         audioProcessor.metronome.resetall();
     }
     else {
+        audioProcessor.metronome.resetall();
         audioProcessor.apvts.getRawParameterValue("ON/OFF")->store(true);
     }
 }

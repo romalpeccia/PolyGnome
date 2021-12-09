@@ -37,21 +37,12 @@ private:
     MetroGnomeAudioProcessor& audioProcessor;
     //TimeVisualizerComponent timeVisualizer;
 
-
-
-
     juce::Image logo;
-
-
     juce::TextButton playButton{ "Start" };
-
-
-    using Attachment = juce::AudioProcessorValueTreeState::SliderAttachment;
-    //juce::Slider 
+    //Sliders
     RotarySliderWithLabels    bpmSlider, subdivisionSlider, numeratorSlider;
     //juce::ComboBox timeSignatureBox;
-
-    Attachment bpmAttachment, subdivisionAttachment, numeratorAttachment;
+    juce::AudioProcessorValueTreeState::SliderAttachment bpmAttachment, subdivisionAttachment, numeratorAttachment;
 
     std::vector<juce::Component*> getComps();
 

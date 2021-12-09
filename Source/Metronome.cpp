@@ -70,12 +70,16 @@ void Metronome::prepareToPlay(double _sampleRate, int samplesPerBlock)
 
 void Metronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer)
 {
-
-    //TODO cache calculations for less processing?
-    
+ //TODO cache calculations for less processing
+   
     resetparams();
+
+    //TODO fix bug instead of this bandaid for sync issues
+    if (beatflag > subdivisions)
+        beatflag = subdivisions;
+
     //temp wrapper because <juce::AudioFormatReaderSource>->getNextAudioBlock expects an AudioSourceChannelInfoObject
-    auto temp = juce::AudioSourceChannelInfo(buffer);
+    auto audiosourcechannelinfo = juce::AudioSourceChannelInfo(buffer);
 
     auto bufferSize = buffer.getNumSamples();
 
@@ -93,7 +97,7 @@ void Metronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer)
         { //TODO this loop seems weird, why is it a loop? double check tutorial
             if (samplenum == timeToStartPlaying)
             {
-                rimShotSub->getNextAudioBlock(temp);
+                rimShotSub->getNextAudioBlock(audiosourcechannelinfo);
             }
         }
         beatflag += 1;
@@ -110,7 +114,7 @@ void Metronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer)
             {
                 if (samplenum == timeToStartPlaying)
                 {
-                    rimShotHigh->getNextAudioBlock(temp);
+                    rimShotHigh->getNextAudioBlock(audiosourcechannelinfo);
                 }
             }
             oneflag = 1; 
@@ -124,7 +128,7 @@ void Metronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer)
             {
                 if (samplenum == timeToStartPlaying)
                 {
-                    rimShotLow->getNextAudioBlock(temp);
+                    rimShotLow->getNextAudioBlock(audiosourcechannelinfo);
                 }
             }
             oneflag += 1;
