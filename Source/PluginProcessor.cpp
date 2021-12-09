@@ -28,6 +28,98 @@ MetroGnomeAudioProcessor::~MetroGnomeAudioProcessor()
 {
 }
 
+
+void MetroGnomeAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
+{
+    // Use this method as the place to do any pre-playback
+    // initialisation that you need..
+    metronome.prepareToPlay(sampleRate, samplesPerBlock);
+}
+
+void MetroGnomeAudioProcessor::releaseResources()
+{
+    // When playback stops, you can use this as an opportunity to free up any
+    // spare memory, etc.
+}
+
+
+void MetroGnomeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
+{
+    /*
+    auto totalNumInputChannels = getTotalNumInputChannels();
+    auto totalNumOutputChannels = getTotalNumOutputChannels();
+    */
+     
+    if (apvts.getRawParameterValue("ON/OFF")->load(); == true)
+    {
+        metronome.getNextAudioBlock(buffer);
+    }
+
+}
+
+
+juce::AudioProcessorValueTreeState::ParameterLayout MetroGnomeAudioProcessor::createParameterLayout() {
+    //initializes parameter layout for APVTS object to create params
+
+    juce::AudioProcessorValueTreeState::ParameterLayout layout;
+
+    //std::make_unique<juce::AudioParameterFloat>
+        //param name, display name, range, default value
+        //normalisableRange(low, high, stepsize, skew)
+            //skew factor handles the rate at which the slider changes over the range given
+
+    layout.add(std::make_unique<juce::AudioParameterBool>("ON/OFF", "On/Off", false));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("BPM", "bpm", juce::NormalisableRange<float>(1.f, 999.f, 0.1f, 0.25f), 120.f));
+    layout.add(std::make_unique<juce::AudioParameterInt>("SUBDIVISION", "Subdivision", 1, 7, 1));
+    layout.add(std::make_unique<juce::AudioParameterInt>("NUMERATOR", "Numerator", 1, 7, 4));
+
+    return layout;
+
+}
+
+
+
+
+juce::AudioProcessorEditor* MetroGnomeAudioProcessor::createEditor()
+{
+    //uncomment first return for generic sliders
+    //return new juce::GenericAudioProcessorEditor(*this);
+    return new MetroGnomeAudioProcessorEditor(*this);
+}
+
+//==============================================================================
+void MetroGnomeAudioProcessor::getStateInformation(juce::MemoryBlock& destData)
+{
+    // You should use this method to store your parameters in the memory block.
+    // You could do that either as raw data, or use the XML or ValueTree classes
+    // as intermediaries to make it easy to save and load complex data.
+
+    juce::MemoryOutputStream mos(destData, true);
+    apvts.state.writeToStream(mos);
+
+}
+void MetroGnomeAudioProcessor::setStateInformation(const void* data, int sizeInBytes)
+{
+    // You should use this method to restore your parameters from this memory block,
+    // whose contents will have been created by the getStateInformation() call.
+    auto tree = juce::ValueTree::readFromData(data, sizeInBytes);
+    if (tree.isValid()) {
+        apvts.replaceState(tree);
+    }
+}
+
+
+
+
+/*
+*
+
+all code below here is default JUCE code and has been untouched
+
+
+*/
+
+
 //==============================================================================
 const juce::String MetroGnomeAudioProcessor::getName() const
 {
@@ -91,18 +183,7 @@ void MetroGnomeAudioProcessor::changeProgramName (int index, const juce::String&
 }
 
 //==============================================================================
-void MetroGnomeAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
-{
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
-    metronome.prepareToPlay(sampleRate, samplesPerBlock);
-}
 
-void MetroGnomeAudioProcessor::releaseResources()
-{
-    // When playback stops, you can use this as an opportunity to free up any
-    // spare memory, etc.
-}
 
 #ifndef JucePlugin_PreferredChannelConfigurations
 bool MetroGnomeAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
@@ -130,23 +211,6 @@ bool MetroGnomeAudioProcessor::isBusesLayoutSupported (const BusesLayout& layout
 }
 #endif
 
-void MetroGnomeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
-{
-
-    auto totalNumInputChannels  = getTotalNumInputChannels();
-    auto totalNumOutputChannels = getTotalNumOutputChannels();
-   // for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
-   //     buffer.clear (i, 0, buffer.getNumSamples());
-
-
-
-    bool playState = apvts.getRawParameterValue("ON/OFF")->load();
-    if (playState== true)
-    {
-        metronome.getNextAudioBlock (buffer);
-    }
-
-}
 
 //==============================================================================
 bool MetroGnomeAudioProcessor::hasEditor() const
@@ -154,34 +218,7 @@ bool MetroGnomeAudioProcessor::hasEditor() const
     return true; // (change this to false if you choose to not supply an editor)
 }
 
-juce::AudioProcessorEditor* MetroGnomeAudioProcessor::createEditor()
-{
-    //uncomment first return for generic sliders
-    //return new juce::GenericAudioProcessorEditor(*this);
-    return new MetroGnomeAudioProcessorEditor (*this);
-}
 
-//==============================================================================
-void MetroGnomeAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
-{
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
-
-    juce::MemoryOutputStream mos(destData, true);
-    apvts.state.writeToStream(mos);
-
-}
-
-void MetroGnomeAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
-{
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
-    auto tree = juce::ValueTree::readFromData(data, sizeInBytes);
-    if (tree.isValid()) {
-        apvts.replaceState(tree);
-    }
-}
 
 //==============================================================================
 // This creates new instances of the plugin..
@@ -190,23 +227,3 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
     return new MetroGnomeAudioProcessor();
 }
 
-juce::AudioProcessorValueTreeState::ParameterLayout MetroGnomeAudioProcessor::createParameterLayout() {
-    //initializes parameter layout
-
-    juce::AudioProcessorValueTreeState::ParameterLayout layout;
-
-    //std::make_unique<juce::AudioParameterFloat>
-    //param name, display name, range, default value
-    //normalisableRange(low, high, stepsize, skew)
-    //skew factor handles the rate at which the slider changes over the range given
-
-    layout.add(std::make_unique<juce::AudioParameterBool>("ON/OFF", "On/Off", false));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("BPM", "bpm", juce::NormalisableRange<float>(1.f, 999.f, 0.1f, 0.25f), 120.f));
-    layout.add(std::make_unique<juce::AudioParameterInt>("SUBDIVISION", "Subdivision", 1, 7, 1));
-
-
-    layout.add(std::make_unique<juce::AudioParameterInt>("NUMERATOR", "Numerator", 1, 7, 4));
-
-    return layout;
-
-}

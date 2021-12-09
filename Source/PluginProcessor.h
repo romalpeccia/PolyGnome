@@ -57,10 +57,11 @@ public:
 
 
 
+
+    //==============================================================================
+    //non default processor code
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
     juce::AudioProcessorValueTreeState apvts{ *this, nullptr, "Parameters", createParameterLayout() };
-
-
     Metronome metronome{ &apvts };
 private:
 
