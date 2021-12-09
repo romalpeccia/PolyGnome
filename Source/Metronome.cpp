@@ -17,72 +17,64 @@ Metronome::Metronome()
 
 Metronome::Metronome(juce::AudioProcessorValueTreeState* _apvts)
 {
-
     apvts = _apvts;  
     resetall();
-    //load up click file
-    //TODO multiple files
-        formatManager.registerBasicFormats();
-        /*
-        juce::String workingDir, fileDir;
-        workingDir = juce::File::getCurrentWorkingDirectory().getFullPathName();
-        
-        fileDir = workingDir + "/Samples/rimshot.wav"; 
-        juce::File clickFile(fileDir);
-        */
+    formatManager.registerBasicFormats();
 
-        //TODO don't hardcode this filepath
-        //TODO write file loader
-        juce::File clickFile("C:/Users/Romal/Desktop/JUCE_PROJECTS/MetroGnome/Samples/rimshot_low.wav");
-        jassert(clickFile.exists());
-        auto formatReader = formatManager.createReaderFor(clickFile);
-        rimShotLow.reset(new juce::AudioFormatReaderSource(formatReader, true));
+
+    //TODO figure out how to use relative paths in JUCE
+    juce::File clickFile("C:/Users/Romal/Desktop/JUCE_PROJECTS/MetroGnome/Samples/rimshot_low.wav");
+    jassert(clickFile.exists());
+    auto formatReader = formatManager.createReaderFor(clickFile);
+    rimShotLow.reset(new juce::AudioFormatReaderSource(formatReader, true));
 
         
-        juce::File clickFile2("C:/Users/Romal/Desktop/JUCE_PROJECTS/MetroGnome/Samples/rimshot_high.wav");
-        jassert(clickFile2.exists());
-        auto formatReader2 = formatManager.createReaderFor(clickFile2);
-        rimShotHigh.reset(new juce::AudioFormatReaderSource(formatReader2, true));
+    juce::File clickFile2("C:/Users/Romal/Desktop/JUCE_PROJECTS/MetroGnome/Samples/rimshot_high.wav");
+    jassert(clickFile2.exists());
+    auto formatReader2 = formatManager.createReaderFor(clickFile2);
+    rimShotHigh.reset(new juce::AudioFormatReaderSource(formatReader2, true));
 
-        juce::File clickFile3("C:/Users/Romal/Desktop/JUCE_PROJECTS/MetroGnome/Samples/rimshot_sub.wav");
-        jassert(clickFile3.exists());
-        auto formatReader3 = formatManager.createReaderFor(clickFile3);
-        rimShotSub.reset(new juce::AudioFormatReaderSource(formatReader3, true));
+    juce::File clickFile3("C:/Users/Romal/Desktop/JUCE_PROJECTS/MetroGnome/Samples/rimshot_sub.wav");
+    jassert(clickFile3.exists());
+    auto formatReader3 = formatManager.createReaderFor(clickFile3);
+    rimShotSub.reset(new juce::AudioFormatReaderSource(formatReader3, true));
         
-    //end load up click file
 }
 
 
 void Metronome::prepareToPlay(double _sampleRate, int samplesPerBlock)
-//preparetoplay should call every time we start (right before)
 {
+//preparetoplay should call every time we start (right before)
 
-    sampleRate = _sampleRate;
     resetparams();
 
-    if (rimShotLow != nullptr)
+    if (sampleRate != _sampleRate)
     {
-        rimShotLow->prepareToPlay(samplesPerBlock, sampleRate);
-       // DBG("file loaded");
+        //if the audioprocessors samplerate hasn't changed, nothing else needs to be done
+        sampleRate = _sampleRate;
+        if (rimShotLow != nullptr)
+        {
+            rimShotLow->prepareToPlay(samplesPerBlock, sampleRate);
+        }
+        if (rimShotHigh != nullptr)
+        {
+            rimShotHigh->prepareToPlay(samplesPerBlock, sampleRate);
+        }
+        if (rimShotSub != nullptr)
+        {
+            rimShotSub->prepareToPlay(samplesPerBlock, sampleRate);
+        }
     }
-    if (rimShotHigh != nullptr)
-    {
-        rimShotHigh->prepareToPlay(samplesPerBlock, sampleRate);
-    }
-    if (rimShotSub != nullptr)
-    {
-        rimShotSub->prepareToPlay(samplesPerBlock, sampleRate);
-    }
-
 
 }
 
 void Metronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer)
 {
-    //TODO fix this entire function, seems hacky 
+
     //TODO cache calculations for less processing?
-    //temp because <juce::AudioFormatReaderSource>->getNextAudioBlock expects an AudioSourceChannelInfoObject
+    
     resetparams();
+    //temp wrapper because <juce::AudioFormatReaderSource>->getNextAudioBlock expects an AudioSourceChannelInfoObject
     auto temp = juce::AudioSourceChannelInfo(buffer);
 
     auto bufferSize = buffer.getNumSamples();
@@ -94,56 +86,56 @@ void Metronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer)
     
      if (subdivisions > 1 && subSamplesProcessed + bufferSize >= subInterval && beatflag != subdivisions)
      {// subdivision logic
-         const auto timeToStartPlaying = subInterval - subSamplesProcessed;
-         DBG("SUB" << beatflag);
-             rimShotSub->setNextReadPosition(0); //reset sample to beginning
-             for (auto samplenum = 0; samplenum < bufferSize + 1; samplenum++)
-             {
-                 if (samplenum == timeToStartPlaying)
-                 {
-                     rimShotSub->getNextAudioBlock(temp);
-                 }
-             }
-             beatflag += 1;
+        const auto timeToStartPlaying = subInterval - subSamplesProcessed;
+        DBG("SUB" << beatflag);
+        rimShotSub->setNextReadPosition(0); //reset sample to beginning
+        for (auto samplenum = 0; samplenum < bufferSize + 1; samplenum++)
+        { //TODO this loop seems weird, why is it a loop? double check tutorial
+            if (samplenum == timeToStartPlaying)
+            {
+                rimShotSub->getNextAudioBlock(temp);
+            }
+        }
+        beatflag += 1;
      }
-
-
      else if (samplesProcessed + bufferSize >= beatInterval)
      { 
-         const auto timeToStartPlaying = beatInterval - samplesProcessed;
-         if (oneflag >= numerator) //check if its the first beat of the bar
-         {//first beat logic
-             DBG("HIGH");
-             rimShotHigh->setNextReadPosition(0); //reset sample to beginning
-             for (auto samplenum = 0; samplenum < bufferSize + 1; samplenum++)
-             {
-                 if (samplenum == timeToStartPlaying)
-                 {
-                     rimShotHigh->getNextAudioBlock(temp);
-                 }
-             }
-             oneflag = 1;
-         }
-         else 
-         {
-             //regular beat logic
-             DBG("LOW");
-             rimShotLow->setNextReadPosition(0); //reset sample to beginning
-             for (auto samplenum = 0; samplenum < bufferSize + 1; samplenum++)
-             {
-                 if (samplenum == timeToStartPlaying)
-                 {
-                     rimShotLow->getNextAudioBlock(temp);
-                 }
-             }
-             oneflag += 1;
-             //non-one main beat
-         }
-         beatflag = 1;
-     }
+        const auto timeToStartPlaying = beatInterval - samplesProcessed;
+        if (oneflag >= numerator) //check if its the first beat of the bar
+        {
+            //first beat logic
+            DBG("HIGH");
+            rimShotHigh->setNextReadPosition(0); //reset sample to beginning
+            for (auto samplenum = 0; samplenum < bufferSize + 1; samplenum++)
+            {
+                if (samplenum == timeToStartPlaying)
+                {
+                    rimShotHigh->getNextAudioBlock(temp);
+                }
+            }
+            oneflag = 1; 
+        }
+        else 
+        {
+            //regular beat logic
+            DBG("LOW");
+            rimShotLow->setNextReadPosition(0); //reset sample to beginning
+            for (auto samplenum = 0; samplenum < bufferSize + 1; samplenum++)
+            {
+                if (samplenum == timeToStartPlaying)
+                {
+                    rimShotLow->getNextAudioBlock(temp);
+                }
+            }
+            oneflag += 1;
+            //non-one main beat
+        }
+        beatflag = 1;
+    }
 
 
- /*
+ /* if the read pointer is not 0, reading was interupted for some reason
+ 
  if (rimShotHigh->getNextReadPosition() != 0)
  {
      rimShotHigh->getNextAudioBlock(temp);
@@ -152,7 +144,6 @@ void Metronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer)
  else if (rimShotLow->getNextReadPosition() != 0)          
     {
         rimShotLow->getNextAudioBlock(temp);
-
     }
     */
  
@@ -161,14 +152,9 @@ void Metronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer)
 
 
 void Metronome::resetall() 
-{
-    numerator = apvts->getRawParameterValue("NUMERATOR")->load();
-    subdivisions = apvts->getRawParameterValue("SUBDIVISION")->load();
-    bpm = apvts->getRawParameterValue("BPM")->load();
+{   //this should be called whenever the metronome is stopped
+    resetparams();
     totalSamples = 0;
-    beatInterval = (60.0 / bpm) * sampleRate;
-    subInterval = beatInterval / subdivisions;
-
     oneflag = numerator;
     beatflag = subdivisions;
 }
@@ -177,16 +163,12 @@ void Metronome::resetall()
 
 
 void Metronome::resetparams()
-{
+{  //this should be called whenever the processor changes a parameter (which should only happen when the user interacts with the GUI)
     numerator = apvts->getRawParameterValue("NUMERATOR")->load();
     subdivisions = apvts->getRawParameterValue("SUBDIVISION")->load();
     bpm = apvts->getRawParameterValue("BPM")->load();
     beatInterval = (60.0 / bpm) * sampleRate;
     subInterval = beatInterval / subdivisions;
-
-    //oneflag = numerator;
-    //beatflag = subdivisions;
-
 
 }
 
