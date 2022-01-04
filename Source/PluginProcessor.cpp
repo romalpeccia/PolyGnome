@@ -49,8 +49,9 @@ void MetroGnomeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
     auto totalNumInputChannels = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
     */
-     
-    if (apvts.getRawParameterValue("ON/OFF")->load() == true)
+    auto mode = apvts.getRawParameterValue("MODE")->load();
+
+    if (apvts.getRawParameterValue("ON/OFF")->load() == true && mode == 0)
     {
         metronome.getNextAudioBlock(buffer);
     }
@@ -72,6 +73,15 @@ juce::AudioProcessorValueTreeState::ParameterLayout MetroGnomeAudioProcessor::cr
     layout.add(std::make_unique<juce::AudioParameterFloat>("BPM", "bpm", juce::NormalisableRange<float>(1.f, 999.f, 0.1f, 0.25f), 120.f));
     layout.add(std::make_unique<juce::AudioParameterInt>("SUBDIVISION", "Subdivision", 1, 7, 1));
     layout.add(std::make_unique<juce::AudioParameterInt>("NUMERATOR", "Numerator", 1, 7, 4));
+
+
+    juce::StringArray stringArray;
+    stringArray.add("Default");
+    stringArray.add("Polyrhythm");
+    stringArray.add("Polymeter");
+    layout.add(std::make_unique<juce::AudioParameterChoice>("MODE", "Mode", stringArray, 0));
+
+
 
     return layout;
 

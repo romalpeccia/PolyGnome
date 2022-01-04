@@ -68,6 +68,66 @@ void Metronome::prepareToPlay(double _sampleRate, int samplesPerBlock)
 
 }
 
+
+enum Event
+{
+    One_Event,
+    Beat_Event,
+    Sub_Event
+
+};
+/* 
+* might use this after finalizing the logic in getNextAudioBlock
+
+void Metronome::audioEvent(juce::AudioBuffer<float>& buffer, Event eventType)
+{   
+
+
+     auto audiosourcechannelinfo = juce::AudioSourceChannelInfo(buffer);
+     auto bufferSize = buffer.getNumSamples();
+
+     if (eventType == Event::Sub_Event)
+     {
+         const auto timeToStartPlaying = subInterval - subSamplesProcessed;
+         DBG("SUB" << beatflag);
+         rimShotSub->setNextReadPosition(0); //reset sample to beginning
+         for (auto samplenum = 0; samplenum < bufferSize + 1; samplenum++)
+         { //TODO this loop seems weird, why is it a loop? double check tutorial
+             if (samplenum == timeToStartPlaying)
+             {
+                 rimShotSub->getNextAudioBlock(audiosourcechannelinfo);
+             }
+         }
+     }
+     else if (eventType == Event::Beat_Event)
+     {
+         const auto timeToStartPlaying = beatInterval - samplesProcessed;
+         //regular beat logic
+         DBG("LOW");
+         rimShotLow->setNextReadPosition(0); //reset sample to beginning
+         for (auto samplenum = 0; samplenum < bufferSize + 1; samplenum++)
+         {
+             if (samplenum == timeToStartPlaying)
+             {
+                 rimShotLow->getNextAudioBlock(audiosourcechannelinfo);
+             }
+         }
+     }
+     else if (eventType == Event::One_Event)
+     {
+         const auto timeToStartPlaying = beatInterval - samplesProcessed;
+         DBG("HIGH");
+         rimShotHigh->setNextReadPosition(0); //reset sample to beginning
+         for (auto samplenum = 0; samplenum < bufferSize + 1; samplenum++)
+         {
+             if (samplenum == timeToStartPlaying)
+             {
+                 rimShotHigh->getNextAudioBlock(audiosourcechannelinfo);
+             }
+         }
+     }
+}
+*/
 void Metronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer)
 {
  //TODO cache calculations for less processing
@@ -85,7 +145,7 @@ void Metronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer)
 
     totalSamples += bufferSize;
     samplesProcessed = totalSamples % beatInterval;
-    auto subSamplesProcessed = totalSamples % subInterval;
+    subSamplesProcessed = totalSamples % subInterval;
 
     
      if (subdivisions > 1 && subSamplesProcessed + bufferSize >= subInterval && beatflag != subdivisions)

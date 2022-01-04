@@ -23,6 +23,8 @@ public:
 
     //==============================================================================
     void paint (juce::Graphics&) override;
+    void paintDefaultMode(juce::Graphics&);
+
     void resized() override;
     void timerCallback() override {
         repaint();
@@ -32,13 +34,17 @@ public:
 
 
 private:
-    // This reference is provided as a quick way for your editor to
-    // access the processor object that created it.
     MetroGnomeAudioProcessor& audioProcessor;
     //TimeVisualizerComponent timeVisualizer;
 
+    //persistent comps
     juce::Image logo;
     juce::TextButton playButton{ "Start" };
+    juce::TextButton defaultModeButton{ "Default" };
+    juce::TextButton polyRModeButton{ "PolyRhythm" };
+    juce::TextButton polyMModeButton{ "PolyMeter" };
+    juce::TextButton placeholderButton{ "Placeholder" };
+
     //Sliders
     RotarySliderWithLabels    bpmSlider, subdivisionSlider, numeratorSlider;
     //juce::ComboBox timeSignatureBox;
