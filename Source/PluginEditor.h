@@ -24,6 +24,10 @@ public:
     //==============================================================================
     void paint (juce::Graphics&) override;
     void paintDefaultMode(juce::Graphics&);
+    void paintPolyRMode(juce::Graphics&);
+
+
+    juce::Rectangle<int> getVisualArea();
 
     void resized() override;
     void timerCallback() override {

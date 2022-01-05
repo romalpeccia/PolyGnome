@@ -33,13 +33,15 @@ MetroGnomeAudioProcessorEditor::MetroGnomeAudioProcessorEditor (MetroGnomeAudioP
     playButton.onClick = [this]() { play(); }; 
     defaultModeButton.onClick = [this]() { 
         audioProcessor.apvts.getRawParameterValue("MODE")->store(0);
-
+        play();
     };    
     polyRModeButton.onClick = [this]() { 
         audioProcessor.apvts.getRawParameterValue("MODE")->store(1);
+        play();
     };    
     polyMModeButton.onClick = [this]() { 
         audioProcessor.apvts.getRawParameterValue("MODE")->store(2);
+        play();
     };
 
     for (auto* comp : getComps())
@@ -70,8 +72,8 @@ void MetroGnomeAudioProcessorEditor::paint (juce::Graphics& g)
         paintDefaultMode(g);
     }
     else if (mode == 1) {
-       // paintDefaultMode(g);
-        ;
+       paintPolyRMode(g);
+        
     }
     else if (mode == 2) {
       //  paintDefaultMode(g);
@@ -80,27 +82,103 @@ void MetroGnomeAudioProcessorEditor::paint (juce::Graphics& g)
 
 }
 
+juce::Rectangle<int> MetroGnomeAudioProcessorEditor::getVisualArea()
+{
+    auto bounds = getLocalBounds();
+    //visual area consists of middle third of top third of area (9 quadrants)
+    auto visualArea = bounds.removeFromTop(bounds.getHeight() * 0.66);
+    visualArea.removeFromLeft(visualArea.getWidth() * 0.33);
+    visualArea.removeFromRight(visualArea.getWidth() * 0.5);
+    return visualArea;
+}
+
+void MetroGnomeAudioProcessorEditor::paintPolyRMode(juce::Graphics& g)
+{
+    auto visualArea = getVisualArea();
+    //uncomment for debugging purposes    
+    g.setColour(juce::Colours::white);
+    //g.drawRect(visualArea);
+
+    int width = visualArea.getWidth();
+    int height = visualArea.getHeight();
+    int circleSkew = 1.2; //TODO adjust this using JUCE_LIVE_CONSTANT
+    int radius = ((width > height) ? height : width)/circleSkew;
+    //take the lesser of height and width to be our circle diameter
+    int X = visualArea.getX();
+    int Y = visualArea.getY();
+
+
+
+
+
+    //TODO maybe? make seperate sliders and variables instead of reusing the ones from the metronome
+    int innerBeats = audioProcessor.apvts.getRawParameterValue("SUBDIVISION")->load();
+    int outerBeats = audioProcessor.apvts.getRawParameterValue("NUMERATOR")->load();
+    auto ON = audioProcessor.apvts.getRawParameterValue("ON/OFF")->load();
+    int pointDiameter = 10;
+    //TODO: make these inner and outer beat logic into functions?
+    if (outerBeats!= 1)
+    {
+        juce::Path outerCircle;
+        int outerRadius = radius / 1;
+        int Xoffset = (width -  outerRadius)/2;
+        int Yoffset = (height -  outerRadius)/2;
+        outerCircle.addEllipse(X + Xoffset, Y + Yoffset, outerRadius, outerRadius);
+        g.setColour(juce::Colours::white);
+        g.strokePath(outerCircle, juce::PathStrokeType(2.0f));
+
+
+        float outerLength = outerCircle.getLength();
+        for (float i = 0; i < outerBeats; i++)
+        {
+            //iterate through points and draw a circle
+            g.setColour(juce::Colours::orange);
+            float temp = (i / outerBeats) * outerLength;
+            auto point = outerCircle.getPointAlongPath(temp );
+            g.fillEllipse(point.getX(), point.getY(), pointDiameter, pointDiameter);
+        }
+
+    }
+    if (innerBeats != 1)
+    {
+        juce::Path innerCircle;
+        int innerRadius = radius / 1.5;
+        int Xoffset = (width - innerRadius) / 2;
+        int Yoffset = (height - innerRadius) / 2;
+        innerCircle.addEllipse(X + Xoffset, Y + Yoffset, innerRadius, innerRadius);
+        g.setColour(juce::Colours::orange);
+        g.strokePath(innerCircle, juce::PathStrokeType(2.0f));
+
+        float innerLength = innerCircle.getLength();
+        for (float i = 0; i < innerBeats; i++)
+        {
+            //iterate through points and draw a circle
+            g.setColour(juce::Colours::white);
+            float temp = (i / innerBeats) * innerLength;
+    
+            auto point = innerCircle.getPointAlongPath(temp);
+            g.fillEllipse(point.getX(), point.getY(), pointDiameter, pointDiameter);
+        }
+
+    }
+}
+
+
+
 void MetroGnomeAudioProcessorEditor::paintDefaultMode(juce::Graphics& g) {
 
 
-    auto bounds = getLocalBounds();
-    //response area consists of middle third of top third of area (9 quadrants)
-    auto responseArea = bounds.removeFromTop(bounds.getHeight() * 0.66);
-    responseArea.removeFromLeft(responseArea.getWidth() * 0.33);
-    responseArea.removeFromRight(responseArea.getWidth() * 0.5);
-
-
-    g.setColour(juce::Colours::white);
-
-
+    auto visualArea = getVisualArea();
     //uncomment for debugging purposes
-    g.drawRect(responseArea);
+    //g.setColour(juce::Colours::white);
+    //g.drawRect(visualArea);
 
 
     int circleradius = 30;
-    auto Y = responseArea.getCentreY();
-    auto X = responseArea.getX();
+    auto Y = visualArea.getCentreY();
+    auto X = visualArea.getX();
     auto ON = audioProcessor.apvts.getRawParameterValue("ON/OFF")->load();
+
     for (int i = 1; i <= audioProcessor.metronome.getNumerator(); i++) {
         //loop to draw metronome circles
         auto circleX = X + i * (circleradius + 5);
@@ -129,9 +207,10 @@ void MetroGnomeAudioProcessorEditor::paintDefaultMode(juce::Graphics& g) {
         }
 
     }
+
     Y += 100;
     circleradius = 10;
-    X = responseArea.getX();
+    X = visualArea.getX();
     int subdivisions = audioProcessor.metronome.getSubdivisions();
     int linewidth = 2;
 
@@ -162,8 +241,6 @@ void MetroGnomeAudioProcessorEditor::paintDefaultMode(juce::Graphics& g) {
             // g.fillEllipse(X + (5 * circleradius), Y, circleradius, circleradius);
         }
     }
-
-
 }
 
 
@@ -182,10 +259,15 @@ void MetroGnomeAudioProcessorEditor::resized()
     flexBox.items.add(juce::FlexItem(75, 50, defaultModeButton));
     flexBox.items.add(juce::FlexItem(100, 50, polyRModeButton));
     flexBox.items.add(juce::FlexItem(125, 50, polyMModeButton));
-    flexBox.items.add(juce::FlexItem(150, 50, placeholderButton));
+    //flexBox.items.add(juce::FlexItem(150, 50, placeholderButton));
     flexBox.performLayout(playBounds);
 
-    auto responseArea = bounds.removeFromTop(bounds.getHeight() * 0.66);
+
+
+    auto visualArea = bounds.removeFromTop(bounds.getHeight() * 0.66);
+    //unused variable but cuts away space used by the visual area from bounds, may be used later
+
+
     bounds.removeFromTop(5);
 
     //every time we remove from bounds, the area of bounds changes 
