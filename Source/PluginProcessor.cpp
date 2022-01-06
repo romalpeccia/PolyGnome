@@ -34,6 +34,7 @@ void MetroGnomeAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBl
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
     metronome.prepareToPlay(sampleRate, samplesPerBlock);
+    polyRmetronome.prepareToPlay(sampleRate, samplesPerBlock);
 }
 
 void MetroGnomeAudioProcessor::releaseResources()
@@ -55,7 +56,10 @@ void MetroGnomeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
     {
         metronome.getNextAudioBlock(buffer);
     }
-
+    else if (apvts.getRawParameterValue("ON/OFF")->load() == true && mode == 1)
+    {
+        polyRmetronome.getNextAudioBlock(buffer);
+    }
 }
 
 

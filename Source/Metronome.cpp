@@ -69,6 +69,10 @@ void Metronome::prepareToPlay(double _sampleRate, int samplesPerBlock)
 }
 
 
+
+/* 
+* might use this after finalizing the logic in getNextAudioBlock
+
 enum Event
 {
     One_Event,
@@ -76,9 +80,6 @@ enum Event
     Sub_Event
 
 };
-/* 
-* might use this after finalizing the logic in getNextAudioBlock
-
 void Metronome::audioEvent(juce::AudioBuffer<float>& buffer, Event eventType)
 {   
 
@@ -140,9 +141,7 @@ void Metronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer)
 
     //temp wrapper because <juce::AudioFormatReaderSource>->getNextAudioBlock expects an AudioSourceChannelInfoObject
     auto audiosourcechannelinfo = juce::AudioSourceChannelInfo(buffer);
-
     auto bufferSize = buffer.getNumSamples();
-
     totalSamples += bufferSize;
     samplesProcessed = totalSamples % beatInterval;
     subSamplesProcessed = totalSamples % subInterval;
@@ -224,8 +223,6 @@ void Metronome::resetall()
 }
 
 
-
-
 void Metronome::resetparams()
 {  //this should be called whenever the processor changes a parameter (which should only happen when the user interacts with the GUI)
     numerator = apvts->getRawParameterValue("NUMERATOR")->load();
@@ -235,4 +232,3 @@ void Metronome::resetparams()
     subInterval = beatInterval / subdivisions;
 
 }
-
