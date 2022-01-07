@@ -220,6 +220,8 @@ void Metronome::resetall()
     totalSamples = 0;
     oneflag = numerator;
     beatflag = subdivisions;
+    samplesProcessed = 0;
+    subSamplesProcessed = 0;
 }
 
 

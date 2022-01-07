@@ -69,14 +69,16 @@ void PolyRhythmMetronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer)
     if (rhythm1Counter >= numerator)
     {
         rhythm1Counter = 0;
+        totalSamples = 0;
     }
     if (rhythm2Counter >= subdivisions)
     {
         rhythm2Counter = 0;
+        totalSamples = 0;
     }
 
     //TODO make this if statement less ugly
-    if ( ((beatflag && subflag )||(rhythm1Counter == 0 && rhythm2Counter == 0)) && numerator > 1 && subdivisions > 1)
+    if ( ((beatflag && subflag )) && numerator > 1 && subdivisions > 1)
     { //edge case, both beats hit at the same time , play a unique tick for that 
         const auto timeToStartPlaying = beatInterval - samplesProcessed;
         DBG("HIGH");
@@ -129,6 +131,8 @@ void PolyRhythmMetronome::resetall()
     totalSamples = 0;
     rhythm1Counter = 0;
     rhythm2Counter = 0;
+    samplesProcessed = 0;
+    subSamplesProcessed = 0;
 }
 
 

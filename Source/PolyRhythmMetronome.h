@@ -27,7 +27,7 @@ public:
     void resetparams();
     int getRhythm1Counter() { return rhythm1Counter; }
     int getRhythm2Counter() { return rhythm2Counter; }
-
+    int getTotalSamples() { return totalSamples; }
 private:
     //note: inherited variables from Metronome class are being used for other purposes, perhaps refactor them later on
     // subdivisions represent the 2nd rhythm for the purposes of this class

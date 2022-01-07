@@ -139,9 +139,8 @@ void MetroGnomeAudioProcessorEditor::paintPolyRMode(juce::Graphics& g)
         }
 
         //draw the clock hand
-        float angle = juce::degreesToRadians(360 * (float(audioProcessor.polyRmetronome.getRhythm1Counter()) / float(outerBeats)) - 180);
-            //*(audioProcessor.polyRmetronome.getSamplesProcessed() / audioProcessor.getSampleRate()));
-        //angle = juce::jmap(angle, 0.f, 1.f, juce::degreesToRadians(0), juce::degreesToRadians(360));
+        float angle = juce::degreesToRadians(360 * (float(audioProcessor.polyRmetronome.getRhythm1Counter()) / float(outerBeats)) + 180);
+       // float angle = juce::degreesToRadians(360 * ((audioProcessor.polyRmetronome.getSamplesProcessed() / audioProcessor.getSampleRate())) - 180);
 
         juce::Point<int> center(X + outerRadius/2, Y + (height - Xoffset) / 2);
         //radius is just outerRadius from before
@@ -152,11 +151,12 @@ void MetroGnomeAudioProcessorEditor::paintPolyRMode(juce::Graphics& g)
         r.setTop(center.getY());
         r.setBottom(center.getY() + outerRadius/2);
         p.addRoundedRectangle(r, 2.f);
-        p.applyTransform(juce::AffineTransform().rotated(angle, center.getX(), center.getY()));
+        p.applyTransform(juce::AffineTransform().rotation(angle, center.getX(), center.getY()));
         g.fillPath(p);
 
-        DBG(juce::radiansToDegrees(angle));
+        // DBG(juce::radiansToDegrees(angle));
         g.drawText(juce::String(audioProcessor.polyRmetronome.getRhythm1Counter()), 5, 5, 310, 310, juce::Justification::centred);
+        g.drawText(juce::String(juce::radiansToDegrees(angle)), 5, 5, 350, 310, juce::Justification::centred);
     }
     if (innerBeats != 1)
     {
@@ -180,11 +180,15 @@ void MetroGnomeAudioProcessorEditor::paintPolyRMode(juce::Graphics& g)
         }
 
         //draw the clock hand
-        float angle = juce::degreesToRadians(360 * (float(audioProcessor.polyRmetronome.getRhythm2Counter()) / float(innerBeats)) -180 );
-        //*(audioProcessor.polyRmetronome.getSamplesProcessed() / audioProcessor.getSampleRate()));
-    //angle = juce::jmap(angle, 0.f, 1.f, juce::degreesToRadians(0), juce::degreesToRadians(360));
+        //float angle = juce::degreesToRadians(360 * (float(audioProcessor.polyRmetronome.getRhythm2Counter()) / float(innerBeats)) +180);
+        float angleRatio;
+       /* if (audioProcessor.polyRmetronome.subdivisions < audioProcessor.polyRmetronome.numerator)
+            angleRatio = audioProcessor.polyRmetronome.getSubSamplesProcessed() / audioProcessor.getSampleRate();
+        else*/
+            angleRatio = audioProcessor.polyRmetronome.getTotalSamples()
         
-
+                / audioProcessor.getSampleRate();
+        float angle = juce::degreesToRadians(360 * (angleRatio/2) - 180);
 
         juce::Point<int> center(X + Xoffset + innerRadius/2, Y + Yoffset + innerRadius / 2);
         //radius is just innerRadius from before
@@ -198,9 +202,10 @@ void MetroGnomeAudioProcessorEditor::paintPolyRMode(juce::Graphics& g)
         p.applyTransform(juce::AffineTransform().rotated(angle, center.getX(), center.getY()));
         g.fillPath(p);
 
-        //DBG(juce::radiansToDegrees(angle));
-        g.drawText(juce::String(audioProcessor.polyRmetronome.getRhythm2Counter()), 5, 5, 300,300, juce::Justification::centred);
-
+       // DBG(juce::radiansToDegrees(angle));
+        DBG(angleRatio);
+        g.drawText(juce::String(angleRatio), 5, 5, 300,300, juce::Justification::centred);
+        
     }
 }
 
