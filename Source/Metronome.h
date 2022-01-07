@@ -27,8 +27,8 @@ class Metronome
         int getBPM() { return bpm;}
         int getoneflag() { return oneflag;}
         int getbeatflag() {return beatflag;}
-
-
+        float getSamplesProcessed() { return samplesProcessed; }
+        float getSubSamplesProcessed() { return subSamplesProcessed; }
 
         /*
      sampleRate gives us the amount of samples (in our incoming audio buffers) per second
