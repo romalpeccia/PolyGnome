@@ -62,8 +62,8 @@ class Metronome
         double sampleRate = 0;
 
         //beat logic variables
-        int beatInterval = 0; //interval representing one beat click = (60.0 / bpm) * sampleRate
-        int samplesProcessed = 0; // samples processed before beat = totalSamples % interval
+        int beatInterval = 1; //interval representing one beat click = (60.0 / bpm) * sampleRate
+        int samplesProcessed = 1; // samples processed before beat = totalSamples % interval
         int oneflag = numerator;  //oneflag signals a first beat of bar when oneflag = numerator, +=1 every main beat, reset to 1 after a bar
 
         //subdivision logic variables

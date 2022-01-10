@@ -153,10 +153,6 @@ void MetroGnomeAudioProcessorEditor::paintPolyRMode(juce::Graphics& g)
         p.addRoundedRectangle(r, 2.f);
         p.applyTransform(juce::AffineTransform().rotation(angle, center.getX(), center.getY()));
         g.fillPath(p);
-
-        // DBG(juce::radiansToDegrees(angle));
-        g.drawText(juce::String(audioProcessor.polyRmetronome.getRhythm1Counter()), 5, 5, 310, 310, juce::Justification::centred);
-        g.drawText(juce::String(juce::radiansToDegrees(angle)), 5, 5, 350, 310, juce::Justification::centred);
     }
     if (innerBeats != 1)
     {
@@ -179,16 +175,22 @@ void MetroGnomeAudioProcessorEditor::paintPolyRMode(juce::Graphics& g)
             g.fillEllipse(point.getX(), point.getY(), pointDiameter, pointDiameter);
         }
 
-        //draw the clock hand
+        /* //clock angle experiments
         //float angle = juce::degreesToRadians(360 * (float(audioProcessor.polyRmetronome.getRhythm2Counter()) / float(innerBeats)) +180);
         float angleRatio;
-       /* if (audioProcessor.polyRmetronome.subdivisions < audioProcessor.polyRmetronome.numerator)
+        if (audioProcessor.polyRmetronome.subdivisions < audioProcessor.polyRmetronome.numerator)
             angleRatio = audioProcessor.polyRmetronome.getSubSamplesProcessed() / audioProcessor.getSampleRate();
-        else*/
+        else
             angleRatio = audioProcessor.polyRmetronome.getTotalSamples()
         
                 / audioProcessor.getSampleRate();
-        float angle = juce::degreesToRadians(360 * (angleRatio/2) - 180);
+
+        //float angle = juce::degreesToRadians(360 * (angleRatio) - 180);
+        */
+        
+        //draw the clock hand
+        float angle = juce::degreesToRadians(360 * (float(audioProcessor.polyRmetronome.getRhythm2Counter()) / float(innerBeats)) + 180);
+
 
         juce::Point<int> center(X + Xoffset + innerRadius/2, Y + Yoffset + innerRadius / 2);
         //radius is just innerRadius from before
@@ -200,12 +202,7 @@ void MetroGnomeAudioProcessorEditor::paintPolyRMode(juce::Graphics& g)
         r.setBottom(center.getY() + innerRadius / 2);
         p.addRoundedRectangle(r, 2.f);
         p.applyTransform(juce::AffineTransform().rotated(angle, center.getX(), center.getY()));
-        g.fillPath(p);
-
-       // DBG(juce::radiansToDegrees(angle));
-        DBG(angleRatio);
-        g.drawText(juce::String(angleRatio), 5, 5, 300,300, juce::Justification::centred);
-        
+        g.fillPath(p);      
     }
 }
 

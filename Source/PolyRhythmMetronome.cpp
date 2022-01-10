@@ -124,7 +124,7 @@ void PolyRhythmMetronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer)
     }
 
 }
-
+/*
 void PolyRhythmMetronome::resetall()
 {   //this should be called whenever the metronome is stopped
     resetparams();
@@ -143,6 +143,51 @@ void PolyRhythmMetronome::resetparams()
     bpm = apvts->getRawParameterValue("BPM")->load();
     beatInterval = 4* ((60.0 / bpm) * sampleRate)/numerator;
     subInterval = 4* ((60.0 / bpm) * sampleRate)/subdivisions;
+    ///TODO (maybe) assumes 4/4 time, maybe make time sig a parameter to advance this
+
+}
+*/
+
+
+void PolyRhythmMetronome::resetall()
+{   //this should be called whenever the metronome is stopped
+    resetparams();
+    totalSamples = 0;
+    rhythm1Counter = 0;
+    rhythm2Counter = 0;
+    samplesProcessed = 0;
+    subSamplesProcessed = 0;
+}
+
+
+void PolyRhythmMetronome::resetparams()
+{  //this should being called constantly, should do something when params change in UI to reflect changes in logic
+
+    int temp_numerator = apvts->getRawParameterValue("NUMERATOR")->load();
+    if (numerator != temp_numerator)
+    {
+        numerator = temp_numerator;
+        resetall();
+    }
+    int temp_subdivisions = apvts->getRawParameterValue("SUBDIVISION")->load();
+    if (subdivisions != temp_subdivisions)
+    {
+        subdivisions = temp_subdivisions;
+        resetall();
+    }
+    float temp_bpm = apvts->getRawParameterValue("BPM")->load();
+   /*
+    if (1)//(bpm != temp_bpm)
+    {
+        bpm = temp_bpm;
+        beatInterval = 4.f * ((60.f / bpm) * sampleRate) / float(numerator);
+        subInterval = 4.f * ((60.f / bpm) * sampleRate) / float(subdivisions);
+        resetall();
+    }*/
+
+    bpm = apvts->getRawParameterValue("BPM")->load();
+    beatInterval = 4 * ((60.0 / bpm) * sampleRate) / numerator;
+    subInterval = 4 * ((60.0 / bpm) * sampleRate) / subdivisions;
     ///TODO (maybe) assumes 4/4 time, maybe make time sig a parameter to advance this
 
 }
