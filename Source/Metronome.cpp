@@ -20,21 +20,21 @@ Metronome::Metronome(juce::AudioProcessorValueTreeState* _apvts)
     apvts = _apvts;  
     resetall();
     formatManager.registerBasicFormats();
-
+    auto sampleDir = "C:/Users/romal/OneDrive/Desktop/JUCE_PROJECTS/MetroGnome/Samples/";
 
     //TODO figure out how to use relative paths in JUCE
-    juce::File clickFile("C:/Users/Romal/Desktop/JUCE_PROJECTS/MetroGnome/Samples/rimshot_low.wav");
+    juce::File clickFile("C:/Users/romal/OneDrive/Desktop/JUCE_PROJECTS/MetroGnome/Samples/rimshot_low.wav");
     jassert(clickFile.exists());
     auto formatReader = formatManager.createReaderFor(clickFile);
     rimShotLow.reset(new juce::AudioFormatReaderSource(formatReader, true));
 
         
-    juce::File clickFile2("C:/Users/Romal/Desktop/JUCE_PROJECTS/MetroGnome/Samples/rimshot_high.wav");
+    juce::File clickFile2("C:/Users/romal/OneDrive/Desktop/JUCE_PROJECTS/MetroGnome/Samples/rimshot_high.wav");
     jassert(clickFile2.exists());
     auto formatReader2 = formatManager.createReaderFor(clickFile2);
     rimShotHigh.reset(new juce::AudioFormatReaderSource(formatReader2, true));
 
-    juce::File clickFile3("C:/Users/Romal/Desktop/JUCE_PROJECTS/MetroGnome/Samples/rimshot_sub.wav");
+    juce::File clickFile3("C:/Users/romal/OneDrive/Desktop/JUCE_PROJECTS/MetroGnome/Samples/rimshot_sub.wav");
     jassert(clickFile3.exists());
     auto formatReader3 = formatManager.createReaderFor(clickFile3);
     rimShotSub.reset(new juce::AudioFormatReaderSource(formatReader3, true));

@@ -258,7 +258,7 @@ void MetroGnomeAudioProcessorEditor::paintDefaultMode(juce::Graphics& g) {
     int linewidth = 2;
 
 
-    if (subdivisions != 1)
+    if (subdivisions > 0)
     {   //loop to draw subdivisions
         for (int i = 1; i <= subdivisions; i++)
         {
@@ -281,7 +281,6 @@ void MetroGnomeAudioProcessorEditor::paintDefaultMode(juce::Graphics& g) {
 
             }
             g.fillEllipse(X, Y, circleradius, circleradius);
-            // g.fillEllipse(X + (5 * circleradius), Y, circleradius, circleradius);
         }
     }
 }

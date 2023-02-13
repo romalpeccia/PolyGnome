@@ -75,8 +75,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout MetroGnomeAudioProcessor::cr
 
     layout.add(std::make_unique<juce::AudioParameterBool>("ON/OFF", "On/Off", false));
     layout.add(std::make_unique<juce::AudioParameterFloat>("BPM", "bpm", juce::NormalisableRange<float>(1.f, 999.f, 0.1f, 0.25f), 120.f));
-    layout.add(std::make_unique<juce::AudioParameterInt>("SUBDIVISION", "Subdivision", 1, 7, 1));
-    layout.add(std::make_unique<juce::AudioParameterInt>("NUMERATOR", "Numerator", 1, 7, 4));
+    layout.add(std::make_unique<juce::AudioParameterInt>("SUBDIVISION", "Subdivision", 1, 8, 1));
+    layout.add(std::make_unique<juce::AudioParameterInt>("NUMERATOR", "Numerator", 1, 8, 4));
 
 
     juce::StringArray stringArray;
