@@ -26,7 +26,7 @@ class Metronome
         int getSubdivisions() {return subdivisions;}
         int getBPM() { return bpm;}
         int getoneflag() { return oneflag;}
-        int getbeatflag() {return beatflag;}
+        int getbeatCount() {return beatCount;}
         float getSamplesProcessed() { return samplesProcessed; }
         float getSubSamplesProcessed() { return subSamplesProcessed; }
 
@@ -45,14 +45,14 @@ class Metronome
      regular beat event
      sub event
 
-     based on beatflag, oneflag
-     //beatflag keeps count of which subdivision we're on, +=1 when subdivision click is played, reset to 1 when main beat is finished
+     based on beatCount, oneflag
+     //beatCount keeps count of which subdivision we're on, +=1 when subdivision click is played, reset to 1 when main beat is finished
      //oneflag signals a first beat of bar when oneflag = numerator, +=1 every main beat, reset to 1 after a bar
 
-     rename beatflag, subflag, beatinterval, subinterval
+     TODO rename beatCount, subflag, beatinterval, subinterval to something more descriptive
      */
 
-     //User params
+        //User params, which change when the sliders are moved
         int numerator = 4; //numerator of time signature
         int subdivisions = 1; // amount of subdivisions, 1 = turns off subdivision logic 
         double bpm = 60;
@@ -69,11 +69,11 @@ class Metronome
         //subdivision logic variables
         int subInterval = 0; //subInterval is beatInterval/subdivisions 
         int subSamplesProcessed = 0; /// samples processed before subbeat= totalSamples % subInterval;
-        int beatflag = subdivisions; //beatflag keeps count of which subdivision we're on, +=1 when subdivision click is played, reset to 1 when main beat is finished
+        int beatCount = subdivisions; //beatCount keeps count of which subdivision we're on, +=1 when subdivision click is played, reset to 1 when main beat is finished
 
 
 
-        //apvts of pluginprocessor that created this instance of metronome
+        //apvts of caller that created this instance of metronome
         juce::AudioProcessorValueTreeState* apvts;
 
         //file processing stuff

@@ -11,6 +11,7 @@
 #include <JuceHeader.h>
 #include "Metronome.h"
 #include "PolyRhythmMetronome.h"
+const int MAX_LENGTH = 12;
 
 //==============================================================================
 /**
@@ -60,6 +61,7 @@ public:
 
     //==============================================================================
     //non default processor code
+ 
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
     juce::AudioProcessorValueTreeState apvts{ *this, nullptr, "Parameters", createParameterLayout() };
     Metronome metronome{ &apvts };

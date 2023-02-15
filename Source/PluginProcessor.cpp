@@ -8,7 +8,9 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include <string>
 
+using namespace std;
 //==============================================================================
 MetroGnomeAudioProcessor::MetroGnomeAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -64,19 +66,16 @@ void MetroGnomeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
 
 
 juce::AudioProcessorValueTreeState::ParameterLayout MetroGnomeAudioProcessor::createParameterLayout() {
-    //initializes parameter layout for APVTS object to create params
+    //Creates all the parameters that change based on the user input and stores them in a apvts.layout object
 
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
 
-    //std::make_unique<juce::AudioParameterFloat>
-        //param name, display name, range, default value
-        //normalisableRange(low, high, stepsize, skew)
-            //skew factor handles the rate at which the slider changes over the range given
+
 
     layout.add(std::make_unique<juce::AudioParameterBool>("ON/OFF", "On/Off", false));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("BPM", "bpm", juce::NormalisableRange<float>(1.f, 999.f, 0.1f, 0.25f), 120.f));
-    layout.add(std::make_unique<juce::AudioParameterInt>("SUBDIVISION", "Subdivision", 1, 8, 1));
-    layout.add(std::make_unique<juce::AudioParameterInt>("NUMERATOR", "Numerator", 1, 8, 4));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("BPM", "bpm", juce::NormalisableRange<float>(1.f, 300.f, 0.1f, 0.25f), 120.f));
+    layout.add(std::make_unique<juce::AudioParameterInt>("SUBDIVISION", "Subdivision", 1, MAX_LENGTH, 1));
+    layout.add(std::make_unique<juce::AudioParameterInt>("NUMERATOR", "Numerator", 1, MAX_LENGTH, 4));
 
 
     juce::StringArray stringArray;
@@ -84,8 +83,11 @@ juce::AudioProcessorValueTreeState::ParameterLayout MetroGnomeAudioProcessor::cr
     stringArray.add("Polyrhythm");
     stringArray.add("Polymeter");
     layout.add(std::make_unique<juce::AudioParameterChoice>("MODE", "Mode", stringArray, 0));
-
-
+    
+    for (int i = 0; i < MAX_LENGTH; i++) {
+        layout.add(std::make_unique<juce::AudioParameterBool>("RHYTHM1."+ to_string(i) + "TOGGLE", "Rhythm1." + to_string(i) + " Toggle", false));
+        layout.add(std::make_unique<juce::AudioParameterBool>("RHYTHM2." + to_string(i) + "TOGGLE", "Rhythm2." + to_string(i) + " Toggle", false));
+    }
 
     return layout;
 
@@ -96,8 +98,9 @@ juce::AudioProcessorValueTreeState::ParameterLayout MetroGnomeAudioProcessor::cr
 
 juce::AudioProcessorEditor* MetroGnomeAudioProcessor::createEditor()
 {
-    //uncomment first return for generic sliders
+    //uncomment first return for generic sliders used for debugging purposes
     //return new juce::GenericAudioProcessorEditor(*this);
+
     return new MetroGnomeAudioProcessorEditor(*this);
 }
 
@@ -116,6 +119,8 @@ void MetroGnomeAudioProcessor::setStateInformation(const void* data, int sizeInB
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+
+
     auto tree = juce::ValueTree::readFromData(data, sizeInBytes);
     if (tree.isValid()) {
         apvts.replaceState(tree);
@@ -126,11 +131,10 @@ void MetroGnomeAudioProcessor::setStateInformation(const void* data, int sizeInB
 
 
 /*
-*
-
-all code below here is default JUCE code and has been untouched
-
-
+******************************************
+******************************************
+Default unchanged JUCE library code
+******************************************
 */
 
 

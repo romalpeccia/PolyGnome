@@ -36,7 +36,7 @@ void CustomLookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int wi
         g.setColour(Colours::black);
         g.drawEllipse(bounds, 1.f);
     }
-    //???if we can cast rswl to rotaryslider with labels then we can use its functions??? why is this needed
+    //TODO: if we can cast rswl to rotaryslider with labels then we can use its functions??? why is this needed
     if (auto* rswl = dynamic_cast<RotarySliderWithLabels*>(&slider)) {
 
         //make main rectangle
@@ -71,6 +71,8 @@ void CustomLookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int wi
 
 //==============================================================================
 void RotarySliderWithLabels::paint(juce::Graphics& g) {
+    //NOTE: the appearance of any other Component is determined by the implementation of its paint() function.
+
 
     using namespace juce;
     auto startAngle = degreesToRadians(180.f + 45.f);
@@ -114,9 +116,6 @@ void RotarySliderWithLabels::paint(juce::Graphics& g) {
     }
 
 }
-
-
-
 
 
 juce::Rectangle<int> RotarySliderWithLabels::getSliderBounds() const {

@@ -50,12 +50,15 @@ private:
     juce::TextButton placeholderButton{ "Placeholder" };
 
     //Sliders
+    //the attachment attaches an APVTS param to a slider
     RotarySliderWithLabels    bpmSlider, subdivisionSlider, numeratorSlider;
-    //juce::ComboBox timeSignatureBox;
     juce::AudioProcessorValueTreeState::SliderAttachment bpmAttachment, subdivisionAttachment, numeratorAttachment;
+  
 
-    std::vector<juce::Component*> getComps();
-
+    juce::ToggleButton Rhythm1Buttons[MAX_LENGTH];
+    juce::ToggleButton Rhythm2Buttons[MAX_LENGTH];
+    std::vector<juce::Component*> getVisibleComps();
+    std::vector<juce::Component*> getHiddenComps();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MetroGnomeAudioProcessorEditor)
 };

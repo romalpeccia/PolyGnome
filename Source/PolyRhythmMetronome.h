@@ -12,6 +12,7 @@
 
 #include <JuceHeader.h>
 #include "Metronome.h"
+using namespace std;
 //==============================================================================
 /*
 */
@@ -29,12 +30,11 @@ public:
     int getRhythm2Counter() { return rhythm2Counter; }
     int getTotalSamples() { return totalSamples; }
 private:
-    //note: inherited variables from Metronome class are being used for other purposes, perhaps refactor them later on
-    // subdivisions represent the 2nd rhythm for the purposes of this class
+    // inherited numerator controls rhythm1
+    // inherited subdivisions controls rhythm2
     int rhythm1Counter = 0;
     int rhythm2Counter = 0;
 
-    float clock1 = 0;
-    float clock2 = 0;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PolyRhythmMetronome)
 };
