@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="J7GAry" name="MetroGnome" projectType="audioplug" useAppConfig="0"
-              addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1">
+              addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
+              pluginCharacteristicsValue="pluginProducesMidiOut">
   <MAINGROUP id="PkQ1Xo" name="MetroGnome">
     <GROUP id="{C6B4A32D-9EBD-62FC-20B1-EDF06920B470}" name="Source">
+      <FILE id="hUzoow" name="MIDIProcessor.h" compile="0" resource="0" file="Source/MIDIProcessor.h"/>
       <FILE id="wRs1N7" name="PolyRhythmMetronome.cpp" compile="1" resource="0"
             file="Source/PolyRhythmMetronome.cpp"/>
       <FILE id="r2Cn8G" name="PolyRhythmMetronome.h" compile="0" resource="0"

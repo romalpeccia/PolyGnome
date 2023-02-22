@@ -53,10 +53,12 @@ PolyRhythmMetronome::~PolyRhythmMetronome()
 
 
 
-void PolyRhythmMetronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer)
-{
+void PolyRhythmMetronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiBuffer)
+{   
+
+
     resetparams();
-    auto audiosourcechannelinfo = juce::AudioSourceChannelInfo(buffer);
+    auto audioSourceChannelInfo = juce::AudioSourceChannelInfo(buffer);
     auto bufferSize = buffer.getNumSamples();
     totalSamples += bufferSize;
     samplesProcessed = totalSamples % beatInterval;
@@ -100,41 +102,43 @@ void PolyRhythmMetronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer)
 
 
         if (apvts->getRawParameterValue("RHYTHM1." + to_string(ID1) + "TOGGLE")->load() == true && apvts->getRawParameterValue("RHYTHM2." + to_string(ID2) + "TOGGLE")->load() == true) {
-            DBG("both");
-            rimShotHigh->setNextReadPosition(0); //reset sample to beginning
+
+            //rimShotHigh->setNextReadPosition(0); //reset sample to beginning
             for (auto samplenum = 0; samplenum < bufferSize + 1; samplenum++)
             {
                 if (samplenum == timeToStartPlaying)
                 {
-                    rimShotHigh->getNextAudioBlock(audiosourcechannelinfo);
+                    //rimShotHigh->getNextAudioBlock(audioSourceChannelInfo);
+                    handleNoteTrigger(midiBuffer, 38);
                 }
             }
         }
         else if (apvts->getRawParameterValue("RHYTHM1." + to_string(ID1) + "TOGGLE")->load() == true) {
-            DBG("1st");
 
-            rimShotLow->setNextReadPosition(0); //reset sample to beginning
+            //rimShotLow->setNextReadPosition(0); //reset sample to beginning
             for (auto samplenum = 0; samplenum < bufferSize + 1; samplenum++)
             {
                 if (samplenum == timeToStartPlaying)
                 {
-                    rimShotLow->getNextAudioBlock(audiosourcechannelinfo);
+                    //rimShotLow->getNextAudioBlock(audioSourceChannelInfo);
+                    handleNoteTrigger(midiBuffer, 36);
                 }
             }
         }
         else if (apvts->getRawParameterValue("RHYTHM2." + to_string(ID2) + "TOGGLE")->load() == true) {
 
-            DBG("2nd");
-            rimShotSub->setNextReadPosition(0); //reset sample to beginning
+
+           // rimShotSub->setNextReadPosition(0); //reset sample to beginning
             for (auto samplenum = 0; samplenum < bufferSize + 1; samplenum++)
             { 
                 if (samplenum == timeToStartPlaying)
                 {
-                    rimShotSub->getNextAudioBlock(audiosourcechannelinfo);
+                    //rimShotSub->getNextAudioBlock(audioSourceChannelInfo);
+                    handleNoteTrigger(midiBuffer, 37);
                 }
             }
         }
-        DBG(to_string(rhythm1Counter) + ";" + to_string(rhythm2Counter));
+       // DBG(to_string(rhythm1Counter) + ";" + to_string(rhythm2Counter));
 
 
 
@@ -143,47 +147,64 @@ void PolyRhythmMetronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer)
     else if (beatflag)
     {
         rhythm1Counter += 1;
-        DBG(to_string(rhythm1Counter) + ";" + to_string(rhythm2Counter));
+        //DBG(to_string(rhythm1Counter) + ";" + to_string(rhythm2Counter));
         if (apvts->getRawParameterValue("RHYTHM1." + to_string(rhythm1Counter) + "TOGGLE")->load() == true) {
-            DBG("1st");
+
             const auto timeToStartPlaying = beatInterval - samplesProcessed;
             rimShotLow->setNextReadPosition(0); //reset sample to beginning
             for (auto samplenum = 0; samplenum < bufferSize + 1; samplenum++)
             {
                 if (samplenum == timeToStartPlaying)
                 {
-                    rimShotLow->getNextAudioBlock(audiosourcechannelinfo);
+                    //rimShotLow->getNextAudioBlock(audioSourceChannelInfo);
+                    handleNoteTrigger(midiBuffer, 36);
                 }
             }
         }
 
+       
 
 
     }
     else if (subflag )
     {
         rhythm2Counter += 1;
-        DBG(to_string(rhythm1Counter) + ";" + to_string(rhythm2Counter));
+        //DBG(to_string(rhythm1Counter) + ";" + to_string(rhythm2Counter));
         if (apvts->getRawParameterValue("RHYTHM2." + to_string(rhythm2Counter) + "TOGGLE")->load() == true) {
-            DBG("2nd");
+
             const auto timeToStartPlaying = subInterval - subSamplesProcessed;
-            rimShotSub->setNextReadPosition(0); //reset sample to beginning
+            //rimShotSub->setNextReadPosition(0); //reset sample to beginning
             for (auto samplenum = 0; samplenum < bufferSize + 1; samplenum++)
             { 
                 if (samplenum == timeToStartPlaying)
                 {
-                    rimShotSub->getNextAudioBlock(audiosourcechannelinfo);
+                    //rimShotSub->getNextAudioBlock(audioSourceChannelInfo);
+                    handleNoteTrigger(midiBuffer, 37);
                 }
             }
         }
-
-
-
     }
+
+
+
+
 }
 
+void PolyRhythmMetronome::handleNoteTrigger(juce::MidiBuffer& midiBuffer, int noteNumber)
+{
+    auto noteDuration = sampleRate;
+    auto message = juce::MidiMessage::noteOn(1, noteNumber, (juce::uint8)100);
+    //message.setTimeStamp(noteDuration);
 
+    auto messageOff = juce::MidiMessage::noteOff(message.getChannel(), message.getNoteNumber());
+    //messageOff.setTimeStamp((noteDuration));
 
+    if (! midiBuffer.addEvent(message, 0)  || ! midiBuffer.addEvent(messageOff, 100) )
+    {
+        DBG("error adding messages to midiBuffer");
+    }
+
+}
 void PolyRhythmMetronome::resetall()
 {   //this should be called whenever the metronome is stopped
    // resetparams();
@@ -197,6 +218,7 @@ void PolyRhythmMetronome::resetall()
 
 void PolyRhythmMetronome::resetparams()
 {  //this should be called when params change in UI to reflect changes in logic
+   //the variables keeping track of time should be reset to reflect the new rhythm
 
     int temp_numerator = apvts->getRawParameterValue("NUMERATOR")->load();
     if (numerator != temp_numerator)

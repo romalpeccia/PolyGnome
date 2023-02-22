@@ -52,6 +52,10 @@ void MetroGnomeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
     auto totalNumInputChannels = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
     */
+
+   // if (midiMessages.isEmpty()) { DBG("empty"); }
+    midiMessages.clear();
+    //if (midiMessages.isEmpty()) { DBG(" still empty"); }
     auto mode = apvts.getRawParameterValue("MODE")->load();
 
     if (apvts.getRawParameterValue("ON/OFF")->load() == true && mode == 0)
@@ -60,7 +64,8 @@ void MetroGnomeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
     }
     else if (apvts.getRawParameterValue("ON/OFF")->load() == true && mode == 1)
     {
-        polyRmetronome.getNextAudioBlock(buffer);
+        polyRmetronome.getNextAudioBlock(buffer,midiMessages);
+        //if (!midiMessages.isEmpty()) { DBG(juce::String(midiMessages.getNumEvents())); }
     }
 }
 

@@ -30,15 +30,15 @@ MetroGnomeAudioProcessorEditor::MetroGnomeAudioProcessorEditor (MetroGnomeAudioP
     playButton.onClick = [this]() { play(); }; 
     defaultModeButton.onClick = [this]() { 
         audioProcessor.apvts.getRawParameterValue("MODE")->store(0);
-        play();
+        
     };    
     polyRModeButton.onClick = [this]() { 
         audioProcessor.apvts.getRawParameterValue("MODE")->store(1);
-        play();
+        
     };    
     polyMModeButton.onClick = [this]() { 
         audioProcessor.apvts.getRawParameterValue("MODE")->store(2);
-        play();
+        
     };
 
 

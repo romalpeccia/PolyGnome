@@ -226,7 +226,7 @@ void Metronome::resetall()
 
 void Metronome::resetparams()
 {  //this should be called whenever the processor changes a parameter (which should only happen when the user interacts with the GUI)
-    //TODO: if loading all of these is expensive it may be better to 
+    //TODO: check if loading all of these is expensive, maybe we can only load the changed param
     numerator = apvts->getRawParameterValue("NUMERATOR")->load();
     subdivisions = apvts->getRawParameterValue("SUBDIVISION")->load();
     bpm = apvts->getRawParameterValue("BPM")->load();
