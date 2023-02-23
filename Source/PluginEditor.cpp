@@ -333,7 +333,7 @@ void MetroGnomeAudioProcessorEditor::paintDefaultMode(juce::Graphics& g) {
         if (audioProcessor.metronome.getoneflag() == i && ON)
         {
 
-            if (audioProcessor.metronome.getbeatCount() != 1)
+            if (audioProcessor.metronome.getSubdivisionCounter() != 1)
             {
                 g.setColour(juce::Colours::blue);
             }
@@ -345,7 +345,7 @@ void MetroGnomeAudioProcessorEditor::paintDefaultMode(juce::Graphics& g) {
             g.fillEllipse(circleX, Y, circleradius, circleradius);
             g.setColour(juce::Colours::orange);
 
-            g.drawText(juce::String(audioProcessor.metronome.getbeatCount()), circleX, Y, circleradius, circleradius, juce::Justification::centred);
+            g.drawText(juce::String(audioProcessor.metronome.getSubdivisionCounter()), circleX, Y, circleradius, circleradius, juce::Justification::centred);
         }
         else
         {
@@ -378,7 +378,7 @@ void MetroGnomeAudioProcessorEditor::paintDefaultMode(juce::Graphics& g) {
             g.fillRect(X + circleradius - 3, Y - circleradius - 3, linewidth, circleradius * 2);
 
 
-            if (audioProcessor.metronome.getbeatCount() == i && ON)
+            if (audioProcessor.metronome.getSubdivisionCounter() == i && ON)
             {
                 //fill in the note that is currently being played
                 g.setColour(juce::Colours::orange);

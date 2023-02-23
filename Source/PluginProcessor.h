@@ -11,7 +11,7 @@
 #include <JuceHeader.h>
 #include "Metronome.h"
 #include "PolyRhythmMetronome.h"
-#include "MIDIProcessor.h"
+
 const int MAX_LENGTH = 12;
 
 //==============================================================================

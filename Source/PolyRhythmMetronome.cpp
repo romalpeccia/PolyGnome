@@ -52,7 +52,31 @@ PolyRhythmMetronome::~PolyRhythmMetronome()
 }
 
 
+void PolyRhythmMetronome::prepareToPlay(double _sampleRate, int samplesPerBlock)
+{
+    //preparetoplay should call every time we start (right before)
 
+    resetparams();
+
+    if (sampleRate != _sampleRate)
+    {
+        //if the audioprocessors samplerate hasn't changed, nothing else needs to be done
+        sampleRate = _sampleRate;
+        if (rimShotLow != nullptr)
+        {
+            rimShotLow->prepareToPlay(samplesPerBlock, sampleRate);
+        }
+        if (rimShotHigh != nullptr)
+        {
+            rimShotHigh->prepareToPlay(samplesPerBlock, sampleRate);
+        }
+        if (rimShotSub != nullptr)
+        {
+            rimShotSub->prepareToPlay(samplesPerBlock, sampleRate);
+        }
+    }
+
+}
 void PolyRhythmMetronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiBuffer)
 {   
 
@@ -61,22 +85,22 @@ void PolyRhythmMetronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer, ju
     auto audioSourceChannelInfo = juce::AudioSourceChannelInfo(buffer);
     auto bufferSize = buffer.getNumSamples();
     totalSamples += bufferSize;
-    samplesProcessed = totalSamples % beatInterval;
-    subSamplesProcessed = totalSamples % subInterval;
+    rhythm1SamplesProcessed = totalSamples % rhythm1Interval;
+    rhythm2SamplesProcessed = totalSamples % rhythm2Interval;
 
 
-    bool beatflag = (samplesProcessed + bufferSize >= beatInterval && numerator > 1);
-    bool subflag = (subSamplesProcessed + bufferSize >= subInterval && subdivisions > 1);
+    bool rhythm1Flag = (rhythm1SamplesProcessed + bufferSize >= rhythm1Interval && rhythm1Value > 1);
+    bool rhythm2Flag = (rhythm2SamplesProcessed + bufferSize >= rhythm2Interval && rhythm2Value > 1);
    
 
 
 
-    if (rhythm1Counter >= numerator )
+    if (rhythm1Counter >= rhythm1Value )
     {
         rhythm1Counter = 0;
         totalSamples = 0;
     }
-    if (rhythm2Counter >= subdivisions )
+    if (rhythm2Counter >= rhythm2Value )
     {
         rhythm2Counter = 0;
         totalSamples = 0;
@@ -85,42 +109,42 @@ void PolyRhythmMetronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer, ju
 
 
     //TODO make this block cleaner
-    if ( ((beatflag && subflag )) )
+    if ( ((rhythm1Flag && rhythm2Flag )) )
     { // both beats hit at the same time , play a unique tick for that 
 
-        const auto timeToStartPlaying = beatInterval - samplesProcessed;
+        const auto timeToStartPlaying = rhythm1Interval - rhythm1SamplesProcessed;
         rhythm1Counter += 1;
         rhythm2Counter += 1;
         int ID1 = rhythm1Counter;
         int ID2 = rhythm2Counter;
-        if (rhythm1Counter == numerator){
+        if (rhythm1Counter == rhythm1Value){
             ID1 = 0;
         }
-        if (rhythm2Counter == subdivisions) {
+        if (rhythm2Counter == rhythm2Value) {
             ID2 = 0;
         }
 
 
         if (apvts->getRawParameterValue("RHYTHM1." + to_string(ID1) + "TOGGLE")->load() == true && apvts->getRawParameterValue("RHYTHM2." + to_string(ID2) + "TOGGLE")->load() == true) {
 
-            //rimShotHigh->setNextReadPosition(0); //reset sample to beginning
+            rimShotHigh->setNextReadPosition(0); //reset sample to beginning
             for (auto samplenum = 0; samplenum < bufferSize + 1; samplenum++)
             {
                 if (samplenum == timeToStartPlaying)
                 {
-                    //rimShotHigh->getNextAudioBlock(audioSourceChannelInfo);
+                    rimShotHigh->getNextAudioBlock(audioSourceChannelInfo);
                     handleNoteTrigger(midiBuffer, 38);
                 }
             }
         }
         else if (apvts->getRawParameterValue("RHYTHM1." + to_string(ID1) + "TOGGLE")->load() == true) {
 
-            //rimShotLow->setNextReadPosition(0); //reset sample to beginning
+            rimShotLow->setNextReadPosition(0); //reset sample to beginning
             for (auto samplenum = 0; samplenum < bufferSize + 1; samplenum++)
             {
                 if (samplenum == timeToStartPlaying)
                 {
-                    //rimShotLow->getNextAudioBlock(audioSourceChannelInfo);
+                    rimShotLow->getNextAudioBlock(audioSourceChannelInfo);
                     handleNoteTrigger(midiBuffer, 36);
                 }
             }
@@ -128,12 +152,12 @@ void PolyRhythmMetronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer, ju
         else if (apvts->getRawParameterValue("RHYTHM2." + to_string(ID2) + "TOGGLE")->load() == true) {
 
 
-           // rimShotSub->setNextReadPosition(0); //reset sample to beginning
+            rimShotSub->setNextReadPosition(0); //reset sample to beginning
             for (auto samplenum = 0; samplenum < bufferSize + 1; samplenum++)
             { 
                 if (samplenum == timeToStartPlaying)
                 {
-                    //rimShotSub->getNextAudioBlock(audioSourceChannelInfo);
+                    rimShotSub->getNextAudioBlock(audioSourceChannelInfo);
                     handleNoteTrigger(midiBuffer, 37);
                 }
             }
@@ -144,19 +168,19 @@ void PolyRhythmMetronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer, ju
 
 
     }
-    else if (beatflag)
+    else if (rhythm1Flag)
     {
         rhythm1Counter += 1;
         //DBG(to_string(rhythm1Counter) + ";" + to_string(rhythm2Counter));
         if (apvts->getRawParameterValue("RHYTHM1." + to_string(rhythm1Counter) + "TOGGLE")->load() == true) {
 
-            const auto timeToStartPlaying = beatInterval - samplesProcessed;
+            const auto timeToStartPlaying = rhythm1Interval - rhythm1SamplesProcessed;
             rimShotLow->setNextReadPosition(0); //reset sample to beginning
             for (auto samplenum = 0; samplenum < bufferSize + 1; samplenum++)
             {
                 if (samplenum == timeToStartPlaying)
                 {
-                    //rimShotLow->getNextAudioBlock(audioSourceChannelInfo);
+                    rimShotLow->getNextAudioBlock(audioSourceChannelInfo);
                     handleNoteTrigger(midiBuffer, 36);
                 }
             }
@@ -166,19 +190,19 @@ void PolyRhythmMetronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer, ju
 
 
     }
-    else if (subflag )
+    else if (rhythm2Flag )
     {
         rhythm2Counter += 1;
         //DBG(to_string(rhythm1Counter) + ";" + to_string(rhythm2Counter));
         if (apvts->getRawParameterValue("RHYTHM2." + to_string(rhythm2Counter) + "TOGGLE")->load() == true) {
 
-            const auto timeToStartPlaying = subInterval - subSamplesProcessed;
-            //rimShotSub->setNextReadPosition(0); //reset sample to beginning
+            const auto timeToStartPlaying = rhythm2Interval - rhythm2SamplesProcessed;
+            rimShotSub->setNextReadPosition(0); //reset sample to beginning
             for (auto samplenum = 0; samplenum < bufferSize + 1; samplenum++)
             { 
                 if (samplenum == timeToStartPlaying)
                 {
-                    //rimShotSub->getNextAudioBlock(audioSourceChannelInfo);
+                    rimShotSub->getNextAudioBlock(audioSourceChannelInfo);
                     handleNoteTrigger(midiBuffer, 37);
                 }
             }
@@ -211,8 +235,8 @@ void PolyRhythmMetronome::resetall()
     totalSamples = 0;
     rhythm1Counter = 0;
     rhythm2Counter = 0;
-    samplesProcessed = 0;
-    subSamplesProcessed = 0;
+    rhythm1SamplesProcessed = 0;
+    rhythm2SamplesProcessed = 0;
 }
 
 
@@ -221,22 +245,22 @@ void PolyRhythmMetronome::resetparams()
    //the variables keeping track of time should be reset to reflect the new rhythm
 
     int temp_numerator = apvts->getRawParameterValue("NUMERATOR")->load();
-    if (numerator != temp_numerator)
+    if (rhythm1Value != temp_numerator)
     {
-        numerator = temp_numerator;
+        rhythm1Value = temp_numerator;
         resetall();
     }
-    int temp_subdivisions = apvts->getRawParameterValue("SUBDIVISION")->load();
-    if (subdivisions != temp_subdivisions)
+    int tempR2Value = apvts->getRawParameterValue("SUBDIVISION")->load();
+    if (rhythm2Value != tempR2Value)
     {
-        subdivisions = temp_subdivisions;
+        rhythm2Value = tempR2Value;
         resetall();
     }
 
 
     bpm = apvts->getRawParameterValue("BPM")->load();
-    beatInterval = 4 * ((60.0 / bpm) * sampleRate) / numerator;
-    subInterval = 4 * ((60.0 / bpm) * sampleRate) / subdivisions;
+    rhythm1Interval = 4 * ((60.0 / bpm) * sampleRate) / rhythm1Value;
+    rhythm2Interval = 4 * ((60.0 / bpm) * sampleRate) / rhythm2Value;
     ///TODO (maybe) assumes 4/4 time, maybe make time sig a parameter to advance this
 
 }
