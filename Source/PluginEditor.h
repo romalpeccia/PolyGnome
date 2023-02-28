@@ -11,6 +11,7 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 #include "LookAndFeel.h"
+#include "Constants.h"
 
 //==============================================================================
 /**
@@ -23,8 +24,9 @@ public:
 
     //==============================================================================
     void paint (juce::Graphics&) override;
-    void paintDefaultMode(juce::Graphics&);
-    void paintPolyRMode(juce::Graphics&);
+    void paintMetronomeMode(juce::Graphics&);
+    void paintPolyRhythmMetronomeMode(juce::Graphics&);
+    void paintPolyRhythmMachineMode(juce::Graphics& g);
 
 
     juce::Rectangle<int> getVisualArea();
@@ -35,31 +37,39 @@ public:
     };
 
     void play();
-    void MetroGnomeAudioProcessorEditor::drawPolyrhythmVisual(juce::Graphics& g, int radius, int width, int height, int X, int Y, int rhythmValue, float radiusSkew, juce::Colour color1, juce::Colour color, int index);
+    void MetroGnomeAudioProcessorEditor::drawPolyRhythmVisual(juce::Graphics& g, int radius, int width, int height, int X, int Y, int rhythmValue, float radiusSkew, juce::Colour color1, juce::Colour color, int index);
 
 private:
     MetroGnomeAudioProcessor& audioProcessor;
-    //TimeVisualizerComponent timeVisualizer;
 
     //persistent comps
     juce::Image logo;
     juce::TextButton playButton{ "Start" };
-    juce::TextButton defaultModeButton{ "Default" };
-    juce::TextButton polyRModeButton{ "PolyRhythm" };
-    juce::TextButton polyMModeButton{ "PolyMeter" };
+    juce::TextButton metronomeButton{ "Default" };
+    juce::TextButton polyRhythmButton{ "PolyRhythm" };
+    juce::TextButton polyMeterButton{ "PolyMeter" };
+    juce::TextButton polyRhythmMachineButton{ "PolyRhythm Machine" };
     juce::TextButton placeholderButton{ "Placeholder" };
+
 
     //Sliders
     //the attachment attaches an APVTS param to a slider
     RotarySliderWithLabels    bpmSlider, subdivisionSlider, numeratorSlider;
     juce::AudioProcessorValueTreeState::SliderAttachment bpmAttachment, subdivisionAttachment, numeratorAttachment;
-  
-
+    
+    //polyrhythm metronome buttons
     juce::ToggleButton Rhythm1Buttons[MAX_LENGTH];
     juce::ToggleButton Rhythm2Buttons[MAX_LENGTH];
+
+
+
+    juce::ToggleButton polyRhythmMachineButtons[MAX_MIDI_CHANNELS][MAX_LENGTH];
+    //RotarySliderWithLabels polyRhythmMachineSliders[MAX_MIDI_CHANNELS];
+    //juce::AudioProcessorValueTreeState::SliderAttachment polyRhythmMachineSliderAttachments[MAX_MIDI_CHANNELS];
+
+
     std::vector<juce::Component*> getVisibleComps();
     std::vector<juce::Component*> getHiddenComps();
-
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MetroGnomeAudioProcessorEditor)
 };
 

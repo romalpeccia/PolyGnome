@@ -97,7 +97,7 @@ void PolyRhythmMetronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer, ju
 
     if (rhythm1Counter >= rhythm1Value )
     {
-        //why reset totalsamples?
+        //TODO why reset totalsamples?
         rhythm1Counter = 0;
         totalSamples = 0;
     }

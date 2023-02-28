@@ -10,7 +10,7 @@
 
 #include "PolyRhythmMachine.h"
 #include <JuceHeader.h>
-
+using namespace std;
 //==============================================================================
 PolyRhythmMachine::PolyRhythmMachine()
 {
@@ -50,7 +50,6 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
 
 
     resetparams();
-    auto audioSourceChannelInfo = juce::AudioSourceChannelInfo(buffer);
     auto bufferSize = buffer.getNumSamples();
     totalSamples += bufferSize;
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
@@ -63,7 +62,7 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
     //reset the rhythm counter
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
         rhythmFlags[i] = (rhythms[i].samplesProcessed + bufferSize >= rhythms[i].interval && rhythms[i].value > 1);
-        if (rhythms[i].counter > rhythms[i].value) {
+        if (rhythms[i].counter >= rhythms[i].value) {
             rhythms[i].counter = 0;
             totalSamples = 0;
 
@@ -73,9 +72,9 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
         if (rhythmFlags[i]) {
 
-            rhythms[i].counter += 1;
 
-            if (apvts->getRawParameterValue("MACHINE_RHYTHM1." + to_string(i) + "TOGGLE")->load() == true) {
+
+            if (apvts->getRawParameterValue("MACHINE" + to_string(i) + "." + to_string(rhythms[i].counter) + "TOGGLE")->load() == true) {
 
                 const auto timeToStartPlaying = rhythms[i].interval - rhythms[i].samplesProcessed;
                 for (auto samplenum = 0; samplenum < bufferSize + 1; samplenum++)
@@ -83,10 +82,11 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
                     if (samplenum == timeToStartPlaying)
                     {
                         handleNoteTrigger(midiBuffer, rhythms[i].midiValue);
+                        DBG("played note" + to_string(i) + "." + to_string(rhythms[i].counter));
                     }
                 }
             }
-
+            rhythms[i].counter += 1;
         }
 
     }

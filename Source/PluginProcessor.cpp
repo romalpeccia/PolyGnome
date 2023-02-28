@@ -36,7 +36,8 @@ void MetroGnomeAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBl
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
     metronome.prepareToPlay(sampleRate, samplesPerBlock);
-    polyRmetronome.prepareToPlay(sampleRate, samplesPerBlock);
+    polyRhythmMetronome.prepareToPlay(sampleRate, samplesPerBlock);
+    polyRhythmMachine.prepareToPlay(sampleRate, samplesPerBlock);
 }
 
 void MetroGnomeAudioProcessor::releaseResources()
@@ -48,14 +49,7 @@ void MetroGnomeAudioProcessor::releaseResources()
 
 void MetroGnomeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-    /*
-    auto totalNumInputChannels = getTotalNumInputChannels();
-    auto totalNumOutputChannels = getTotalNumOutputChannels();
-    */
-
-   // if (midiMessages.isEmpty()) { DBG("empty"); }
     midiMessages.clear();
-    //if (midiMessages.isEmpty()) { DBG(" still empty"); }
     auto mode = apvts.getRawParameterValue("MODE")->load();
 
     if (apvts.getRawParameterValue("ON/OFF")->load() == true && mode == 0)
@@ -64,8 +58,11 @@ void MetroGnomeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
     }
     else if (apvts.getRawParameterValue("ON/OFF")->load() == true && mode == 1)
     {
-        polyRmetronome.getNextAudioBlock(buffer,midiMessages);
-        //if (!midiMessages.isEmpty()) { DBG(juce::String(midiMessages.getNumEvents())); }
+        polyRhythmMetronome.getNextAudioBlock(buffer,midiMessages);
+    }
+    else if (apvts.getRawParameterValue("ON/OFF")->load() == true && mode == 3)
+    {
+        polyRhythmMachine.getNextAudioBlock(buffer, midiMessages);
     }
 }
 
@@ -87,11 +84,20 @@ juce::AudioProcessorValueTreeState::ParameterLayout MetroGnomeAudioProcessor::cr
     stringArray.add("Default");
     stringArray.add("Polyrhythm");
     stringArray.add("Polymeter");
+    stringArray.add("Machine");
     layout.add(std::make_unique<juce::AudioParameterChoice>("MODE", "Mode", stringArray, 0));
     
     for (int i = 0; i < MAX_LENGTH; i++) {
         layout.add(std::make_unique<juce::AudioParameterBool>("RHYTHM1."+ to_string(i) + "TOGGLE", "Rhythm1." + to_string(i) + " Toggle", false));
         layout.add(std::make_unique<juce::AudioParameterBool>("RHYTHM2." + to_string(i) + "TOGGLE", "Rhythm2." + to_string(i) + " Toggle", false));
+    }
+
+    for (int i = 0; i < MAX_MIDI_CHANNELS; i++)
+     {
+        for (int j = 0; j < MAX_LENGTH; j++)
+         {
+            layout.add(std::make_unique<juce::AudioParameterBool>("MACHINE" + to_string(i) + "." + to_string(j) + "TOGGLE", "Machine" + to_string(i) + "." + to_string(j) + "Toggle", false));
+        }
     }
 
     return layout;

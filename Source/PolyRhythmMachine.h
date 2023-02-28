@@ -10,8 +10,8 @@
 
 #pragma once
 #include <JuceHeader.h>
+#include "Constants.h"
 
-const int MAX_MIDI_CHANNELS = 12;
 using namespace std;
 //==============================================================================
 /*
