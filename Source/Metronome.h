@@ -25,7 +25,7 @@ class Metronome
         int getNumerator() {return numerator;}
         int getSubdivisions() {return subdivisions;}
         int getBPM() { return bpm;}
-        int getoneflag() { return beatCounter;}
+        int getBeatCounter() { return beatCounter;}
         int getSubdivisionCounter() {return subdivisionCounter;}
         float getSamplesProcessed() { return samplesProcessed; }
         float getSubSamplesProcessed() { return subSamplesProcessed; }

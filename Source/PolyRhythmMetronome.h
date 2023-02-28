@@ -11,7 +11,6 @@
 #pragma once
 
 #include <JuceHeader.h>
-#include "Metronome.h"
 
 using namespace std;
 //==============================================================================
@@ -40,6 +39,7 @@ private:
 
     void PolyRhythmMetronome::handleNoteTrigger(juce::MidiBuffer&, int noteNumber);
 
+    //TODO make value more descriptive... subdivisions?
     int rhythm1Value = 4; //represented as NUMERATOR in apvts
     int rhythm2Value = 1; //represented as SUBDIVISION in apvts
     double bpm = 60;
@@ -49,8 +49,8 @@ private:
     double sampleRate = 0; //sampleRate from app, usually 44100
 
     //rhythm1 logic variables
-    int rhythm1Interval = 1;
-    int rhythm1SamplesProcessed = 1; // samples processed before beat = totalSamples % interval
+    int rhythm1Interval = 0;
+    int rhythm1SamplesProcessed = 0; // samples processed before beat = totalSamples % interval
     int rhythm1Counter = 0;
     //rhythm2 logic variables
     int rhythm2Interval = 0;

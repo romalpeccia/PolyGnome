@@ -35,7 +35,7 @@ public:
     };
 
     void play();
-
+    void MetroGnomeAudioProcessorEditor::drawPolyrhythmVisual(juce::Graphics& g, int radius, int width, int height, int X, int Y, int rhythmValue, float radiusSkew, juce::Colour color1, juce::Colour color, int index);
 
 private:
     MetroGnomeAudioProcessor& audioProcessor;

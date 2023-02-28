@@ -97,6 +97,7 @@ void PolyRhythmMetronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer, ju
 
     if (rhythm1Counter >= rhythm1Value )
     {
+        //why reset totalsamples?
         rhythm1Counter = 0;
         totalSamples = 0;
     }
@@ -244,10 +245,10 @@ void PolyRhythmMetronome::resetparams()
 {  //this should be called when params change in UI to reflect changes in logic
    //the variables keeping track of time should be reset to reflect the new rhythm
 
-    int temp_numerator = apvts->getRawParameterValue("NUMERATOR")->load();
-    if (rhythm1Value != temp_numerator)
+    int tempR1Value = apvts->getRawParameterValue("NUMERATOR")->load();
+    if (rhythm1Value != tempR1Value)
     {
-        rhythm1Value = temp_numerator;
+        rhythm1Value = tempR1Value;
         resetall();
     }
     int tempR2Value = apvts->getRawParameterValue("SUBDIVISION")->load();
@@ -261,6 +262,6 @@ void PolyRhythmMetronome::resetparams()
     bpm = apvts->getRawParameterValue("BPM")->load();
     rhythm1Interval = 4 * ((60.0 / bpm) * sampleRate) / rhythm1Value;
     rhythm2Interval = 4 * ((60.0 / bpm) * sampleRate) / rhythm2Value;
-    ///TODO (maybe) assumes 4/4 time, maybe make time sig a parameter to advance this
+    ///TODO (maybe) assumes 4/4 time, maybe make time sig a parameter to advance this. explain why its 4*
 
 }

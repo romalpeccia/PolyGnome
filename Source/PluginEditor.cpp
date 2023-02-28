@@ -10,35 +10,35 @@
 #include "PluginEditor.h"
 using namespace std;
 //==============================================================================
-MetroGnomeAudioProcessorEditor::MetroGnomeAudioProcessorEditor (MetroGnomeAudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p)
+MetroGnomeAudioProcessorEditor::MetroGnomeAudioProcessorEditor(MetroGnomeAudioProcessor& p)
+    : AudioProcessorEditor(&p), audioProcessor(p)
 
     ,
     bpmSlider(*audioProcessor.apvts.getParameter("BPM"), "bpm"),
     subdivisionSlider(*audioProcessor.apvts.getParameter("SUBDIVISION"), " "),
-    numeratorSlider(*audioProcessor.apvts.getParameter("NUMERATOR"), " "), 
+    numeratorSlider(*audioProcessor.apvts.getParameter("NUMERATOR"), " "),
 
     bpmAttachment(audioProcessor.apvts, "BPM", bpmSlider),
     subdivisionAttachment(audioProcessor.apvts, "SUBDIVISION", subdivisionSlider),
-   numeratorAttachment(audioProcessor.apvts, "NUMERATOR", numeratorSlider)
+    numeratorAttachment(audioProcessor.apvts, "NUMERATOR", numeratorSlider)
 {
 
 
     //images are stored in binary using projucer
     logo = juce::ImageCache::getFromMemory(BinaryData::OSRS_gnome_png, BinaryData::OSRS_gnome_pngSize);
 
-    playButton.onClick = [this]() { play(); }; 
-    defaultModeButton.onClick = [this]() { 
+    playButton.onClick = [this]() { play(); };
+    defaultModeButton.onClick = [this]() {
         audioProcessor.apvts.getRawParameterValue("MODE")->store(0);
-        
-    };    
-    polyRModeButton.onClick = [this]() { 
+
+    };
+    polyRModeButton.onClick = [this]() {
         audioProcessor.apvts.getRawParameterValue("MODE")->store(1);
-        
-    };    
-    polyMModeButton.onClick = [this]() { 
+
+    };
+    polyMModeButton.onClick = [this]() {
         audioProcessor.apvts.getRawParameterValue("MODE")->store(2);
-        
+
     };
 
 
@@ -76,7 +76,7 @@ MetroGnomeAudioProcessorEditor::MetroGnomeAudioProcessorEditor (MetroGnomeAudioP
 
 
     startTimerHz(144);
-    setSize (1000, 700);
+    setSize(1000, 700);
 }
 
 
@@ -102,7 +102,7 @@ void MetroGnomeAudioProcessorEditor::resized()
 
     auto visualArea = bounds.removeFromTop(bounds.getHeight() * 0.66);
     //unused variable, this call cuts away space used by the visual area from bounds, may be used later
-    
+
 
     bounds.removeFromTop(5);
     //every time we remove from bounds, the area of bounds changes 
@@ -120,9 +120,9 @@ MetroGnomeAudioProcessorEditor::~MetroGnomeAudioProcessorEditor()
 }
 
 //==============================================================================
-void MetroGnomeAudioProcessorEditor::paint (juce::Graphics& g)
+void MetroGnomeAudioProcessorEditor::paint(juce::Graphics& g)
 {
-    g.fillAll (juce::Colours::black);
+    g.fillAll(juce::Colours::black);
     g.drawImageAt(logo, 0, 0);
 
     auto mode = audioProcessor.apvts.getRawParameterValue("MODE")->load();
@@ -138,8 +138,8 @@ void MetroGnomeAudioProcessorEditor::paint (juce::Graphics& g)
         paintDefaultMode(g);
     }
     else if (mode == 1) {
-       paintPolyRMode(g);
-        
+        paintPolyRMode(g);
+
     }
     else if (mode == 2) {
 
@@ -151,12 +151,67 @@ void MetroGnomeAudioProcessorEditor::paint (juce::Graphics& g)
 juce::Rectangle<int> MetroGnomeAudioProcessorEditor::getVisualArea()
 {
     auto bounds = getLocalBounds();
-    //visual area consists of middle third of top third of area (9 quadrants)
+    //visual area consists of middle third of top third of area 
     auto visualArea = bounds.removeFromTop(bounds.getHeight() * 0.66);
     visualArea.removeFromLeft(visualArea.getWidth() * 0.33);
     visualArea.removeFromRight(visualArea.getWidth() * 0.5);
     return visualArea;
 }
+
+void MetroGnomeAudioProcessorEditor::drawPolyrhythmVisual(juce::Graphics& g, int radius, int width, int height, int X, int Y, int rhythmValue, float radiusSkew, juce::Colour color1, juce::Colour color2, int index) {
+    // draws the perimiter of a circle with buttons on the line representing beats of the polyrythm, as well as the clock hand indicating which beat is being counted
+
+    //draw the circle
+    juce::Path rhythmCircle;
+    int rhythmRadius = radius / radiusSkew; //TODO maybe change this number, make a param?
+    int Xoffset = (width - rhythmRadius) / 2;
+    int Yoffset = (height - rhythmRadius) / 2;
+    rhythmCircle.addEllipse(X + Xoffset, Y + Yoffset, rhythmRadius, rhythmRadius);
+    g.setColour(color1);
+    g.strokePath(rhythmCircle, juce::PathStrokeType(2.0f));
+
+
+    float rhythm1Length = rhythmCircle.getLength();
+    for (int i = 0; i < rhythmValue; i++)
+    {
+        //iterate through beats and draw toggle button on the edge of the main circle
+
+        float distanceOnPath = (float(i) / rhythmValue) * rhythm1Length;
+        auto point = rhythmCircle.getPointAlongPath(distanceOnPath);
+        juce::Rectangle<int> pointBounds(point.getX(), point.getY(), 22, 22);
+        if (index == 1) {
+            Rhythm1Buttons[i].setBounds(pointBounds);
+            Rhythm1Buttons[i].setVisible(true);
+        }
+        else if (index == 2) {
+            Rhythm2Buttons[i].setBounds(pointBounds);
+            Rhythm2Buttons[i].setVisible(true);
+        }
+
+    }
+    //draw the clock hand
+    g.setColour(color2);
+    float angle = juce::degreesToRadians(360 * (float(audioProcessor.polyRmetronome.getRhythm1Counter()) / float(rhythmValue)) + 180);
+    juce::Point<int> center;
+    if (index == 1) {
+        center.setXY(X + rhythmRadius / 2, Y + (height - Xoffset) / 2);
+    }
+    else if (index == 2) {
+        center.setXY(X + Xoffset + rhythmRadius / 2, Y + Yoffset + rhythmRadius / 2);
+    }
+
+    juce::Path clockHand;
+    juce::Rectangle<float> r;
+    r.setLeft(center.getX() - 2);
+    r.setRight(center.getX() + 2);
+    r.setTop(center.getY());
+    r.setBottom(center.getY() + rhythmRadius / 2);
+    clockHand.addRoundedRectangle(r, 2.f);
+    clockHand.applyTransform(juce::AffineTransform().rotation(angle, center.getX(), center.getY()));
+    g.fillPath(clockHand);
+
+}
+
 
 void MetroGnomeAudioProcessorEditor::paintPolyRMode(juce::Graphics& g)
 {
@@ -165,10 +220,11 @@ void MetroGnomeAudioProcessorEditor::paintPolyRMode(juce::Graphics& g)
     g.setColour(juce::Colours::white);
     //g.drawRect(visualArea);
 
+
     int width = visualArea.getWidth();
     int height = visualArea.getHeight();
     int circleSkew = 1.2; //TODO adjust this using JUCE_LIVE_CONSTANT
-    int radius = ((width > height) ? height : width)/circleSkew;
+    int radius = ((width > height) ? height : width) / circleSkew;
     //take the lesser of height and width to be our circle diameter
     int X = visualArea.getX(); //top left corner X
     int Y = visualArea.getY(); //top left corner  Y
@@ -178,124 +234,19 @@ void MetroGnomeAudioProcessorEditor::paintPolyRMode(juce::Graphics& g)
     int rhythm2Value = audioProcessor.apvts.getRawParameterValue("SUBDIVISION")->load();
 
     auto ON = audioProcessor.apvts.getRawParameterValue("ON/OFF")->load();
-    int pointDiameter = 10;
-    //TODO: make these rhythm2 and rhythm1 beat logic into functions, one for each drawing, and then one for drawing the entire object?
-    if (rhythm1Value!= 1)
+
+    //function params radius, width, height, X, Y
+    if (rhythm1Value != 1)
     {
-        //draw the circle
-        juce::Path rhythm1Circle;
-        int rhythm1Radius = radius / 1; //TODO maybe change this number, make a param?
-        int Xoffset = (width -  rhythm1Radius)/2;
-        int Yoffset = (height -  rhythm1Radius)/2;
-        rhythm1Circle.addEllipse(X + Xoffset, Y + Yoffset, rhythm1Radius, rhythm1Radius);
-        g.setColour(juce::Colours::white);
-        g.strokePath(rhythm1Circle, juce::PathStrokeType(2.0f));
-
-
-        float rhythm1Length = rhythm1Circle.getLength();
-        for (int i = 0; i < rhythm1Value; i++)
-        {
-            //iterate through beats and draw toggle button on the edge of the main circle
-           
-
-            g.setColour(juce::Colours::orange);
-
-
-            float distanceOnPath = (float(i) / rhythm1Value) * rhythm1Length;
-           
-
-            auto point = rhythm1Circle.getPointAlongPath(distanceOnPath);
-            /*
-            g.fillEllipse(point.getX(), point.getY(), pointDiameter, pointDiameter);
-            */
-            juce::Rectangle<int> pointBounds(point.getX(), point.getY(), 22, 22);
-            Rhythm1Buttons[i].setBounds(pointBounds);
-            Rhythm1Buttons[i].setVisible(true);
-        }
-
-
-
-        //draw the clock hand
-        float angle = juce::degreesToRadians(360 * (float(audioProcessor.polyRmetronome.getRhythm1Counter()) / float(rhythm1Value)) + 180);
-
-        juce::Point<int> center(X + rhythm1Radius/2, Y + (height - Xoffset) / 2);
-        //radius is just rhythm1Radius from before
-        juce::Path p;
-        juce::Rectangle<float> r;
-        r.setLeft(center.getX() - 2);
-        r.setRight(center.getX() + 2);
-        r.setTop(center.getY());
-        r.setBottom(center.getY() + rhythm1Radius/2);
-        p.addRoundedRectangle(r, 2.f);
-        p.applyTransform(juce::AffineTransform().rotation(angle, center.getX(), center.getY()));
-        g.fillPath(p);
+        drawPolyrhythmVisual(g, radius, width, height, X, Y, rhythm1Value, 1, juce::Colours::white, juce::Colours::orange, 1);
     }
     if (rhythm2Value != 1)
     {
-        //draw the circle
-        juce::Path rhythm2Circle;
-        int rhythm2Radius = radius / 1.5;
-        int Xoffset = (width - rhythm2Radius) / 2;
-        int Yoffset = (height - rhythm2Radius) / 2;
-        rhythm2Circle.addEllipse(X + Xoffset, Y + Yoffset, rhythm2Radius, rhythm2Radius);
-        g.setColour(juce::Colours::orange);
-        g.strokePath(rhythm2Circle, juce::PathStrokeType(2.0f));
-
-        //iterate through points and draw a circle on the edge of the main circle
-        float rhythm2Length = rhythm2Circle.getLength();
-        for (int i = 0; i < rhythm2Value; i++)
-        {
-
-            g.setColour(juce::Colours::white);
-            float distanceOnPath = (float(i) / rhythm2Value) * rhythm2Length;
-            
-
-   
-            auto point = rhythm2Circle.getPointAlongPath(distanceOnPath);
-            /*
-            g.fillEllipse(point.getX(), point.getY(), pointDiameter, pointDiameter);
-            */
-
-            juce::Rectangle<int> pointBounds(point.getX(), point.getY(), 22, 22);
-            Rhythm2Buttons[i].setBounds(pointBounds);
-            Rhythm2Buttons[i].setVisible(true);
-        }
-
-  
-
-        /* //clock angle experiments
-        //float angle = juce::degreesToRadians(360 * (float(audioProcessor.polyRmetronome.getRhythm2Counter()) / float(rhythm2Value)) +180);
-        float angleRatio;
-        if (audioProcessor.polyRmetronome.subdivisions < audioProcessor.polyRmetronome.numerator)
-            angleRatio = audioProcessor.polyRmetronome.getSubSamplesProcessed() / audioProcessor.getSampleRate();
-        else
-            angleRatio = audioProcessor.polyRmetronome.getTotalSamples()
-        
-                / audioProcessor.getSampleRate();
-
-        //float angle = juce::degreesToRadians(360 * (angleRatio) - 180);
-        */
-        
-        //draw the clock hand
-        float angle = juce::degreesToRadians(360 * (float(audioProcessor.polyRmetronome.getRhythm2Counter()) / float(rhythm2Value)) + 180);
-
-
-        juce::Point<int> center(X + Xoffset + rhythm2Radius/2, Y + Yoffset + rhythm2Radius / 2);
-        //radius is just rhythm2Radius from before
-        juce::Path p;
-        juce::Rectangle<float> r;
-        r.setLeft(center.getX() - 2);
-        r.setRight(center.getX() + 2);
-        r.setTop(center.getY());
-        r.setBottom(center.getY() + rhythm2Radius / 2);
-        p.addRoundedRectangle(r, 2.f);
-        p.applyTransform(juce::AffineTransform().rotated(angle, center.getX(), center.getY()));
-        g.fillPath(p);      
+        drawPolyrhythmVisual(g, radius, width, height, X, Y, rhythm2Value, 1.5, juce::Colours::orange, juce::Colours::white, 2);
     }
 
     //hide any components that no longer need to be shown
-
-    for (int i = rhythm1Value ; i < MAX_LENGTH; i++) {
+    for (int i = rhythm1Value; i < MAX_LENGTH; i++) {
         Rhythm1Buttons[i].setVisible(false);
     }
     for (int i = rhythm2Value; i < MAX_LENGTH; i++) {
@@ -330,7 +281,7 @@ void MetroGnomeAudioProcessorEditor::paintDefaultMode(juce::Graphics& g) {
         //loop to draw metronome circles
         auto circleX = X + i * (circleradius + 5);
 
-        if (audioProcessor.metronome.getoneflag() == i && ON)
+        if (audioProcessor.metronome.getBeatCounter() == i && ON)
         {
 
             if (audioProcessor.metronome.getSubdivisionCounter() != 1)
@@ -344,7 +295,6 @@ void MetroGnomeAudioProcessorEditor::paintDefaultMode(juce::Graphics& g) {
 
             g.fillEllipse(circleX, Y, circleradius, circleradius);
             g.setColour(juce::Colours::orange);
-
             g.drawText(juce::String(audioProcessor.metronome.getSubdivisionCounter()), circleX, Y, circleradius, circleradius, juce::Justification::centred);
         }
         else
@@ -419,14 +369,14 @@ std::vector<juce::Component*> MetroGnomeAudioProcessorEditor::getVisibleComps() 
     comps.push_back(&numeratorSlider);
 
 
-    return{ 
+    return{
         comps
     };
 
 }
 
 std::vector<juce::Component*> MetroGnomeAudioProcessorEditor::getHiddenComps() {
-    
+
     std::vector<juce::Component*> comps;
     for (int i = 0; i < MAX_LENGTH; i++) {
         comps.push_back(&Rhythm1Buttons[i]);
