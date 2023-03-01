@@ -11,7 +11,7 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 #include "LookAndFeel.h"
-#include "Constants.h"
+#include "Utilities.h"
 
 //==============================================================================
 /**
@@ -19,11 +19,11 @@
 class MetroGnomeAudioProcessorEditor : public juce::AudioProcessorEditor, juce::Timer
 {
 public:
-    MetroGnomeAudioProcessorEditor (MetroGnomeAudioProcessor&);
+    MetroGnomeAudioProcessorEditor(MetroGnomeAudioProcessor&);
     ~MetroGnomeAudioProcessorEditor() override;
 
     //==============================================================================
-    void paint (juce::Graphics&) override;
+    void paint(juce::Graphics&) override;
     void paintMetronomeMode(juce::Graphics&);
     void paintPolyRhythmMetronomeMode(juce::Graphics&);
     void paintPolyRhythmMachineMode(juce::Graphics& g);
@@ -56,7 +56,7 @@ private:
     //the attachment attaches an APVTS param to a slider
     RotarySliderWithLabels    bpmSlider, subdivisionSlider, numeratorSlider;
     juce::AudioProcessorValueTreeState::SliderAttachment bpmAttachment, subdivisionAttachment, numeratorAttachment;
-    
+
     //polyrhythm metronome buttons
     juce::ToggleButton Rhythm1Buttons[MAX_LENGTH];
     juce::ToggleButton Rhythm2Buttons[MAX_LENGTH];
@@ -64,12 +64,14 @@ private:
 
 
     juce::ToggleButton polyRhythmMachineButtons[MAX_MIDI_CHANNELS][MAX_LENGTH];
-    //RotarySliderWithLabels polyRhythmMachineSliders[MAX_MIDI_CHANNELS];
-    //juce::AudioProcessorValueTreeState::SliderAttachment polyRhythmMachineSliderAttachments[MAX_MIDI_CHANNELS];
-
+    juce::Slider polyRhythmMachineSubdivisionSliders[MAX_MIDI_CHANNELS];
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> polyRhythmMachineSubdivisionSliderAttachments[MAX_MIDI_CHANNELS];
+    juce::Slider polyRhythmMachineMidiSliders[MAX_MIDI_CHANNELS];
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> polyRhythmMachineMidiSliderAttachments[MAX_MIDI_CHANNELS];
 
     std::vector<juce::Component*> getVisibleComps();
     std::vector<juce::Component*> getHiddenComps();
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MetroGnomeAudioProcessorEditor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MetroGnomeAudioProcessorEditor)
 };
+
 

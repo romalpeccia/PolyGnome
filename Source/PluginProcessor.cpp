@@ -98,6 +98,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout MetroGnomeAudioProcessor::cr
          {
             layout.add(std::make_unique<juce::AudioParameterBool>("MACHINE" + to_string(i) + "." + to_string(j) + "TOGGLE", "Machine" + to_string(i) + "." + to_string(j) + "Toggle", false));
         }
+        layout.add(std::make_unique<juce::AudioParameterInt>("MACHINESUBDIVISIONS" + to_string(i), "Machine Subdivisions" + to_string(i), 1, MAX_LENGTH, 1));
     }
 
     return layout;

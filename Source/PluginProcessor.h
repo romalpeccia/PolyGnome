@@ -12,7 +12,7 @@
 #include "Metronome.h"
 #include "PolyRhythmMetronome.h"
 #include "PolyRhythmMachine.h"
-#include "Constants.h"
+#include "Utilities.h"
 
 
 //==============================================================================

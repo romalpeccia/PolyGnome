@@ -28,6 +28,10 @@ struct RotarySliderWithLabels : juce::Slider
         setLookAndFeel(&lnf);
     }
 
+    RotarySliderWithLabels() {
+       
+    }
+
     ~RotarySliderWithLabels() {
         setLookAndFeel(nullptr);
     }
