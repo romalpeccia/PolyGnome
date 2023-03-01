@@ -74,14 +74,15 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
 
 
 
-            if (apvts->getRawParameterValue("MACHINE" + to_string(i) + "." + to_string(rhythms[i].counter) + "TOGGLE")->load() == true)  {
+            if (apvts->getRawParameterValue("MACHINE" + to_string(i) + "." + to_string(rhythms[i].counter) + "TOGGLE")->load() == true) {
 
                 const auto timeToStartPlaying = rhythms[i].interval - rhythms[i].samplesProcessed;
+                int midiValue = apvts->getRawParameterValue("MACHINEMIDI" + to_string(i))->load();
                 for (auto samplenum = 0; samplenum < bufferSize + 1; samplenum++)
                 {
                     if (samplenum == timeToStartPlaying)
                     {
-                        handleNoteTrigger(midiBuffer, rhythms[i].midiValue + i); //TODO REMOVE THIS +i AFTER ADDING MIDIVALUE SLIDER
+                        handleNoteTrigger(midiBuffer, rhythms[i].midiValue);
                         DBG("played note" + to_string(i) + "." + to_string(rhythms[i].counter));
                     }
                 }
@@ -129,10 +130,16 @@ void PolyRhythmMachine::resetparams()
 
 
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
-        int tempRhythmValue = apvts->getRawParameterValue("MACHINESUBDIVISIONS" + to_string(i))->load();;       // apvts->getRawParameterValue("  ")->load();
+        int tempRhythmValue = apvts->getRawParameterValue("MACHINESUBDIVISIONS" + to_string(i))->load();;
         if (rhythms[i].value != tempRhythmValue)
         {
             rhythms[i].value = tempRhythmValue;
+            resetall();
+        }
+        int tempMidiValue = apvts->getRawParameterValue("MACHINEMIDI" + to_string(i))->load();
+        if (rhythms[i].value != tempMidiValue)
+        {
+            rhythms[i].value = tempMidiValue;
             resetall();
         }
         rhythms[i].interval = 4 * ((60.0 / bpm) * sampleRate) / rhythms[i].value;

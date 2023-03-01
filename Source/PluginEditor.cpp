@@ -85,7 +85,7 @@ MetroGnomeAudioProcessorEditor::MetroGnomeAudioProcessorEditor(MetroGnomeAudioPr
             polyRhythmMachineSubdivisionSliders[i]);
 
         polyRhythmMachineMidiSliders[i].setSliderStyle(juce::Slider::SliderStyle::Rotary);
-        polyRhythmMachineSubdivisionSliderAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,
+        polyRhythmMachineMidiSliderAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,
             "MACHINEMIDI" + to_string(i),
             polyRhythmMachineMidiSliders[i]);
 

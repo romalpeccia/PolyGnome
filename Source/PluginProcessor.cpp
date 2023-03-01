@@ -14,14 +14,14 @@ using namespace std;
 //==============================================================================
 MetroGnomeAudioProcessor::MetroGnomeAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
-     : AudioProcessor (BusesProperties()
-                     #if ! JucePlugin_IsMidiEffect
-                      #if ! JucePlugin_IsSynth
-                       .withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
-                      #endif
-                       .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
-                     #endif
-                       )
+    : AudioProcessor(BusesProperties()
+#if ! JucePlugin_IsMidiEffect
+#if ! JucePlugin_IsSynth
+        .withInput("Input", juce::AudioChannelSet::stereo(), true)
+#endif
+        .withOutput("Output", juce::AudioChannelSet::stereo(), true)
+#endif
+    )
 #endif
 {
 }
@@ -58,7 +58,7 @@ void MetroGnomeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
     }
     else if (apvts.getRawParameterValue("ON/OFF")->load() == true && mode == 1)
     {
-        polyRhythmMetronome.getNextAudioBlock(buffer,midiMessages);
+        polyRhythmMetronome.getNextAudioBlock(buffer, midiMessages);
     }
     else if (apvts.getRawParameterValue("ON/OFF")->load() == true && mode == 3)
     {
@@ -86,19 +86,21 @@ juce::AudioProcessorValueTreeState::ParameterLayout MetroGnomeAudioProcessor::cr
     stringArray.add("Polymeter");
     stringArray.add("Machine");
     layout.add(std::make_unique<juce::AudioParameterChoice>("MODE", "Mode", stringArray, 0));
-    
+
     for (int i = 0; i < MAX_LENGTH; i++) {
-        layout.add(std::make_unique<juce::AudioParameterBool>("RHYTHM1."+ to_string(i) + "TOGGLE", "Rhythm1." + to_string(i) + " Toggle", false));
+        layout.add(std::make_unique<juce::AudioParameterBool>("RHYTHM1." + to_string(i) + "TOGGLE", "Rhythm1." + to_string(i) + " Toggle", false));
         layout.add(std::make_unique<juce::AudioParameterBool>("RHYTHM2." + to_string(i) + "TOGGLE", "Rhythm2." + to_string(i) + " Toggle", false));
     }
 
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++)
-     {
+    {
         for (int j = 0; j < MAX_LENGTH; j++)
-         {
+        {
             layout.add(std::make_unique<juce::AudioParameterBool>("MACHINE" + to_string(i) + "." + to_string(j) + "TOGGLE", "Machine" + to_string(i) + "." + to_string(j) + "Toggle", false));
         }
         layout.add(std::make_unique<juce::AudioParameterInt>("MACHINESUBDIVISIONS" + to_string(i), "Machine Subdivisions" + to_string(i), 1, MAX_LENGTH, 1));
+        layout.add(std::make_unique<juce::AudioParameterInt>("MACHINEMIDI" + to_string(i), "Machine Midi" + to_string(i), 0, 127, 36 + i));
+
     }
 
     return layout;
@@ -158,29 +160,29 @@ const juce::String MetroGnomeAudioProcessor::getName() const
 
 bool MetroGnomeAudioProcessor::acceptsMidi() const
 {
-   #if JucePlugin_WantsMidiInput
+#if JucePlugin_WantsMidiInput
     return true;
-   #else
+#else
     return false;
-   #endif
+#endif
 }
 
 bool MetroGnomeAudioProcessor::producesMidi() const
 {
-   #if JucePlugin_ProducesMidiOutput
+#if JucePlugin_ProducesMidiOutput
     return true;
-   #else
+#else
     return false;
-   #endif
+#endif
 }
 
 bool MetroGnomeAudioProcessor::isMidiEffect() const
 {
-   #if JucePlugin_IsMidiEffect
+#if JucePlugin_IsMidiEffect
     return true;
-   #else
+#else
     return false;
-   #endif
+#endif
 }
 
 double MetroGnomeAudioProcessor::getTailLengthSeconds() const
@@ -191,7 +193,7 @@ double MetroGnomeAudioProcessor::getTailLengthSeconds() const
 int MetroGnomeAudioProcessor::getNumPrograms()
 {
     return 1;   // NB: some hosts don't cope very well if you tell them there are 0 programs,
-                // so this should be at least 1, even if you're not really implementing programs.
+    // so this should be at least 1, even if you're not really implementing programs.
 }
 
 int MetroGnomeAudioProcessor::getCurrentProgram()
@@ -199,16 +201,16 @@ int MetroGnomeAudioProcessor::getCurrentProgram()
     return 0;
 }
 
-void MetroGnomeAudioProcessor::setCurrentProgram (int index)
+void MetroGnomeAudioProcessor::setCurrentProgram(int index)
 {
 }
 
-const juce::String MetroGnomeAudioProcessor::getProgramName (int index)
+const juce::String MetroGnomeAudioProcessor::getProgramName(int index)
 {
     return {};
 }
 
-void MetroGnomeAudioProcessor::changeProgramName (int index, const juce::String& newName)
+void MetroGnomeAudioProcessor::changeProgramName(int index, const juce::String& newName)
 {
 }
 
@@ -216,28 +218,28 @@ void MetroGnomeAudioProcessor::changeProgramName (int index, const juce::String&
 
 
 #ifndef JucePlugin_PreferredChannelConfigurations
-bool MetroGnomeAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
+bool MetroGnomeAudioProcessor::isBusesLayoutSupported(const BusesLayout& layouts) const
 {
-  #if JucePlugin_IsMidiEffect
-    juce::ignoreUnused (layouts);
+#if JucePlugin_IsMidiEffect
+    juce::ignoreUnused(layouts);
     return true;
-  #else
+#else
     // This is the place where you check if the layout is supported.
     // In this template code we only support mono or stereo.
     // Some plugin hosts, such as certain GarageBand versions, will only
     // load plugins that support stereo bus layouts.
     if (layouts.getMainOutputChannelSet() != juce::AudioChannelSet::mono()
-     && layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
+        && layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
         return false;
 
     // This checks if the input layout matches the output layout
-   #if ! JucePlugin_IsSynth
+#if ! JucePlugin_IsSynth
     if (layouts.getMainOutputChannelSet() != layouts.getMainInputChannelSet())
         return false;
-   #endif
+#endif
 
     return true;
-  #endif
+#endif
 }
 #endif
 
