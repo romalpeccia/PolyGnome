@@ -20,8 +20,8 @@ class Metronome
 
         void prepareToPlay(double _sampleRate, int samplesPerBlock);
         void getNextAudioBlock(juce::AudioBuffer<float>& buffer);
-        void resetall();
-        void resetparams();
+        void resetAll();
+        void resetParams();
         int getNumerator() {return numerator;}
         int getSubdivisions() {return subdivisions;}
         int getBPM() { return bpm;}

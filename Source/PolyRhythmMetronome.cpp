@@ -24,7 +24,7 @@ PolyRhythmMetronome::PolyRhythmMetronome()
 PolyRhythmMetronome::PolyRhythmMetronome(juce::AudioProcessorValueTreeState* _apvts)
 {
     apvts = _apvts;
-    resetall();
+    resetAll();
     formatManager.registerBasicFormats();
     auto sampleDir = "C:/JUCE_PROJECTS/MetroGnome/Samples/";
 
@@ -56,7 +56,7 @@ void PolyRhythmMetronome::prepareToPlay(double _sampleRate, int samplesPerBlock)
 {
     //preparetoplay should call every time we start (right before)
 
-    resetparams();
+    resetParams();
 
     if (sampleRate != _sampleRate)
     {
@@ -81,7 +81,7 @@ void PolyRhythmMetronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer, ju
 {   
 
 
-    resetparams();
+    resetParams();
     auto audioSourceChannelInfo = juce::AudioSourceChannelInfo(buffer);
     auto bufferSize = buffer.getNumSamples();
     totalSamples += bufferSize;
@@ -134,7 +134,8 @@ void PolyRhythmMetronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer, ju
                 if (samplenum == timeToStartPlaying)
                 {
                     rimShotHigh->getNextAudioBlock(audioSourceChannelInfo);
-                    handleNoteTrigger(midiBuffer, 38);
+                    handleNoteTrigger(midiBuffer, 36);
+                    handleNoteTrigger(midiBuffer, 37);
                 }
             }
         }
@@ -230,9 +231,9 @@ void PolyRhythmMetronome::handleNoteTrigger(juce::MidiBuffer& midiBuffer, int no
     }
 
 }
-void PolyRhythmMetronome::resetall()
+void PolyRhythmMetronome::resetAll()
 {   //this should be called whenever the metronome is stopped
-   // resetparams();
+   // resetParams();
     totalSamples = 0;
     rhythm1Counter = 0;
     rhythm2Counter = 0;
@@ -241,7 +242,7 @@ void PolyRhythmMetronome::resetall()
 }
 
 
-void PolyRhythmMetronome::resetparams()
+void PolyRhythmMetronome::resetParams()
 {  //this should be called when params change in UI to reflect changes in logic
    //the variables keeping track of time should be reset to reflect the new rhythm
 
@@ -249,13 +250,13 @@ void PolyRhythmMetronome::resetparams()
     if (rhythm1Value != tempR1Value)
     {
         rhythm1Value = tempR1Value;
-        resetall();
+        resetAll();
     }
     int tempR2Value = apvts->getRawParameterValue("SUBDIVISION")->load();
     if (rhythm2Value != tempR2Value)
     {
         rhythm2Value = tempR2Value;
-        resetall();
+        resetAll();
     }
 
 

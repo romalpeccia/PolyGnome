@@ -24,7 +24,8 @@ PolyRhythmMachine::PolyRhythmMachine()
 PolyRhythmMachine::PolyRhythmMachine(juce::AudioProcessorValueTreeState* _apvts)
 {
     apvts = _apvts;
-    resetall();
+    resetAll();
+    startTime = juce::Time::getMillisecondCounterHiRes()*0.001;
 }
 
 PolyRhythmMachine::~PolyRhythmMachine()
@@ -36,7 +37,7 @@ void PolyRhythmMachine::prepareToPlay(double _sampleRate, int samplesPerBlock)
 {
     //preparetoplay should call every time we start (right before)
 
-    resetparams();
+    resetParams();
 
     if (sampleRate != _sampleRate)
     {
@@ -49,7 +50,7 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
 {
 
 
-    resetparams();
+    resetParams(midiBuffer);
     auto bufferSize = buffer.getNumSamples();
     totalSamples += bufferSize;
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
@@ -57,33 +58,27 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
     }
 
 
-    int rhythmFlags[MAX_MIDI_CHANNELS];
+    
 
     //reset the rhythm counter
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
-        rhythmFlags[i] = (rhythms[i].samplesProcessed + bufferSize >= rhythms[i].interval && rhythms[i].value > 1);
-        if (rhythms[i].counter >= rhythms[i].value) {
+        rhythmFlags[i] = (rhythms[i].samplesProcessed + bufferSize >= rhythms[i].interval && rhythms[i].subdivisions > 1);
+        if (rhythms[i].counter >= rhythms[i].subdivisions) {
             rhythms[i].counter = 0;
-            totalSamples = 0;
-
         }
     }
 
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
         if (rhythmFlags[i]) {
-
-
-
             if (apvts->getRawParameterValue("MACHINE" + to_string(i) + "." + to_string(rhythms[i].counter) + "TOGGLE")->load() == true) {
 
                 const auto timeToStartPlaying = rhythms[i].interval - rhythms[i].samplesProcessed;
-                int midiValue = apvts->getRawParameterValue("MACHINEMIDI" + to_string(i))->load();
                 for (auto samplenum = 0; samplenum < bufferSize + 1; samplenum++)
                 {
                     if (samplenum == timeToStartPlaying)
                     {
-                        handleNoteTrigger(midiBuffer, rhythms[i].midiValue);
-                        DBG("played note" + to_string(i) + "." + to_string(rhythms[i].counter));
+                        handleNoteTrigger(midiBuffer, rhythms[i].midiValue, rhythms[i].interval);
+                        //DBG("played note" + to_string(i) + "." + to_string(rhythms[i].counter));
                     }
                 }
             }
@@ -95,24 +90,20 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
 
 }
 
-void PolyRhythmMachine::handleNoteTrigger(juce::MidiBuffer& midiBuffer, int noteNumber)
+void PolyRhythmMachine::handleNoteTrigger(juce::MidiBuffer& midiBuffer, int noteNumber, int interval)
 {
-    auto noteDuration = sampleRate;
     auto message = juce::MidiMessage::noteOn(1, noteNumber, (juce::uint8)100);
-    //message.setTimeStamp(noteDuration);
-
     auto messageOff = juce::MidiMessage::noteOff(message.getChannel(), message.getNoteNumber());
-    //messageOff.setTimeStamp((noteDuration));
 
-    if (!midiBuffer.addEvent(message, 0) || !midiBuffer.addEvent(messageOff, 100))
+
+    if (!midiBuffer.addEvent(messageOff, 0)|| !midiBuffer.addEvent(message, 0) )
     {
         DBG("error adding messages to midiBuffer");
     }
-
 }
-void PolyRhythmMachine::resetall()
+void PolyRhythmMachine::resetAll()
 {   //this should be called whenever the metronome is stopped
-   // resetparams();
+   // resetParams();
     totalSamples = 0;
 
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
@@ -123,29 +114,58 @@ void PolyRhythmMachine::resetall()
 }
 
 
-void PolyRhythmMachine::resetparams()
+void PolyRhythmMachine::resetParams(juce::MidiBuffer& midiBuffer)
 {  //this should be called when params change in UI to reflect changes in logic
    //the variables keeping track of time should be reset to reflect the new rhythm
-
+   //this overloaded version allows you to send note offs for any notes currently playing, which is needed if the user changes a MIDI value while the app is running 
 
 
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
         int tempRhythmValue = apvts->getRawParameterValue("MACHINESUBDIVISIONS" + to_string(i))->load();;
-        if (rhythms[i].value != tempRhythmValue)
+        if (rhythms[i].subdivisions != tempRhythmValue)
         {
-            rhythms[i].value = tempRhythmValue;
-            resetall();
+            rhythms[i].subdivisions = tempRhythmValue;
+            resetAll();
         }
         int tempMidiValue = apvts->getRawParameterValue("MACHINEMIDI" + to_string(i))->load();
-        if (rhythms[i].value != tempMidiValue)
+        if (rhythms[i].midiValue != tempMidiValue)
         {
-            rhythms[i].value = tempMidiValue;
-            resetall();
-        }
-        rhythms[i].interval = 4 * ((60.0 / bpm) * sampleRate) / rhythms[i].value;
-    }
+            auto messageOff = juce::MidiMessage::noteOff(1, rhythms[i].midiValue);
+            midiBuffer.addEvent(messageOff, 0);
+            rhythms[i].midiValue = tempMidiValue;
 
+            resetAll();
+        }
+        rhythms[i].interval = 4 * ((60.0 / bpm) * sampleRate) / rhythms[i].subdivisions;
+
+    }
     bpm = apvts->getRawParameterValue("BPM")->load();
 
 
 }
+
+void PolyRhythmMachine::resetParams()
+{  //this should be called when params change in UI to reflect changes in logic
+   //the variables keeping track of time should be reset to reflect the new rhythm
+
+    for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
+        int tempRhythmValue = apvts->getRawParameterValue("MACHINESUBDIVISIONS" + to_string(i))->load();;
+        if (rhythms[i].subdivisions != tempRhythmValue)
+        {
+            rhythms[i].subdivisions = tempRhythmValue;
+            resetAll();
+        }
+        int tempMidiValue = apvts->getRawParameterValue("MACHINEMIDI" + to_string(i))->load();
+        if (rhythms[i].midiValue != tempMidiValue)
+        {
+            rhythms[i].midiValue = tempMidiValue;
+            resetAll();
+        }
+        rhythms[i].interval = 4 * ((60.0 / bpm) * sampleRate) / rhythms[i].subdivisions;
+
+    }
+    bpm = apvts->getRawParameterValue("BPM")->load();
+
+
+}
+

@@ -63,7 +63,7 @@ private:
 
 
 
-    juce::ToggleButton polyRhythmMachineButtons[MAX_MIDI_CHANNELS][MAX_LENGTH];
+    juce::TextButton polyRhythmMachineButtons[MAX_MIDI_CHANNELS][MAX_LENGTH];
     juce::Slider polyRhythmMachineSubdivisionSliders[MAX_MIDI_CHANNELS];
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> polyRhythmMachineSubdivisionSliderAttachments[MAX_MIDI_CHANNELS];
     juce::Slider polyRhythmMachineMidiSliders[MAX_MIDI_CHANNELS];

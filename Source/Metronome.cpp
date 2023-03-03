@@ -19,7 +19,7 @@ Metronome::Metronome(juce::AudioProcessorValueTreeState* _apvts)
 {
     //TODO: probably don't need to copy the apvts, double check here and in other constructors
     apvts = _apvts;  
-    resetall();
+    resetAll();
     formatManager.registerBasicFormats();
     auto sampleDir = "C:/JUCE_PROJECTS/MetroGnome/Samples/";
 
@@ -47,7 +47,7 @@ void Metronome::prepareToPlay(double _sampleRate, int samplesPerBlock)
 {
 //preparetoplay should call every time we start (right before)
 
-    resetparams();
+    resetParams();
 
     if (sampleRate != _sampleRate)
     {
@@ -75,7 +75,7 @@ void Metronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer)
 {
  //TODO cache calculations for less processing?
    
-    resetparams();
+    resetParams();
 
     //TODO fix bug instead of this bandaid for sync issues
     if (subdivisionCounter > subdivisions)
@@ -152,9 +152,9 @@ void Metronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer)
 
 
 
-void Metronome::resetall() 
+void Metronome::resetAll() 
 {   //this should be called whenever the metronome is stopped
-    resetparams();
+    resetParams();
     totalSamples = 0;
     beatCounter = numerator;
     subdivisionCounter = subdivisions;
@@ -163,7 +163,7 @@ void Metronome::resetall()
 }
 
 
-void Metronome::resetparams()
+void Metronome::resetParams()
 {  //this should be called whenever the processor changes a parameter (which should only happen when the user interacts with the GUI)
     //TODO: check if loading all of these is expensive, maybe we can only load the changed param
     numerator = apvts->getRawParameterValue("NUMERATOR")->load();

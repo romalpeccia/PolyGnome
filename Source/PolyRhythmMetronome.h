@@ -25,8 +25,8 @@ public:
 
     void prepareToPlay(double _sampleRate, int samplesPerBlock);
     void getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiBuffer);// override; //no override?
-    void resetall() ;
-    void resetparams();
+    void resetAll() ;
+    void resetParams();
     int getRhythm1Counter() { return rhythm1Counter; }
     int getRhythm2Counter() { return rhythm2Counter; }
     int getTotalSamples() { return totalSamples; }
