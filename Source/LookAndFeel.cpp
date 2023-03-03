@@ -22,7 +22,7 @@ void CustomLookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int wi
 
     if (enabled)
     {
-        g.setColour(juce::Colours::purple);
+        g.setColour(juce::Colours::purple);//Colour(48u, 9u, 84)
         g.fillEllipse(bounds);
 
         g.setColour(Colour(128u, 77u, 1u));

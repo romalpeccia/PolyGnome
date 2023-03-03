@@ -5,7 +5,8 @@
               pluginCharacteristicsValue="pluginProducesMidiOut" companyName="Romal">
   <MAINGROUP id="PkQ1Xo" name="MetroGnome">
     <GROUP id="{C6B4A32D-9EBD-62FC-20B1-EDF06920B470}" name="Source">
-      <FILE id="axyEvd" name="Utilities.h" compile="0" resource="0" file="Source/Utilities.h"/>
+      <FILE id="fnmiPc" name="Utilities.cpp" compile="1" resource="0" file="Source/Utilities.cpp"/>
+      <FILE id="n45m6i" name="Utilities.h" compile="0" resource="0" file="Source/Utilities.h"/>
       <FILE id="znq21E" name="PolyRhythmMachine.cpp" compile="1" resource="0"
             file="Source/PolyRhythmMachine.cpp"/>
       <FILE id="IY3ewK" name="PolyRhythmMachine.h" compile="0" resource="0"
