@@ -14,7 +14,7 @@ string midiIntToString(int midiValue) {
 
     if (midiValue > 127 || midiValue < 0)
     {
-        return "error: midiValue out of range";
+        return "";
     }
     string noteName;
     string noteInt;

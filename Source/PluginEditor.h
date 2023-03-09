@@ -67,7 +67,10 @@ private:
     juce::Slider polyRhythmMachineSubdivisionSliders[MAX_MIDI_CHANNELS];
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> polyRhythmMachineSubdivisionSliderAttachments[MAX_MIDI_CHANNELS];
     juce::Slider polyRhythmMachineMidiSliders[MAX_MIDI_CHANNELS];
+    juce::TextEditor polyRhythmMachineMidiTextEditors[MAX_MIDI_CHANNELS];
+
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> polyRhythmMachineMidiSliderAttachments[MAX_MIDI_CHANNELS];
+
 
     std::vector<juce::Component*> getVisibleComps();
     std::vector<juce::Component*> getHiddenComps();
