@@ -49,6 +49,17 @@ void MetroGnomeAudioProcessor::releaseResources()
 
 void MetroGnomeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
+   
+    //check if the user is in a recognized DAW or other host
+    if (juce::String(pluginHostType.getHostDescription()) != "Unknown") {
+        //apvts.getRawParameterValue("HOST_CONNECTED")->store(true);
+        /*
+        if (double bpm = playHead->getPosition()->getBpm() != 0) {
+            
+        }
+        */
+    }
+   
     midiMessages.clear();
     auto mode = apvts.getRawParameterValue("MODE")->load();
 
@@ -75,6 +86,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout MetroGnomeAudioProcessor::cr
 
 
     layout.add(std::make_unique<juce::AudioParameterBool>("ON/OFF", "On/Off", false));
+    layout.add(std::make_unique<juce::AudioParameterBool>("HOST_CONNECTED", "Host Connected", false));
     layout.add(std::make_unique<juce::AudioParameterFloat>("BPM", "bpm", juce::NormalisableRange<float>(1.f, 300.f, 0.1f, 0.25f), 120.f));
     layout.add(std::make_unique<juce::AudioParameterInt>("SUBDIVISION", "Subdivision", 1, MAX_LENGTH, 1));
     layout.add(std::make_unique<juce::AudioParameterInt>("NUMERATOR", "Numerator", 1, MAX_LENGTH, 4));
@@ -88,18 +100,18 @@ juce::AudioProcessorValueTreeState::ParameterLayout MetroGnomeAudioProcessor::cr
     layout.add(std::make_unique<juce::AudioParameterChoice>("MODE", "Mode", stringArray, 0));
 
     for (int i = 0; i < MAX_LENGTH; i++) {
-        layout.add(std::make_unique<juce::AudioParameterBool>("RHYTHM1." + to_string(i) + "TOGGLE", "Rhythm1." + to_string(i) + " Toggle", false));
-        layout.add(std::make_unique<juce::AudioParameterBool>("RHYTHM2." + to_string(i) + "TOGGLE", "Rhythm2." + to_string(i) + " Toggle", false));
+        layout.add(std::make_unique<juce::AudioParameterBool>("RHYTHM1." + to_string(i) + "_TOGGLE", "Rhythm1." + to_string(i) + " Toggle", false));
+        layout.add(std::make_unique<juce::AudioParameterBool>("RHYTHM2." + to_string(i) + "_TOGGLE", "Rhythm2." + to_string(i) + " Toggle", false));
     }
 
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++)
     {
         for (int j = 0; j < MAX_LENGTH; j++)
         {
-            layout.add(std::make_unique<juce::AudioParameterBool>("MACHINE" + to_string(i) + "." + to_string(j) + "TOGGLE", "Machine" + to_string(i) + "." + to_string(j) + "Toggle", false));
+            layout.add(std::make_unique<juce::AudioParameterBool>("MACHINE" + to_string(i) + "." + to_string(j) + "_TOGGLE", "Machine" + to_string(i) + "." + to_string(j) + "Toggle", false));
         }
-        layout.add(std::make_unique<juce::AudioParameterInt>("MACHINESUBDIVISIONS" + to_string(i), "Machine Subdivisions" + to_string(i), 1, MAX_LENGTH, 1));
-        layout.add(std::make_unique<juce::AudioParameterInt>("MACHINEMIDI" + to_string(i), "Machine Midi" + to_string(i), 0, 127, 36 + i));
+        layout.add(std::make_unique<juce::AudioParameterInt>("MACHINE_SUBDIVISIONS" + to_string(i), "Machine Subdivisions" + to_string(i), 1, MAX_LENGTH, 1));
+        layout.add(std::make_unique<juce::AudioParameterInt>("MACHINE_MIDI_VALUE" + to_string(i), "Machine Midi" + to_string(i), 0, 127, 36 + i));
 
     }
 

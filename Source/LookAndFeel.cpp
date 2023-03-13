@@ -22,10 +22,10 @@ void CustomLookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int wi
 
     if (enabled)
     {
-        g.setColour(juce::Colours::purple);//Colour(48u, 9u, 84)
+        g.setColour(juce::Colours::indigo);
         g.fillEllipse(bounds);
 
-        g.setColour(Colour(128u, 77u, 1u));
+        g.setColour(juce::Colours::orange);
         g.drawEllipse(bounds, 1.f);
     }
     else
@@ -61,9 +61,9 @@ void CustomLookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int wi
         auto strWidth = g.getCurrentFont().getStringWidth(text);
         r.setSize(strWidth + 4, rswl->getTextHeight() + 2);
         r.setCentre(center);
-        g.setColour(enabled ? Colour(48u, 9u, 84) : Colours::darkgrey);
+        g.setColour(enabled ? Colours::indigo : Colours::darkgrey);
         g.fillRect(r);
-        g.setColour(enabled ? Colours::orange : Colours::darkgrey);
+        g.setColour(Colours::orange); //g.setColour(enabled ? Colours::orange : Colours::darkgrey);
         g.drawFittedText(text, r.toNearestInt(), juce::Justification::centred, 1);
     }
 }
@@ -84,7 +84,7 @@ void RotarySliderWithLabels::paint(juce::Graphics& g) {
     /*
     g.setColour(Colours::red);
     g.drawRect(getLocalBounds());
-    g.setColour(Colours::yellow);
+    g.setColour(Colours::green );
     g.drawRect(sliderBounds);
     */
     getLookAndFeel().drawRotarySlider(g, sliderBounds.getX(), sliderBounds.getY(), sliderBounds.getWidth(), sliderBounds.getHeight(),
@@ -94,7 +94,7 @@ void RotarySliderWithLabels::paint(juce::Graphics& g) {
     auto center = sliderBounds.toFloat().getCentre();
     auto radius = sliderBounds.getWidth() * 0.5f;
 
-    g.setColour(Colours::white);
+    g.setColour(Colours::lightgrey);
     g.setFont(getTextHeight());
 
     //iterate through labels and draw them?

@@ -70,8 +70,12 @@ public:
     PolyRhythmMetronome polyRhythmMetronome{ &apvts };
     PolyRhythmMachine polyRhythmMachine{ &apvts };
 
-private:
 
+
+private:
+    juce::AudioPlayHead *playHead;
+    juce::PluginHostType pluginHostType;
+    juce::PluginHostType::HostType pluginHostType2;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MetroGnomeAudioProcessor)

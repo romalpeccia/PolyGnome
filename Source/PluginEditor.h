@@ -27,7 +27,8 @@ public:
     void paintMetronomeMode(juce::Graphics&);
     void paintPolyRhythmMetronomeMode(juce::Graphics&);
     void paintPolyRhythmMachineMode(juce::Graphics& g);
-
+    void drawPolyRhythmVisual(juce::Graphics& g, int radius, int width, int height, int X, int Y, int rhythmValue, float radiusSkew, juce::Colour color1, juce::Colour color, int index);
+    void changeMenuButtonColors(juce::TextButton *buttonOn);
 
     juce::Rectangle<int> getVisualArea();
 
@@ -36,8 +37,8 @@ public:
         repaint();
     };
 
-    void play();
-    void MetroGnomeAudioProcessorEditor::drawPolyRhythmVisual(juce::Graphics& g, int radius, int width, int height, int X, int Y, int rhythmValue, float radiusSkew, juce::Colour color1, juce::Colour color, int index);
+    void toggleAudioProcessorChildrenStates();
+   
 
 private:
     MetroGnomeAudioProcessor& audioProcessor;
@@ -74,6 +75,13 @@ private:
 
     std::vector<juce::Component*> getVisibleComps();
     std::vector<juce::Component*> getHiddenComps();
+
+
+
+
+
+
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MetroGnomeAudioProcessorEditor)
 };
 

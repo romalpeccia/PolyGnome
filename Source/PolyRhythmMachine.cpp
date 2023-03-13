@@ -70,7 +70,7 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
 
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
         if (rhythmFlags[i]) {
-            if (apvts->getRawParameterValue("MACHINE" + to_string(i) + "." + to_string(rhythms[i].counter) + "TOGGLE")->load() == true) {
+            if (apvts->getRawParameterValue("MACHINE" + to_string(i) + "." + to_string(rhythms[i].counter) + "_TOGGLE")->load() == true) {
 
                 const auto timeToStartPlaying = rhythms[i].interval - rhythms[i].samplesProcessed;
                 for (auto samplenum = 0; samplenum < bufferSize + 1; samplenum++)
@@ -117,19 +117,19 @@ void PolyRhythmMachine::resetAll()
 
 
 void PolyRhythmMachine::resetParams(juce::MidiBuffer& midiBuffer)
-{  //this should be called when params change in UI to reflect changes in logic
-   //the variables keeping track of time should be reset to reflect the new rhythm
+{  //this should be called when slider params change in UI to reflect changes in logic
+   //the variables keeping track of time should be reset to reflect the new rhythm (TODO: maybe not? test this)
    //this overloaded version allows you to send note offs for any notes currently playing, which is needed if the user changes a MIDI value while the app is running 
-
+  
 
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
-        int tempRhythmValue = apvts->getRawParameterValue("MACHINESUBDIVISIONS" + to_string(i))->load();;
+        int tempRhythmValue = apvts->getRawParameterValue("MACHINE_SUBDIVISIONS" + to_string(i))->load();;
         if (rhythms[i].subdivisions != tempRhythmValue)
-        {
+        {   
             rhythms[i].subdivisions = tempRhythmValue;
             resetAll();
         }
-        int tempMidiValue = apvts->getRawParameterValue("MACHINEMIDI" + to_string(i))->load();
+        int tempMidiValue = apvts->getRawParameterValue("MACHINE_MIDI_VALUE" + to_string(i))->load();
         if (rhythms[i].midiValue != tempMidiValue)
         {
             auto messageOff = juce::MidiMessage::noteOff(1, rhythms[i].midiValue);
@@ -151,13 +151,13 @@ void PolyRhythmMachine::resetParams()
    //the variables keeping track of time should be reset to reflect the new rhythm
 
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
-        int tempRhythmValue = apvts->getRawParameterValue("MACHINESUBDIVISIONS" + to_string(i))->load();;
+        int tempRhythmValue = apvts->getRawParameterValue("MACHINE_SUBDIVISIONS" + to_string(i))->load();;
         if (rhythms[i].subdivisions != tempRhythmValue)
         {
             rhythms[i].subdivisions = tempRhythmValue;
             resetAll();
         }
-        int tempMidiValue = apvts->getRawParameterValue("MACHINEMIDI" + to_string(i))->load();
+        int tempMidiValue = apvts->getRawParameterValue("MACHINE_MIDI_VALUE" + to_string(i))->load();
         if (rhythms[i].midiValue != tempMidiValue)
         {
             rhythms[i].midiValue = tempMidiValue;
