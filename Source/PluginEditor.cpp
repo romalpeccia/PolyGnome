@@ -30,36 +30,34 @@ MetroGnomeAudioProcessorEditor::MetroGnomeAudioProcessorEditor(MetroGnomeAudioPr
 
     //initialize the menu buttons
     playButton.onClick = [this]() { 
-        if (audioProcessor.apvts.getRawParameterValue("ON/OFF")->load() == true)
-        {
-            audioProcessor.apvts.getRawParameterValue("ON/OFF")->store(false);
-            playButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::steelblue);
-        }
-        else {
-            audioProcessor.apvts.getRawParameterValue("ON/OFF")->store(true);
-            playButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::indigo);
-        }
+
+        togglePlayState();
+        toggleAudioProcessorChildrenStates();
     };
 
     metronomeButton.onClick = [this]() {
         audioProcessor.apvts.getRawParameterValue("MODE")->store(0);
         changeMenuButtonColors(&metronomeButton);
         toggleAudioProcessorChildrenStates();
+        togglePlayStateOff();
     };
     polyRhythmButton.onClick = [this]() {
         audioProcessor.apvts.getRawParameterValue("MODE")->store(1);
         changeMenuButtonColors(&polyRhythmButton);
         toggleAudioProcessorChildrenStates();
+        togglePlayStateOff();
     };
     polyMeterButton.onClick = [this]() {
         audioProcessor.apvts.getRawParameterValue("MODE")->store(2);
         changeMenuButtonColors(&polyMeterButton);
         toggleAudioProcessorChildrenStates();
+        togglePlayStateOff();
     };
     polyRhythmMachineButton.onClick = [this]() {
         audioProcessor.apvts.getRawParameterValue("MODE")->store(3);
         changeMenuButtonColors(&polyRhythmMachineButton);
         toggleAudioProcessorChildrenStates();
+        togglePlayStateOff();
     };
     playButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::steelblue);
     metronomeButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::indigo);
@@ -114,15 +112,17 @@ MetroGnomeAudioProcessorEditor::MetroGnomeAudioProcessorEditor(MetroGnomeAudioPr
         polyRhythmMachineSubdivisionSliderAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,
             "MACHINE_SUBDIVISIONS" + to_string(i),
             polyRhythmMachineSubdivisionSliders[i]);
-        /*
+         
+
+        //initialize the MIDI control slider    
         polyRhythmMachineMidiSliders[i].setSliderStyle(juce::Slider::SliderStyle::Rotary);
         polyRhythmMachineMidiSliderAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,
             "MACHINE_MIDI_VALUE" + to_string(i),
             polyRhythmMachineMidiSliders[i]);
-        */
 
         //initialize the text entry for MIDI Values
-        polyRhythmMachineMidiTextEditors[i].setText(midiIntToString(36 + i) + " / " + to_string(36 + i));
+        int currentIntValue = audioProcessor.apvts.getRawParameterValue("MACHINE_MIDI_VALUE" + to_string(i))->load();
+        polyRhythmMachineMidiTextEditors[i].setText(midiIntToString(currentIntValue) + " / " + to_string(currentIntValue));
         polyRhythmMachineMidiTextEditors[i].setReadOnly(false);
         polyRhythmMachineMidiTextEditors[i].setColour(juce::TextEditor::ColourIds::textColourId, juce::Colours::orange);
         polyRhythmMachineMidiTextEditors[i].setColour(juce::TextEditor::ColourIds::focusedOutlineColourId, juce::Colours::orange);
@@ -133,30 +133,42 @@ MetroGnomeAudioProcessorEditor::MetroGnomeAudioProcessorEditor(MetroGnomeAudioPr
             string inputString = input.toStdString();
             int inputInt;
             string convertedString;
+            int currentIntValue = audioProcessor.apvts.getRawParameterValue("MACHINE_MIDI_VALUE" + to_string(i))->load();
             if (sscanf(inputString.c_str(), "%d", &inputInt) == 1)
             {   //if the user inputted an int
                 convertedString = midiIntToString(inputInt);
                 if (convertedString != "") {
                     polyRhythmMachineMidiTextEditors[i].setText(convertedString + " / " + to_string(inputInt));
                     audioProcessor.apvts.getRawParameterValue("MACHINE_MIDI_VALUE" + to_string(i))->store(inputInt);
+                    //add control of MIDI slider to textbox
+                    polyRhythmMachineMidiSliders[i].setValue(inputInt);
                 }
                 else {
-                    polyRhythmMachineMidiTextEditors[i].setText(midiIntToString(audioProcessor.apvts.getRawParameterValue("MACHINE_MIDI_VALUE" + to_string(i))->load()));
+                    polyRhythmMachineMidiTextEditors[i].setText(midiIntToString(currentIntValue) + " / " + to_string(currentIntValue));
                 }
-            }
+            } 
             else
             { //user inputted a string
                 int convertedInt = midiStringToInt(inputString);
                 if (convertedInt != -1) {
                     polyRhythmMachineMidiTextEditors[i].setText(inputString + " / " + to_string(convertedInt));
                     audioProcessor.apvts.getRawParameterValue("MACHINE_MIDI_VALUE" + to_string(i))->store(convertedInt);
+                    //add control of MIDI slider to textbox
+                    polyRhythmMachineMidiSliders[i].setValue(convertedInt);
                 }
                 else {
-                    polyRhythmMachineMidiTextEditors[i].setText(midiIntToString(audioProcessor.apvts.getRawParameterValue("MACHINE_MIDI_VALUE" + to_string(i))->load()));
+                    polyRhythmMachineMidiTextEditors[i].setText(midiIntToString(currentIntValue) + " / " + to_string(currentIntValue));
                 }
-                
             }   
         };
+
+        //add control of textbox to MIDI slider
+        polyRhythmMachineMidiSliders[i].onValueChange = [this, i]() {
+            int sliderInt = polyRhythmMachineMidiSliders[i].getValue();
+            polyRhythmMachineMidiTextEditors[i].setText(midiIntToString(sliderInt) + " / " + to_string(sliderInt));
+        };
+
+
     }
 
 
@@ -340,20 +352,23 @@ void MetroGnomeAudioProcessorEditor::paintPolyRhythmMachineMode(juce::Graphics& 
             polyRhythmMachineButtons[i][k].setVisible(false);
         }
 
-        //draw the sliders
+        //draw the sliders/texteditor
         juce::Rectangle<int> subdivisionSliderBounds(X + width + 10, Y + spacing * (i-1) , 75, 75);
         polyRhythmMachineSubdivisionSliders[i].setBounds(subdivisionSliderBounds);
+        polyRhythmMachineSubdivisionSliders[i].setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxRight, false, 25, spacing / 2);
         polyRhythmMachineSubdivisionSliders[i].setVisible(true);
-        polyRhythmMachineSubdivisionSliders[i].setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxRight, true, 25, spacing/2 );
 
-        /*
-        juce::Rectangle<int> midiSliderBounds(X + width + 10 + 75, Y + spacing * i - 35, 75, 75);
-        polyRhythmMachineMidiSliders[i].setBounds(midiSliderBounds);
-        polyRhythmMachineMidiSliders[i].setVisible(true);
-        */
+
         juce::Rectangle<int> midiTextEditorBounds(X + width + 10 + 85, Y + spacing * (i-1) + 25, 75, 25);
         polyRhythmMachineMidiTextEditors[i].setBounds(midiTextEditorBounds);
         polyRhythmMachineMidiTextEditors[i].setVisible(true);
+
+               
+        juce::Rectangle<int> midiSliderBounds(X + width + 10 + 160, Y + spacing * (i-1) + 13, 50, 50);
+        polyRhythmMachineMidiSliders[i].setBounds(midiSliderBounds);
+        polyRhythmMachineMidiSliders[i].setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, false, 0, 0);
+        polyRhythmMachineMidiSliders[i].setVisible(true);
+
     }
 
 }
@@ -543,12 +558,27 @@ void MetroGnomeAudioProcessorEditor::toggleAudioProcessorChildrenStates()
     audioProcessor.metronome.resetAll();
     audioProcessor.polyRhythmMetronome.resetAll();
     audioProcessor.polyRhythmMachine.resetAll();
-    audioProcessor.apvts.getRawParameterValue("ON/OFF")->store(false);
-    playButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::steelblue);
+
 
 }
+void MetroGnomeAudioProcessorEditor::togglePlayState() {
 
-
+    if (audioProcessor.apvts.getRawParameterValue("ON/OFF")->load() == true)
+    {
+        togglePlayStateOff();
+    }
+    else {
+        togglePlayStateOn();
+    }
+}
+void MetroGnomeAudioProcessorEditor::togglePlayStateOff() {
+    audioProcessor.apvts.getRawParameterValue("ON/OFF")->store(false);
+    playButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::steelblue);
+}
+void MetroGnomeAudioProcessorEditor::togglePlayStateOn() {
+    audioProcessor.apvts.getRawParameterValue("ON/OFF")->store(true);
+    playButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::indigo);
+}
 std::vector<juce::Component*> MetroGnomeAudioProcessorEditor::getVisibleComps() {
 
 
@@ -594,4 +624,18 @@ void MetroGnomeAudioProcessorEditor::changeMenuButtonColors(juce::TextButton *bu
     polyRhythmMachineButton.setColour(buttonColourId, juce::Colours::steelblue);
     placeholderButton.setColour(buttonColourId, juce::Colours::steelblue);
     buttonOn->setColour(buttonColourId, juce::Colours::indigo);
+}
+
+void MetroGnomeAudioProcessorEditor::storePolyRhythmMachineParams() {
+
+    for (int i = 0; i < MAX_MIDI_CHANNELS; i++)
+    {
+        for (int j = 0; j < MAX_LENGTH; j++)
+        {
+       //     "MACHINE" + to_string(i) + "." + to_string(j) + "_TOGGLE"
+        }
+        //"MACHINE_SUBDIVISIONS" + to_string(i)
+      // "MACHINE_MIDI_VALUE" + to_string(i)
+
+    }
 }

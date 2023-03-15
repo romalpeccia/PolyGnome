@@ -25,7 +25,7 @@ PolyRhythmMachine::PolyRhythmMachine(juce::AudioProcessorValueTreeState* _apvts)
 {
     apvts = _apvts;
     resetAll();
-    startTime = juce::Time::getMillisecondCounterHiRes()*0.001;
+
 }
 
 PolyRhythmMachine::~PolyRhythmMachine()
@@ -41,8 +41,8 @@ void PolyRhythmMachine::prepareToPlay(double _sampleRate, int samplesPerBlock)
 
     if (sampleRate != _sampleRate)
     {
-        //if the audioprocessors samplerate hasn't changed, nothing else needs to be done
         sampleRate = _sampleRate;
+        //change any logic that depends on sampleRate here
     }
 
 }
@@ -53,12 +53,10 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
     resetParams(midiBuffer);
     auto bufferSize = buffer.getNumSamples();
     totalSamples += bufferSize;
+
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
         rhythms[i].samplesProcessed = totalSamples % rhythms[i].interval;
     }
-
-
-    
 
     //reset the rhythm counter
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {

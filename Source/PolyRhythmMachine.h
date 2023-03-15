@@ -55,8 +55,6 @@ private:
     juce::AudioProcessorValueTreeState* apvts;
 
 
-    double startTime = juce::Time::getMillisecondCounterHiRes() * 0.001;
-    //
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PolyRhythmMachine)
 };
 

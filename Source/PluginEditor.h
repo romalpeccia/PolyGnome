@@ -38,7 +38,10 @@ public:
     };
 
     void toggleAudioProcessorChildrenStates();
-   
+    void togglePlayState();
+    void togglePlayStateOff();
+    void togglePlayStateOn();
+    void MetroGnomeAudioProcessorEditor::storePolyRhythmMachineParams();
 
 private:
     MetroGnomeAudioProcessor& audioProcessor;

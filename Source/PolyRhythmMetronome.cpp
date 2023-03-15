@@ -126,7 +126,7 @@ void PolyRhythmMetronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer, ju
         }
 
 
-        if (apvts->getRawParameterValue("RHYTHM1." + to_string(ID1) + "TOGGLE")->load() == true && apvts->getRawParameterValue("RHYTHM2." + to_string(ID2) + "TOGGLE")->load() == true) {
+        if (apvts->getRawParameterValue("RHYTHM1." + to_string(ID1) + "_TOGGLE")->load() == true && apvts->getRawParameterValue("RHYTHM2." + to_string(ID2) + "_TOGGLE")->load() == true) {
 
             rimShotHigh->setNextReadPosition(0); //reset sample to beginning
             for (auto samplenum = 0; samplenum < bufferSize + 1; samplenum++)
@@ -139,7 +139,7 @@ void PolyRhythmMetronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer, ju
                 }
             }
         }
-        else if (apvts->getRawParameterValue("RHYTHM1." + to_string(ID1) + "TOGGLE")->load() == true) {
+        else if (apvts->getRawParameterValue("RHYTHM1." + to_string(ID1) + "_TOGGLE")->load() == true) {
 
             rimShotLow->setNextReadPosition(0); //reset sample to beginning
             for (auto samplenum = 0; samplenum < bufferSize + 1; samplenum++)
@@ -151,7 +151,7 @@ void PolyRhythmMetronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer, ju
                 }
             }
         }
-        else if (apvts->getRawParameterValue("RHYTHM2." + to_string(ID2) + "TOGGLE")->load() == true) {
+        else if (apvts->getRawParameterValue("RHYTHM2." + to_string(ID2) + "_TOGGLE")->load() == true) {
 
 
             rimShotSub->setNextReadPosition(0); //reset sample to beginning
@@ -174,7 +174,7 @@ void PolyRhythmMetronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer, ju
     {
         rhythm1Counter += 1;
         //DBG(to_string(rhythm1Counter) + ";" + to_string(rhythm2Counter));
-        if (apvts->getRawParameterValue("RHYTHM1." + to_string(rhythm1Counter) + "TOGGLE")->load() == true) {
+        if (apvts->getRawParameterValue("RHYTHM1." + to_string(rhythm1Counter) + "_TOGGLE")->load() == true) {
 
             const auto timeToStartPlaying = rhythm1Interval - rhythm1SamplesProcessed;
             rimShotLow->setNextReadPosition(0); //reset sample to beginning
@@ -196,7 +196,7 @@ void PolyRhythmMetronome::getNextAudioBlock(juce::AudioBuffer<float>& buffer, ju
     {
         rhythm2Counter += 1;
         //DBG(to_string(rhythm1Counter) + ";" + to_string(rhythm2Counter));
-        if (apvts->getRawParameterValue("RHYTHM2." + to_string(rhythm2Counter) + "TOGGLE")->load() == true) {
+        if (apvts->getRawParameterValue("RHYTHM2." + to_string(rhythm2Counter) + "_TOGGLE")->load() == true) {
 
             const auto timeToStartPlaying = rhythm2Interval - rhythm2SamplesProcessed;
             rimShotSub->setNextReadPosition(0); //reset sample to beginning
