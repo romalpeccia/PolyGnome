@@ -23,8 +23,6 @@ MetroGnomeAudioProcessorEditor::MetroGnomeAudioProcessorEditor(MetroGnomeAudioPr
     numeratorAttachment(audioProcessor.apvts, "NUMERATOR", numeratorSlider)
 
 {
-
-
     //images are stored in binary using projucer
     logo = juce::ImageCache::getFromMemory(BinaryData::OSRS_gnome_png, BinaryData::OSRS_gnome_pngSize);
 
@@ -106,13 +104,12 @@ MetroGnomeAudioProcessorEditor::MetroGnomeAudioProcessorEditor(MetroGnomeAudioPr
                 }
                 else {
                     //audioProcessor.apvts.getRawParameterValue(name)->store(true);
-                    polyRhythmMachineButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::indigo);
+                    polyRhythmMachineButtons[i][j].setColour(juce::TextButton::ColourIds::buttonOnColourId, juce::Colours::indigo);
                 }
             };
             polyRhythmMachineButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::grey);
-
-            //polyRhythmMachineButtons[i][j].setClickingTogglesState(true);
-            //polyRhythmMachineButtonAttachments[i][j] = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.apvts, name,polyRhythmMachineButtons[i][j]);
+            polyRhythmMachineButtons[i][j].setClickingTogglesState(true);
+            polyRhythmMachineButtonAttachments[i][j] = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.apvts, name,polyRhythmMachineButtons[i][j]);
         }
         //initialize the subdivision sliders
         polyRhythmMachineSubdivisionSliders[i].setSliderStyle(juce::Slider::SliderStyle::Rotary);
@@ -352,13 +349,14 @@ void MetroGnomeAudioProcessorEditor::paintPolyRhythmMachineMode(juce::Graphics& 
             if (audioProcessor.apvts.getRawParameterValue("MACHINE" + to_string(i) + "." + to_string(j) + "_TOGGLE")->load() == true) {
 
                 if (j == audioProcessor.polyRhythmMachine.rhythms[i].counter) {
-                    polyRhythmMachineButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::green );
+                    polyRhythmMachineButtons[i][j].setColour(juce::TextButton::ColourIds::buttonOnColourId, juce::Colours::green );
                 }
                 else {
-                    polyRhythmMachineButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::indigo);
+                    polyRhythmMachineButtons[i][j].setColour(juce::TextButton::ColourIds::buttonOnColourId, juce::Colours::indigo);
                 }
             }
             else {
+                //TODO: redundant?
                 polyRhythmMachineButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::grey);
             }
               
@@ -642,7 +640,7 @@ void MetroGnomeAudioProcessorEditor::changeMenuButtonColors(juce::TextButton *bu
     polyMeterButton.setColour(buttonColourId, juce::Colours::steelblue);
     polyRhythmMachineButton.setColour(buttonColourId, juce::Colours::steelblue);
     placeholderButton.setColour(buttonColourId, juce::Colours::steelblue);
-    buttonOn->setColour(buttonColourId, juce::Colours::indigo);
+    buttonOn->setColour(juce::TextButton::ColourIds::buttonOnColourId, juce::Colours::indigo);
 }
 
 void MetroGnomeAudioProcessorEditor::savePreset() {
@@ -664,7 +662,7 @@ void MetroGnomeAudioProcessorEditor::savePreset() {
 }
 
 void MetroGnomeAudioProcessorEditor::loadPreset() {
-
+        //
 
 
         fileChooser = std::make_unique<juce::FileChooser>("Select a .gnome preset file",
@@ -678,6 +676,7 @@ void MetroGnomeAudioProcessorEditor::loadPreset() {
                 juce::File gnomeFile(chooser.getResult());
                 audioProcessor.apvts.replaceState(juce::ValueTree::fromXml(*juce::XmlDocument::parse(gnomeFile)));
             });
-    
-
+        
+        //TODO: bandaid fix for mode not being stored
+        audioProcessor.apvts.getRawParameterValue("MODE")->store(3);
 }
