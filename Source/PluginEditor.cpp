@@ -59,6 +59,15 @@ MetroGnomeAudioProcessorEditor::MetroGnomeAudioProcessorEditor(MetroGnomeAudioPr
         toggleAudioProcessorChildrenStates();
         togglePlayStateOff();
     };
+
+    loadPresetButton.onClick = [this]() {
+        loadPreset();
+    };
+    savePresetButton.onClick = [this]() {
+        savePreset();
+    };
+
+
     playButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::steelblue);
     metronomeButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::indigo);
     polyRhythmButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::steelblue);
@@ -92,15 +101,18 @@ MetroGnomeAudioProcessorEditor::MetroGnomeAudioProcessorEditor(MetroGnomeAudioPr
             juce::String name = "MACHINE" + to_string(i) + "." + to_string(j) + "_TOGGLE";
             polyRhythmMachineButtons[i][j].onClick = [this, name, i, j]() {
                 if (audioProcessor.apvts.getRawParameterValue(name)->load() == true) {
-                    audioProcessor.apvts.getRawParameterValue(name)->store(false);
+                    //audioProcessor.apvts.getRawParameterValue(name)->store(false);
                     polyRhythmMachineButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::grey);
                 }
                 else {
-                    audioProcessor.apvts.getRawParameterValue(name)->store(true);
+                    //audioProcessor.apvts.getRawParameterValue(name)->store(true);
                     polyRhythmMachineButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::indigo);
                 }
             };
             polyRhythmMachineButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::grey);
+
+            //polyRhythmMachineButtons[i][j].setClickingTogglesState(true);
+            //polyRhythmMachineButtonAttachments[i][j] = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.apvts, name,polyRhythmMachineButtons[i][j]);
         }
         //initialize the subdivision sliders
         polyRhythmMachineSubdivisionSliders[i].setSliderStyle(juce::Slider::SliderStyle::Rotary);
@@ -204,6 +216,8 @@ void MetroGnomeAudioProcessorEditor::resized()
     flexBox.items.add(juce::FlexItem(100, 50, polyRhythmButton));
     flexBox.items.add(juce::FlexItem(125, 50, polyMeterButton));
     flexBox.items.add(juce::FlexItem(150, 50, polyRhythmMachineButton));
+    flexBox.items.add(juce::FlexItem(175, 50, loadPresetButton));
+    flexBox.items.add(juce::FlexItem(200, 50, savePresetButton));
     flexBox.performLayout(playBounds);
 
 
@@ -259,6 +273,8 @@ void MetroGnomeAudioProcessorEditor::paint(juce::Graphics& g)
             subdivisionSlider.setVisible(true);
             numeratorSlider.setVisible(true);
         }
+        loadPresetButton.setVisible(false);
+        savePresetButton.setVisible(false);
     }
 
     if (mode == 1) {
@@ -297,7 +313,8 @@ juce::Rectangle<int> MetroGnomeAudioProcessorEditor::getVisualArea()
 
 void MetroGnomeAudioProcessorEditor::paintPolyRhythmMachineMode(juce::Graphics& g) {
       
-
+    loadPresetButton.setVisible(true);
+    savePresetButton.setVisible(true);
     //TODO look into only calling redraws of specific elements if needed
     auto visualArea = getVisualArea();
 
@@ -599,6 +616,8 @@ std::vector<juce::Component*> MetroGnomeAudioProcessorEditor::getVisibleComps() 
 std::vector<juce::Component*> MetroGnomeAudioProcessorEditor::getHiddenComps() {
 
     std::vector<juce::Component*> comps;
+    comps.push_back(&loadPresetButton);
+    comps.push_back(&savePresetButton);
     for (int i = 0; i < MAX_LENGTH; i++) {
         comps.push_back(&Rhythm1Buttons[i]);
         comps.push_back(&Rhythm2Buttons[i]);
@@ -626,16 +645,39 @@ void MetroGnomeAudioProcessorEditor::changeMenuButtonColors(juce::TextButton *bu
     buttonOn->setColour(buttonColourId, juce::Colours::indigo);
 }
 
-void MetroGnomeAudioProcessorEditor::storePolyRhythmMachineParams() {
+void MetroGnomeAudioProcessorEditor::savePreset() {
 
-    for (int i = 0; i < MAX_MIDI_CHANNELS; i++)
-    {
-        for (int j = 0; j < MAX_LENGTH; j++)
+
+
+    fileChooser = std::make_unique<juce::FileChooser>("Save a .gnome preset file",
+        juce::File::getCurrentWorkingDirectory(),
+        "*.gnome");
+    auto folderChooserFlags = juce::FileBrowserComponent::saveMode;
+
+    fileChooser->launchAsync(folderChooserFlags, [this](const juce::FileChooser& chooser )
         {
-       //     "MACHINE" + to_string(i) + "." + to_string(j) + "_TOGGLE"
-        }
-        //"MACHINE_SUBDIVISIONS" + to_string(i)
-      // "MACHINE_MIDI_VALUE" + to_string(i)
+            std::unique_ptr< juce::XmlElement > apvtsXML = audioProcessor.apvts.copyState().createXml();
+            juce::File gnomeFile(chooser.getResult());
+            apvtsXML->writeTo(gnomeFile, juce::XmlElement::TextFormat()); 
+            DBG(apvtsXML->toString());
+        });
+}
 
-    }
+void MetroGnomeAudioProcessorEditor::loadPreset() {
+
+
+
+        fileChooser = std::make_unique<juce::FileChooser>("Select a .gnome preset file",
+            juce::File::getCurrentWorkingDirectory(),
+            "*.gnome");
+
+        auto folderChooserFlags = juce::FileBrowserComponent::openMode ;
+
+        fileChooser->launchAsync(folderChooserFlags, [this](const juce::FileChooser& chooser)
+            {
+                juce::File gnomeFile(chooser.getResult());
+                audioProcessor.apvts.replaceState(juce::ValueTree::fromXml(*juce::XmlDocument::parse(gnomeFile)));
+            });
+    
+
 }

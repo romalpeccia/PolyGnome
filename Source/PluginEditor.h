@@ -54,7 +54,12 @@ private:
     juce::TextButton polyMeterButton{ "PolyMeter" };
     juce::TextButton polyRhythmMachineButton{ "PolyRhythm Machine" };
     juce::TextButton placeholderButton{ "Placeholder" };
+    juce::TextButton loadPresetButton{ "load preset" };
+    juce::TextButton savePresetButton{ "save preset" };
 
+    void loadPreset();
+    void savePreset();
+    std::unique_ptr<juce::FileChooser> fileChooser;
 
     //Sliders
     //the attachment attaches an APVTS param to a slider
@@ -68,6 +73,7 @@ private:
 
 
     juce::TextButton polyRhythmMachineButtons[MAX_MIDI_CHANNELS][MAX_LENGTH];
+    std::unique_ptr <juce::AudioProcessorValueTreeState::ButtonAttachment> polyRhythmMachineButtonAttachments[MAX_MIDI_CHANNELS][MAX_LENGTH];
     juce::Slider polyRhythmMachineSubdivisionSliders[MAX_MIDI_CHANNELS];
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> polyRhythmMachineSubdivisionSliderAttachments[MAX_MIDI_CHANNELS];
     juce::Slider polyRhythmMachineMidiSliders[MAX_MIDI_CHANNELS];

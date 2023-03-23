@@ -76,8 +76,8 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
                     if (samplenum == timeToStartPlaying)
                     {
                         handleNoteTrigger(midiBuffer, rhythms[i].midiValue, rhythms[i].interval);
-                        DBG(midiIntToString(rhythms[i].midiValue));
-                        DBG(to_string(midiStringToInt(midiIntToString(rhythms[i].midiValue))));
+                        //DBG(midiIntToString(rhythms[i].midiValue));
+                        //DBG(to_string(midiStringToInt(midiIntToString(rhythms[i].midiValue))));
                         //DBG("played note" + to_string(i) + "." + to_string(rhythms[i].counter));
                     }
                 }
