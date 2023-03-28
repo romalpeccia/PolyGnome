@@ -245,7 +245,7 @@ void MetroGnomeAudioProcessorEditor::paint(juce::Graphics& g)
     g.drawImageAt(logo, 0, 0);
 
     auto mode = audioProcessor.apvts.getRawParameterValue("MODE")->load();
-
+    DBG(mode);
     if (audioProcessor.apvts.getRawParameterValue("HOST_CONNECTED")->load()){
         bpmSlider.setEnabled(false);
     }
@@ -640,7 +640,7 @@ void MetroGnomeAudioProcessorEditor::changeMenuButtonColors(juce::TextButton *bu
     polyMeterButton.setColour(buttonColourId, juce::Colours::steelblue);
     polyRhythmMachineButton.setColour(buttonColourId, juce::Colours::steelblue);
     placeholderButton.setColour(buttonColourId, juce::Colours::steelblue);
-    buttonOn->setColour(juce::TextButton::ColourIds::buttonOnColourId, juce::Colours::indigo);
+    buttonOn->setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::indigo);
 }
 
 void MetroGnomeAudioProcessorEditor::savePreset() {
@@ -656,8 +656,12 @@ void MetroGnomeAudioProcessorEditor::savePreset() {
         {
             std::unique_ptr< juce::XmlElement > apvtsXML = audioProcessor.apvts.copyState().createXml();
             juce::File gnomeFile(chooser.getResult());
-            apvtsXML->writeTo(gnomeFile, juce::XmlElement::TextFormat()); 
-            DBG(apvtsXML->toString());
+
+            if (gnomeFile.existsAsFile()) {
+                apvtsXML->writeTo(gnomeFile, juce::XmlElement::TextFormat());
+                DBG(apvtsXML->toString());
+            }
+
         });
 }
 
@@ -674,7 +678,9 @@ void MetroGnomeAudioProcessorEditor::loadPreset() {
         fileChooser->launchAsync(folderChooserFlags, [this](const juce::FileChooser& chooser)
             {
                 juce::File gnomeFile(chooser.getResult());
-                audioProcessor.apvts.replaceState(juce::ValueTree::fromXml(*juce::XmlDocument::parse(gnomeFile)));
+                if (gnomeFile.existsAsFile()) {
+                    audioProcessor.apvts.replaceState(juce::ValueTree::fromXml(*juce::XmlDocument::parse(gnomeFile)));
+                }
             });
         
         //TODO: bandaid fix for mode not being stored

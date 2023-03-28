@@ -146,7 +146,8 @@ void MetroGnomeAudioProcessor::setStateInformation(const void* data, int sizeInB
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
 
-    /*
+    /*TODO: UNCOMMENT TO RESTORE params when the plugin is closed
+    * 
     auto tree = juce::ValueTree::readFromData(data, sizeInBytes);
     if (tree.isValid()) {
         apvts.replaceState(tree);
