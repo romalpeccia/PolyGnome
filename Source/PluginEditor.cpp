@@ -645,8 +645,6 @@ void MetroGnomeAudioProcessorEditor::changeMenuButtonColors(juce::TextButton *bu
 
 void MetroGnomeAudioProcessorEditor::savePreset() {
 
-
-
     fileChooser = std::make_unique<juce::FileChooser>("Save a .gnome preset file",
         juce::File::getCurrentWorkingDirectory(),
         "*.gnome");
@@ -666,8 +664,6 @@ void MetroGnomeAudioProcessorEditor::savePreset() {
 }
 
 void MetroGnomeAudioProcessorEditor::loadPreset() {
-        //
-
 
         fileChooser = std::make_unique<juce::FileChooser>("Select a .gnome preset file",
             juce::File::getCurrentWorkingDirectory(),
@@ -682,7 +678,4 @@ void MetroGnomeAudioProcessorEditor::loadPreset() {
                     audioProcessor.apvts.replaceState(juce::ValueTree::fromXml(*juce::XmlDocument::parse(gnomeFile)));
                 }
             });
-        
-        //TODO: bandaid fix for mode not being stored
-        audioProcessor.apvts.getRawParameterValue("MODE")->store(3);
 }
