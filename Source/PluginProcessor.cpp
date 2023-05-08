@@ -100,8 +100,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout MetroGnomeAudioProcessor::cr
     layout.add(std::make_unique<juce::AudioParameterChoice>("MODE", "Mode", stringArray, 0));
 
     for (int i = 0; i < MAX_LENGTH; i++) {
-        layout.add(std::make_unique<juce::AudioParameterBool>("RHYTHM1."+ to_string(i) + "TOGGLE", "Rhythm1." + to_string(i) + " Toggle", false));
-        layout.add(std::make_unique<juce::AudioParameterBool>("RHYTHM2." + to_string(i) + "TOGGLE", "Rhythm2." + to_string(i) + " Toggle", false));
+        layout.add(std::make_unique<juce::AudioParameterBool>("RHYTHM1."+ to_string(i) + "_TOGGLE", "Rhythm1." + to_string(i) + " Toggle", false));
+        layout.add(std::make_unique<juce::AudioParameterBool>("RHYTHM2." + to_string(i) + "_TOGGLE", "Rhythm2." + to_string(i) + " Toggle", false));
     }
 
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++)
