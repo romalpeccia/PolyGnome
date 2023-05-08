@@ -48,7 +48,7 @@ private:
 
     //persistent comps
     juce::Image logo;
-    juce::TextButton playButton{ "Start" };
+    juce::TextButton playButton{ "Play" };
     juce::TextButton metronomeButton{ "Default" };
     juce::TextButton polyRhythmButton{ "PolyRhythm" };
     juce::TextButton polyMeterButton{ "PolyMeter" };

@@ -457,10 +457,23 @@ void MetroGnomeAudioProcessorEditor::drawPolyRhythmCircle(juce::Graphics& g, int
         if (index == 1) {
             Rhythm1Buttons[i].setBounds(pointBounds);
             Rhythm1Buttons[i].setVisible(true);
+            if ((audioProcessor.apvts.getRawParameterValue("RHYTHM1." + to_string(i) + "_TOGGLE")->load() == true) && audioProcessor.polyRhythmMetronome.getRhythm1Counter() == i) {
+                Rhythm1Buttons[i].setColour(juce::ToggleButton::ColourIds::tickColourId, juce::Colours::green);
+            }
+            else {
+                 Rhythm1Buttons[i].setColour(juce::ToggleButton::ColourIds::tickColourId, juce::Colours::grey);
+            }
         }
         else if (index == 2) {
             Rhythm2Buttons[i].setBounds(pointBounds);
             Rhythm2Buttons[i].setVisible(true);
+
+            if ((audioProcessor.apvts.getRawParameterValue("RHYTHM2." + to_string(i) + "_TOGGLE")->load() == true) && audioProcessor.polyRhythmMetronome.getRhythm2Counter() == i){
+                Rhythm2Buttons[i].setColour(juce::ToggleButton::ColourIds::tickColourId, juce::Colours::green);
+            }
+            else {
+                Rhythm2Buttons[i].setColour(juce::ToggleButton::ColourIds::tickColourId, juce::Colours::grey);
+            }
         }
 
     }
