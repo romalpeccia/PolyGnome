@@ -26,8 +26,8 @@ public:
     void paint(juce::Graphics&) override;
     void paintMetronomeMode(juce::Graphics&);
     void paintPolyRhythmMetronomeMode(juce::Graphics&);
+    void drawPolyRhythmCircle(juce::Graphics& g, int radius, int width, int height, int X, int Y, int rhythmValue, float radiusSkew, juce::Colour color1, juce::Colour color, int index);
     void paintPolyRhythmMachineMode(juce::Graphics& g);
-    void drawPolyRhythmVisual(juce::Graphics& g, int radius, int width, int height, int X, int Y, int rhythmValue, float radiusSkew, juce::Colour color1, juce::Colour color, int index);
     void changeMenuButtonColors(juce::TextButton *buttonOn);
 
     juce::Rectangle<int> getVisualArea();

@@ -198,8 +198,6 @@ MetroGnomeAudioProcessorEditor::MetroGnomeAudioProcessorEditor(MetroGnomeAudioPr
 
 void MetroGnomeAudioProcessorEditor::resized()
 {
-    // This is generally where you'll want to lay out the positions of any
-    // subcomponents in your editor..
 
     juce::Rectangle<int> bounds = getLocalBounds();
     juce::Rectangle<int> playBounds(100, 100);
@@ -390,35 +388,32 @@ void MetroGnomeAudioProcessorEditor::paintPolyRhythmMachineMode(juce::Graphics& 
 
 void MetroGnomeAudioProcessorEditor::paintPolyRhythmMetronomeMode(juce::Graphics& g)
 {
-    auto visualArea = getVisualArea();
+
     //uncomment for debugging purposes    
-    g.setColour(juce::Colours::lightgrey);
     //g.drawRect(visualArea);
+
+    g.setColour(juce::Colours::lightgrey);
+    int rhythm1Value = audioProcessor.apvts.getRawParameterValue("NUMERATOR")->load();
+    int rhythm2Value = audioProcessor.apvts.getRawParameterValue("SUBDIVISION")->load();
+    auto visualArea = getVisualArea();
 
 
     int width = visualArea.getWidth();
     int height = visualArea.getHeight();
     int circleSkew = 1.2; //TODO adjust this using JUCE_LIVE_CONSTANT
-    int radius = ((width > height) ? height : width) / circleSkew;
-    //take the lesser of height and width to be our circle diameter
+    int radius = ((width > height) ? height : width) / circleSkew; //take the lesser of height and width of the visual area to be our circle diameter
     int X = visualArea.getX(); //top left corner X
     int Y = visualArea.getY(); //top left corner  Y
-
-
-    int rhythm1Value = audioProcessor.apvts.getRawParameterValue("NUMERATOR")->load();
-    int rhythm2Value = audioProcessor.apvts.getRawParameterValue("SUBDIVISION")->load();
-
-    auto ON = audioProcessor.apvts.getRawParameterValue("ON/OFF")->load();
-
-    //function params radius, width, height, X, Y
     if (rhythm1Value != 1)
     {
-        drawPolyRhythmVisual(g, radius, width, height, X, Y, rhythm1Value, 1, juce::Colours::lightgrey, juce::Colours::orange, 1);
+        drawPolyRhythmCircle(g, radius, width, height, X, Y, rhythm1Value, 1, juce::Colours::lightgrey, juce::Colours::orange, 1);
     }
     if (rhythm2Value != 1)
     {
-        drawPolyRhythmVisual(g, radius, width, height, X, Y, rhythm2Value, 1.5, juce::Colours::orange, juce::Colours::lightgrey, 2);
+        drawPolyRhythmCircle(g, radius, width, height, X, Y, rhythm2Value, 1.5, juce::Colours::orange, juce::Colours::lightgrey, 2);
     }
+    
+
 
     //hide any components that no longer need to be shown
     for (int i = rhythm1Value; i < MAX_LENGTH; i++) {
@@ -436,16 +431,18 @@ void MetroGnomeAudioProcessorEditor::paintPolyRhythmMetronomeMode(juce::Graphics
 
 }
 
-void MetroGnomeAudioProcessorEditor::drawPolyRhythmVisual(juce::Graphics& g, int radius, int width, int height, int X, int Y, int rhythmValue, float radiusSkew, juce::Colour color1, juce::Colour color2, int index) {
+void MetroGnomeAudioProcessorEditor::drawPolyRhythmCircle(juce::Graphics& g, int radius, int width, int height, int X, int Y, int rhythmValue, float radiusSkew, juce::Colour circleColour, juce::Colour handColour, int index) {
     // draws the perimiter of a circle with buttons on the line representing beats of the polyrythm, as well as the clock hand indicating which beat is being counted
+    // could potentially be adapted to include more than 2 indexes 
 
+    auto ON = audioProcessor.apvts.getRawParameterValue("ON/OFF")->load();
     //draw the circle
     juce::Path rhythmCircle;
     int rhythmRadius = radius / radiusSkew; //TODO maybe change this number, make a param?
     int Xoffset = (width - rhythmRadius) / 2;
     int Yoffset = (height - rhythmRadius) / 2;
     rhythmCircle.addEllipse(X + Xoffset, Y + Yoffset, rhythmRadius, rhythmRadius);
-    g.setColour(color1);
+    g.setColour(circleColour);
     g.strokePath(rhythmCircle, juce::PathStrokeType(2.0f));
 
 
@@ -468,14 +465,16 @@ void MetroGnomeAudioProcessorEditor::drawPolyRhythmVisual(juce::Graphics& g, int
 
     }
     //draw the clock hand
-    g.setColour(color2);
-    float angle = juce::degreesToRadians(360 * (float(audioProcessor.polyRhythmMetronome.getRhythm1Counter()) / float(rhythmValue)) + 180);
+    g.setColour(handColour);
+    float angle = 0;
     juce::Point<int> center;
     if (index == 1) {
         center.setXY(X + rhythmRadius / 2, Y + (height - Xoffset) / 2);
+        angle = juce::degreesToRadians(360 * (float(audioProcessor.polyRhythmMetronome.getRhythm1Counter()) / float(rhythmValue)) + 180);
     }
     else if (index == 2) {
         center.setXY(X + Xoffset + rhythmRadius / 2, Y + Yoffset + rhythmRadius / 2);
+        angle = juce::degreesToRadians(360 * (float(audioProcessor.polyRhythmMetronome.getRhythm2Counter()) / float(rhythmValue)) + 180);
     }
 
     juce::Path clockHand;
