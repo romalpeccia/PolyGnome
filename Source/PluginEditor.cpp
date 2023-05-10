@@ -346,7 +346,7 @@ void MetroGnomeAudioProcessorEditor::paintPolyRhythmMachineMode(juce::Graphics& 
             //TODO : clean this
             if (audioProcessor.apvts.getRawParameterValue("MACHINE" + to_string(i) + "." + to_string(j) + "_TOGGLE")->load() == true) {
 
-                if (j == audioProcessor.polyRhythmMachine.rhythms[i].counter) {
+                if (j == audioProcessor.polyRhythmMachine.rhythms[i].counter - 1) {
                     polyRhythmMachineButtons[i][j].setColour(juce::TextButton::ColourIds::buttonOnColourId, juce::Colours::green );
                 }
                 else {
@@ -354,7 +354,7 @@ void MetroGnomeAudioProcessorEditor::paintPolyRhythmMachineMode(juce::Graphics& 
                 }
             }
             else {
-                if (j == audioProcessor.polyRhythmMachine.rhythms[i].counter) {
+                if (j == audioProcessor.polyRhythmMachine.rhythms[i].counter - 1) {
                     polyRhythmMachineButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::darkgrey);
                 }
                 else {
@@ -362,8 +362,6 @@ void MetroGnomeAudioProcessorEditor::paintPolyRhythmMachineMode(juce::Graphics& 
                 }
 
             }
-              
-
         }
         //hide any hidden buttons
         for (int k = subdivisions; k < MAX_LENGTH; k++) {
