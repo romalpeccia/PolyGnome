@@ -261,8 +261,9 @@ void PolyRhythmMetronome::resetParams()
 
 
     bpm = apvts->getRawParameterValue("BPM")->load();
+    //4 * because we have 4 beats in a bar
     rhythm1Interval = 4 * ((60.0 / bpm) * sampleRate) / rhythm1Value;
     rhythm2Interval = 4 * ((60.0 / bpm) * sampleRate) / rhythm2Value;
-    ///TODO (maybe) assumes 4/4 time, maybe make time sig a parameter to advance this. explain why its 4*
+    ///TODO  assumes 4/4 time, a time signature parameter could be interesting
 
 }

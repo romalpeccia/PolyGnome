@@ -243,7 +243,6 @@ void MetroGnomeAudioProcessorEditor::paint(juce::Graphics& g)
     g.drawImageAt(logo, 0, 0);
 
     auto mode = audioProcessor.apvts.getRawParameterValue("MODE")->load();
-    DBG(mode);
     if (audioProcessor.apvts.getRawParameterValue("HOST_CONNECTED")->load()){
         bpmSlider.setEnabled(false);
     }
@@ -344,6 +343,7 @@ void MetroGnomeAudioProcessorEditor::paintPolyRhythmMachineMode(juce::Graphics& 
             polyRhythmMachineButtons[i][j].setBounds(pointBounds);
             polyRhythmMachineButtons[i][j].setVisible(true);
 
+            //TODO : clean this
             if (audioProcessor.apvts.getRawParameterValue("MACHINE" + to_string(i) + "." + to_string(j) + "_TOGGLE")->load() == true) {
 
                 if (j == audioProcessor.polyRhythmMachine.rhythms[i].counter) {
@@ -354,8 +354,13 @@ void MetroGnomeAudioProcessorEditor::paintPolyRhythmMachineMode(juce::Graphics& 
                 }
             }
             else {
-                //TODO: redundant?
-                polyRhythmMachineButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::grey);
+                if (j == audioProcessor.polyRhythmMachine.rhythms[i].counter) {
+                    polyRhythmMachineButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::darkgrey);
+                }
+                else {
+                    polyRhythmMachineButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::grey);
+                }
+
             }
               
 
