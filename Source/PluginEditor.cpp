@@ -354,7 +354,7 @@ void MetroGnomeAudioProcessorEditor::paintPolyRhythmMachineMode(juce::Graphics& 
                 }
             }
             else {
-                if (j == audioProcessor.polyRhythmMachine.rhythms[i].counter - 1) {
+                if (j == audioProcessor.polyRhythmMachine.rhythms[i].counter - 1 && audioProcessor.polyRhythmMachine.rhythms[i].subdivisions != 1) {
                     polyRhythmMachineButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::darkgrey);
                 }
                 else {
@@ -668,8 +668,9 @@ void MetroGnomeAudioProcessorEditor::savePreset() {
         {
             std::unique_ptr< juce::XmlElement > apvtsXML = audioProcessor.apvts.copyState().createXml();
             juce::File gnomeFile(chooser.getResult());
-
+            DBG("test");
             if (gnomeFile.existsAsFile()) {
+                DBG("test2");
                 apvtsXML->writeTo(gnomeFile, juce::XmlElement::TextFormat());
                 DBG(apvtsXML->toString());
             }
@@ -690,6 +691,7 @@ void MetroGnomeAudioProcessorEditor::loadPreset() {
                 juce::File gnomeFile(chooser.getResult());
                 if (gnomeFile.existsAsFile()) {
                     audioProcessor.apvts.replaceState(juce::ValueTree::fromXml(*juce::XmlDocument::parse(gnomeFile)));
+                    audioProcessor.apvts.getRawParameterValue("MODE")->store(3);
                 }
             });
 }

@@ -50,9 +50,9 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
 {
     resetParams(midiBuffer); //checks if user params have changed and updates class variables accordingly
     auto bufferSize = buffer.getNumSamples();
-    totalSamples += bufferSize; //usually ...128, 256, 512, 1024, currently 
+    totalSamples += bufferSize; //usually 16, 32, 64... 1024...
 
-    //test case for when i write unit tests
+    //unit test
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
         if (rhythms[i].interval * rhythms[i].subdivisions != samplesPerBar) {
             DBG("rhythm interval calculation error");
@@ -61,35 +61,39 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
     
 
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
-        float temp = rhythms[i].interval * (rhythms[i].counter);
+        float samplesCounted = rhythms[i].interval * (rhythms[i].counter);
         rhythms[i].samplesProcessed += bufferSize;
-        rhythmFlags[i] = (rhythms[i].samplesProcessed >= temp                         && rhythms[i].subdivisions > 1);
+        rhythmFlags[i] = (rhythms[i].samplesProcessed >= samplesCounted     );
 
-
-        if (rhythmFlags[i]) {
-            if (apvts->getRawParameterValue("MACHINE" + to_string(i) + "." + to_string(rhythms[i].counter) + "_TOGGLE")->load() == true) {
-                //TODO: sort out this bufferPosition calculation error. possibly related to GUI error?. possibly completely irrelevant variable
-                int bufferPosition = totalSamples - temp;
-                if (bufferPosition > bufferSize)
-                {
-                    DBG("midi buffer calculation error");
-                    DBG(rhythms[i].interval);
-                    DBG(totalSamples);
-                    DBG(temp);
-                }
-                handleNoteTrigger(midiBuffer, rhythms[i].midiValue, bufferPosition);
-            }
-            rhythms[i].counter += 1;
-        }
         if (rhythms[i].counter > rhythms[i].subdivisions) {
             rhythms[i].counter = 0;
             rhythms[i].samplesProcessed -= samplesPerBar;
         }
+        if (rhythmFlags[i]) {
+            if (rhythms[i].counter < MAX_MIDI_CHANNELS) {
+                if (apvts->getRawParameterValue("MACHINE" + to_string(i) + "." + to_string(rhythms[i].counter) + "_TOGGLE")->load() == true) {
+                    //TODO: sort out this bufferPosition calculation error. possibly related to GUI error?. possibly completely irrelevant variable
+
+
+                    int bufferPosition = totalSamples - samplesCounted;
+                    //bufferPosition = 0; //for debugging
+                    if (bufferPosition > bufferSize)
+                    {
+                        /*
+                        DBG("midi buffer calculation error");
+                        DBG(rhythms[i].interval);
+                        DBG(totalSamples);
+                        DBG(samplesCounted);
+                        */
+                        ;
+                    }
+                    handleNoteTrigger(midiBuffer, rhythms[i].midiValue, bufferPosition);
+                }
+            }
+            rhythms[i].counter += 1;
+        }
     }
 
-
-
-    //do something with noteOffs
     if (totalSamples > samplesPerBar) {
         totalSamples -= samplesPerBar;
     }
@@ -122,16 +126,27 @@ void PolyRhythmMachine::resetAll()
 
 void PolyRhythmMachine::resetParams(juce::MidiBuffer& midiBuffer)
 {  //this should be called when slider params change in UI to reflect changes in logic
-   //the variables keeping track of time should be reset to reflect the new rhythm (TODO: maybe not? test this)
    //this overloaded version allows you to send note offs for any notes currently playing, which is needed if the user changes a MIDI value while the app is running 
   
     bpm = apvts->getRawParameterValue("BPM")->load();
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
         int tempRhythmValue = apvts->getRawParameterValue("MACHINE_SUBDIVISIONS" + to_string(i))->load();;
         if (rhythms[i].subdivisions != tempRhythmValue)
-        {   
+        {
+            DBG("i:" << i);
+            DBG("tempRhythmValue" << tempRhythmValue);
+            auto oldRatio = (double)(rhythms[i].counter + 1.0)/ (double)(rhythms[i].subdivisions);
+            DBG("oldsubd: " << rhythms[i].subdivisions);
+            DBG("oldcounter: " <<  rhythms[i].counter);
+            DBG("oldRatio:" << oldRatio);
             rhythms[i].subdivisions = tempRhythmValue;
-            resetAll();
+            //solve for new rhythms[i].counter
+            
+            rhythms[i].counter = (int)(oldRatio * rhythms[i].subdivisions);
+            DBG("newsubd: " << rhythms[i].subdivisions);
+            DBG("newcounter: " << rhythms[i].counter);
+            
+
         }
         int tempMidiValue = apvts->getRawParameterValue("MACHINE_MIDI_VALUE" + to_string(i))->load();
         if (rhythms[i].midiValue != tempMidiValue)
@@ -139,8 +154,6 @@ void PolyRhythmMachine::resetParams(juce::MidiBuffer& midiBuffer)
             auto messageOff = juce::MidiMessage::noteOff(1, rhythms[i].midiValue);
             midiBuffer.addEvent(messageOff, 0);
             rhythms[i].midiValue = tempMidiValue;
-
-            resetAll();
         }
         samplesPerBar = 4 * (60.0 / bpm) * sampleRate;
         rhythms[i].interval = samplesPerBar / rhythms[i].subdivisions;
@@ -153,6 +166,7 @@ void PolyRhythmMachine::resetParams(juce::MidiBuffer& midiBuffer)
 void PolyRhythmMachine::resetParams()
 {  //this should be called when params change in UI to reflect changes in logic
    //the variables keeping track of time should be reset to reflect the new rhythm
+   //TODO: maybe this gets deleted in favor of the overloaded version
 
     bpm = apvts->getRawParameterValue("BPM")->load();
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
@@ -160,73 +174,16 @@ void PolyRhythmMachine::resetParams()
         if (rhythms[i].subdivisions != tempRhythmValue)
         {
             rhythms[i].subdivisions = tempRhythmValue;
-            resetAll();
+            //resetAll();
         }
         int tempMidiValue = apvts->getRawParameterValue("MACHINE_MIDI_VALUE" + to_string(i))->load();
         if (rhythms[i].midiValue != tempMidiValue)
         {
             rhythms[i].midiValue = tempMidiValue;
-            resetAll();
+            //resetAll();
         }
         samplesPerBar = 4 * (60.0 / bpm) * sampleRate;
         rhythms[i].interval = samplesPerBar / rhythms[i].subdivisions;
        
     }
-
-
-
 }
-
-
-
-
-
-
-/*
-void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiBuffer)
-{
-
-
-    resetParams(midiBuffer); //checks if user params have changed and updates class variables accordingly
-    auto bufferSize = buffer.getNumSamples();
-    totalSamples += bufferSize;
-
-    for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
-        rhythms[i].samplesProcessed = totalSamples % rhythms[i].interval;
-    }
-
-
-    for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
-        rhythmFlags[i] = (rhythms[i].samplesProcessed + bufferSize >= rhythms[i].interval && rhythms[i].subdivisions > 1);
-
-        if (rhythms[i].counter >= rhythms[i].subdivisions) {
-            rhythms[i].counter = 0;
-        }
-    }
-
-    for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
-        if (rhythmFlags[i]) {
-            if (apvts->getRawParameterValue("MACHINE" + to_string(i) + "." + to_string(rhythms[i].counter) + "_TOGGLE")->load() == true) {
-
-                const auto timeToStartPlaying = rhythms[i].interval - rhythms[i].samplesProcessed;
-                for (auto samplenum = 0; samplenum < bufferSize + 1; samplenum++)
-                {
-                    if (samplenum == timeToStartPlaying)
-                    {
-                        handleNoteTrigger(midiBuffer, rhythms[i].midiValue, rhythms[i].interval);
-                        //DBG(midiIntToString(rhythms[i].midiValue));
-                        //DBG(to_string(midiStringToInt(midiIntToString(rhythms[i].midiValue))));
-                        //DBG("played note" + to_string(i) + "." + to_string(rhythms[i].counter));
-                    }
-                }
-            }
-            rhythms[i].counter += 1;
-        }
-
-    }
-
-    //do something with noteOffs
-
-
-}
-*/
