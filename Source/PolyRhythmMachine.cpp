@@ -110,7 +110,6 @@ void PolyRhythmMachine::handleNoteTrigger(juce::MidiBuffer& midiBuffer, int note
 //TODO: clean up resetAll and resetParams so their purposes are more clear
 void PolyRhythmMachine::resetAll()
 {   //this should be called whenever the metronome is stopped
-   // resetParams();
     totalSamples = 0;
 
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {

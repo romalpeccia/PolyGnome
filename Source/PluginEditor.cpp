@@ -360,7 +360,6 @@ void MetroGnomeAudioProcessorEditor::paintPolyRhythmMachineMode(juce::Graphics& 
                 else {
                     polyRhythmMachineButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::grey);
                 }
-
             }
         }
         //hide any hidden buttons

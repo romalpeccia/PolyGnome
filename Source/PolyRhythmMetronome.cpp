@@ -26,25 +26,25 @@ PolyRhythmMetronome::PolyRhythmMetronome(juce::AudioProcessorValueTreeState* _ap
     apvts = _apvts;
     resetAll();
     formatManager.registerBasicFormats();
-    auto sampleDir = "C:/JUCE_PROJECTS/MetroGnome/Samples/";
 
-    //TODO figure out how to use relative paths in JUCE
-    juce::File clickFile("C:/JUCE_PROJECTS/MetroGnome/Samples/rimshot_low.wav");
+    auto buildDir = juce::File(juce::File::getCurrentWorkingDirectory().getFullPathName());
+    auto baseDir = buildDir.getParentDirectory().getParentDirectory();
+    jassert(baseDir.exists());
+
+    auto clickFile = juce::File(baseDir.getFullPathName() + "\\Samples\\rimshot_low.wav");
     jassert(clickFile.exists());
     auto formatReader = formatManager.createReaderFor(clickFile);
     rimShotLow.reset(new juce::AudioFormatReaderSource(formatReader, true));
 
-
-    juce::File clickFile2("C:/JUCE_PROJECTS/MetroGnome/Samples/rimshot_high.wav");
+    juce::File clickFile2 = juce::File(baseDir.getFullPathName() + "\\Samples\\rimshot_high.wav");
     jassert(clickFile2.exists());
     auto formatReader2 = formatManager.createReaderFor(clickFile2);
     rimShotHigh.reset(new juce::AudioFormatReaderSource(formatReader2, true));
 
-    juce::File clickFile3("C:/JUCE_PROJECTS/MetroGnome/Samples/rimshot_sub.wav");
+    juce::File clickFile3 = juce::File(baseDir.getFullPathName() + "\\Samples\\rimshot_sub.wav");
     jassert(clickFile3.exists());
     auto formatReader3 = formatManager.createReaderFor(clickFile3);
     rimShotSub.reset(new juce::AudioFormatReaderSource(formatReader3, true));
-
 }
 
 PolyRhythmMetronome::~PolyRhythmMetronome()

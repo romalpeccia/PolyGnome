@@ -20,7 +20,7 @@ using namespace std;
 struct Rhythm {
     int interval = 0; //samples per subdivided beat, updated when user changes a param. interval interval =  4 * ((60.0 / bpm) * sampleRate) / rhythms[i].subdivisions;
     int samplesProcessed = 0; 
-    int counter = 0; // counts from 0 to num subdivisions then resets to 0
+    int counter = 0; // counts by 1 after each subdivided beat has been played (from 0 to num subdivisions) then resets to 0. 
     int subdivisions = 1;
     int midiValue = 36; 
 };        
