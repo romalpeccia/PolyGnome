@@ -667,14 +667,11 @@ void MetroGnomeAudioProcessorEditor::savePreset() {
     fileChooser->launchAsync(folderChooserFlags, [this](const juce::FileChooser& chooser )
         {
             std::unique_ptr< juce::XmlElement > apvtsXML = audioProcessor.apvts.copyState().createXml();
-            juce::File gnomeFile(chooser.getResult());
-            DBG("test");
-            if (gnomeFile.existsAsFile()) {
-                DBG("test2");
+            auto gnomeFile = chooser.getResult();
+            if (gnomeFile != juce::File{} ) {
                 apvtsXML->writeTo(gnomeFile, juce::XmlElement::TextFormat());
                 DBG(apvtsXML->toString());
             }
-
         });
 }
 
@@ -688,8 +685,8 @@ void MetroGnomeAudioProcessorEditor::loadPreset() {
 
         fileChooser->launchAsync(folderChooserFlags, [this](const juce::FileChooser& chooser)
             {
-                juce::File gnomeFile(chooser.getResult());
-                if (gnomeFile.existsAsFile()) {
+                auto gnomeFile = chooser.getResult();
+                if (gnomeFile != juce::File{}) {
                     audioProcessor.apvts.replaceState(juce::ValueTree::fromXml(*juce::XmlDocument::parse(gnomeFile)));
                     audioProcessor.apvts.getRawParameterValue("MODE")->store(3);
                 }
