@@ -71,13 +71,15 @@ private:
     juce::ToggleButton Rhythm2Buttons[MAX_LENGTH];
 
 
-
+    //polyrhythm machine buttons
     juce::TextButton polyRhythmMachineButtons[MAX_MIDI_CHANNELS][MAX_LENGTH];
     std::unique_ptr <juce::AudioProcessorValueTreeState::ButtonAttachment> polyRhythmMachineButtonAttachments[MAX_MIDI_CHANNELS][MAX_LENGTH];
     juce::Slider polyRhythmMachineSubdivisionSliders[MAX_MIDI_CHANNELS];
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> polyRhythmMachineSubdivisionSliderAttachments[MAX_MIDI_CHANNELS];
     juce::Slider polyRhythmMachineMidiSliders[MAX_MIDI_CHANNELS];
     juce::TextEditor polyRhythmMachineMidiTextEditors[MAX_MIDI_CHANNELS];
+    juce::ToggleButton polyRhythmMachineMuteButtons[MAX_MIDI_CHANNELS];
+    std::unique_ptr <juce::AudioProcessorValueTreeState::ButtonAttachment> polyRhythmMachineMuteButtonAttachments[MAX_MIDI_CHANNELS];
 
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> polyRhythmMachineMidiSliderAttachments[MAX_MIDI_CHANNELS];
 

@@ -79,7 +79,7 @@ void MetroGnomeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
 
 
 juce::AudioProcessorValueTreeState::ParameterLayout MetroGnomeAudioProcessor::createParameterLayout() {
-    //Creates all the parameters that change based on the user input and stores them in a apvts.layout object
+    //Creates all the parameters that change based on the user input and returns them in a AudioProcessorValueTreeState::ParameterLayout object
 
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
 
@@ -117,7 +117,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout MetroGnomeAudioProcessor::cr
         }
         layout.add(std::make_unique<juce::AudioParameterInt>("MACHINE_SUBDIVISIONS" + to_string(i), "Machine Subdivisions" + to_string(i), 1, MAX_LENGTH, 1));
         layout.add(std::make_unique<juce::AudioParameterInt>("MACHINE_MIDI_VALUE" + to_string(i), "Machine Midi" + to_string(i), 0, 127, 36 + i));
-
+        layout.add(std::make_unique<juce::AudioParameterBool>("MACHINE_TRACK_ENABLE" + to_string(i), "Machine Mute" + to_string(i), true));
     }
 
     return layout;
@@ -151,13 +151,12 @@ void MetroGnomeAudioProcessor::setStateInformation(const void* data, int sizeInB
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
 
-    /*TODO: UNCOMMENT TO RESTORE params when the plugin is closed
-    * 
+
     auto tree = juce::ValueTree::readFromData(data, sizeInBytes);
     if (tree.isValid()) {
         apvts.replaceState(tree);
     }
-    */
+    
 }
 
 

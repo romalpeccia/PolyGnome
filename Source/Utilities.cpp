@@ -11,7 +11,7 @@
 #include "Utilities.h"
 #include <JuceHeader.h>
 string midiIntToString(int midiValue) {
-
+    //takes an integer and returns it's cooresponding MIDI string value
     if (midiValue > 127 || midiValue < 0)
     {
         return "";
@@ -97,7 +97,8 @@ string midiIntToString(int midiValue) {
 
 
 int midiStringToInt(string midiValue) {
-    //string can be some combination of (Note char)(optional sharp)(optional negative symbol)(note int), giving us 4 possible ways to parse a midi note
+    //takes an MIDI string and returns it's cooresponding MIDI integer value
+    //a value MIDI string can be some combination of (Note char)(optional sharp)(optional negative symbol)(note int), giving us 4 possible ways to parse a midi note
 
     string noteName;
     string noteValue;

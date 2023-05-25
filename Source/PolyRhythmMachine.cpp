@@ -55,7 +55,7 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
     //unit test
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
         if (rhythms[i].interval * rhythms[i].subdivisions != samplesPerBar) {
-            ;// DBG("rhythm interval calculation error");
+            DBG("rhythm interval calculation error");
         }
     }
     
@@ -71,7 +71,8 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
         }
         if (rhythmFlags[i]) {
             if (rhythms[i].counter < MAX_MIDI_CHANNELS) {
-                if (apvts->getRawParameterValue("MACHINE" + to_string(i) + "." + to_string(rhythms[i].counter) + "_TOGGLE")->load() == true) {
+                if (apvts->getRawParameterValue("MACHINE" + to_string(i) + "." + to_string(rhythms[i].counter) + "_TOGGLE")->load() == true ) {
+                    
                     //TODO: sort out this bufferPosition calculation error. possibly related to GUI error?. possibly completely irrelevant variable
 
 
@@ -87,7 +88,14 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
                         */
                         ;
                     }
-                    handleNoteTrigger(midiBuffer, rhythms[i].midiValue, bufferPosition);
+                    if (apvts->getRawParameterValue("MACHINE_TRACK_ENABLE" + to_string(i))->load() == true) {
+                        handleNoteTrigger(midiBuffer, rhythms[i].midiValue, bufferPosition);
+                    }
+                    else {
+                        auto messageOff = juce::MidiMessage::noteOff(1, rhythms[i].midiValue);
+                        midiBuffer.addEvent(messageOff, 0);
+                    }
+
                 }
             }
             rhythms[i].counter += 1;
@@ -106,7 +114,7 @@ void PolyRhythmMachine::handleNoteTrigger(juce::MidiBuffer& midiBuffer, int note
     auto messageOff = juce::MidiMessage::noteOff(1, noteNumber);
     if (!midiBuffer.addEvent(message, interval))
     {
-        ;// DBG("error adding messages to midiBuffer");
+       DBG("error adding messages to midiBuffer");
     }
 }
 
