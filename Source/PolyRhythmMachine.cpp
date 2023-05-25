@@ -42,20 +42,20 @@ void PolyRhythmMachine::prepareToPlay(double _sampleRate, int samplesPerBlock)
     if (sampleRate != _sampleRate)
     {
         sampleRate = _sampleRate;
-        //TODO: edge case (the user changes their sample rate mid session): change any logic that depends on sampleRate here
+        //TODO: rare edge case (the user changes their sample rate mid session): change any logic that depends on sampleRate here
     }
 
 }
 void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiBuffer)
 {
     resetParams(midiBuffer); //checks if user params have changed and updates class variables accordingly
-    auto bufferSize = buffer.getNumSamples();
-    totalSamples += bufferSize; //usually 16, 32, 64... 1024...
+    auto bufferSize = buffer.getNumSamples(); //usually 16, 32, 64... 1024...
+    totalSamples += bufferSize; 
 
     //unit test
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
         if (rhythms[i].interval * rhythms[i].subdivisions != samplesPerBar) {
-            DBG("rhythm interval calculation error");
+            ;// DBG("rhythm interval calculation error");
         }
     }
     
@@ -75,7 +75,7 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
                     //TODO: sort out this bufferPosition calculation error. possibly related to GUI error?. possibly completely irrelevant variable
 
 
-                    int bufferPosition = totalSamples - samplesCounted;
+                    int bufferPosition = totalSamples - samplesCounted; //TODO: maybe this should be samplesProcessed instead of totalSamples
                     //bufferPosition = 0; //for debugging
                     if (bufferPosition > bufferSize)
                     {
@@ -106,7 +106,7 @@ void PolyRhythmMachine::handleNoteTrigger(juce::MidiBuffer& midiBuffer, int note
     auto messageOff = juce::MidiMessage::noteOff(1, noteNumber);
     if (!midiBuffer.addEvent(message, interval))
     {
-        DBG("error adding messages to midiBuffer");
+        ;// DBG("error adding messages to midiBuffer");
     }
 }
 
@@ -133,19 +133,23 @@ void PolyRhythmMachine::resetParams(juce::MidiBuffer& midiBuffer)
         int tempRhythmValue = apvts->getRawParameterValue("MACHINE_SUBDIVISIONS" + to_string(i))->load();;
         if (rhythms[i].subdivisions != tempRhythmValue)
         {
+
+            auto oldRatio = (double)(rhythms[i].counter + 1.0)/ (double)(rhythms[i].subdivisions);
+            /*
             DBG("i:" << i);
             DBG("tempRhythmValue" << tempRhythmValue);
-            auto oldRatio = (double)(rhythms[i].counter + 1.0)/ (double)(rhythms[i].subdivisions);
             DBG("oldsubd: " << rhythms[i].subdivisions);
             DBG("oldcounter: " <<  rhythms[i].counter);
             DBG("oldRatio:" << oldRatio);
+            */
             rhythms[i].subdivisions = tempRhythmValue;
             //solve for new rhythms[i].counter
             
             rhythms[i].counter = (int)(oldRatio * rhythms[i].subdivisions);
+            /*
             DBG("newsubd: " << rhythms[i].subdivisions);
             DBG("newcounter: " << rhythms[i].counter);
-            
+            */
 
         }
         int tempMidiValue = apvts->getRawParameterValue("MACHINE_MIDI_VALUE" + to_string(i))->load();

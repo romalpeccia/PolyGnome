@@ -52,7 +52,7 @@ private:
     int totalSamples = 0; //total samples since start time
     double sampleRate = 0; //sampleRate from DAW, usually 44100 samples/beat
     double samplesPerBar = 0; //= 4 * (60.0 / bpm) * sampleRate;
-    double bpm = 60;
+    double bpm = 120;
 
     //apvts of caller that created this instance of polyRhythmMachine
     juce::AudioProcessorValueTreeState* apvts;
