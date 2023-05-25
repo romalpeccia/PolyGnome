@@ -126,40 +126,40 @@ int midiStringToInt(string midiValue) {
         return -1;
 
 
-    if (noteName == "C") {
+    if (noteName == "C" || noteName == "c") {
         noteAddition = 0;
     }
-    else if (noteName == "C#") {
+    else if (noteName == "C#" || noteName == "c#") {
         noteAddition = 1;
     }
-    else if (noteName == "D") {
+    else if (noteName == "D" || noteName == "d") {
         noteAddition = 2;
     }
-    else if (noteName == "D#") {
+    else if (noteName == "D#" || noteName == "d#") {
         noteAddition = 3;
     }
-    else if (noteName == "E") {
+    else if (noteName == "E" || noteName == "e") {
         noteAddition = 4;
     }
-    else if (noteName == "F") {
+    else if (noteName == "F" || noteName == "f") {
         noteAddition = 5;
     }
-    else if (noteName == "F#") {
+    else if (noteName == "F#" || noteName == "f#") {
         noteAddition = 6;
     }
-    else if (noteName == "G") {
+    else if (noteName == "G" || noteName == "g") {
         noteAddition = 7;
     }
-    else if (noteName == "G#") {
+    else if (noteName == "G#" || noteName == "g#") {
         noteAddition = 8;
     }
-    else if (noteName == "A") {
+    else if (noteName == "A" || noteName == "a") {
         noteAddition = 9;
     }
-    else if (noteName == "A#") {
+    else if (noteName == "A#" || noteName == "a#") {
         noteAddition = 10;
     }
-    else if (noteName == "B") {
+    else if (noteName == "B" || noteName == "b") {
         noteAddition = 11;
     }
     else {

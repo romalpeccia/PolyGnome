@@ -21,33 +21,21 @@ Metronome::Metronome(juce::AudioProcessorValueTreeState* _apvts)
     apvts = _apvts;  
     resetAll();
     formatManager.registerBasicFormats();
-    
-    auto buildDir = juce::File(juce::File::getCurrentWorkingDirectory().getFullPathName());
-    auto baseDir = buildDir.getParentDirectory().getParentDirectory();
-    jassert(baseDir.exists());
+
     //TODO: make this block a loop
     juce::MemoryInputStream inputStream(BinaryData::rimshot_low_wav, BinaryData::rimshot_low_wavSize, false);
     juce::WavAudioFormat wavFormat;
     juce::AudioFormatReader* formatReader = wavFormat.createReaderFor(&inputStream, false);
-    //auto clickFile = juce::File(baseDir.getFullPathName() + "\\Samples\\rimshot_low.wav");
-    //jassert(clickFile.exists());
-    //auto formatReader = formatManager.createReaderFor(clickFile);
     rimShotLow.reset(new juce::AudioFormatReaderSource(formatReader, true));
 
     juce::MemoryInputStream inputStream2(BinaryData::rimshot_high_wav, BinaryData::rimshot_high_wavSize, false);
     juce::WavAudioFormat wavFormat2;
     juce::AudioFormatReader* formatReader2 = wavFormat.createReaderFor(&inputStream2, false);
-    //juce::File clickFile2 = juce::File(baseDir.getFullPathName() + "\\Samples\\rimshot_high.wav");
-    //jassert(clickFile2.exists());
-    //auto formatReader2 = formatManager.createReaderFor(clickFile2);
     rimShotHigh.reset(new juce::AudioFormatReaderSource(formatReader2, true));
-
+    
     juce::MemoryInputStream inputStream3(BinaryData::rimshot_sub_wav, BinaryData::rimshot_sub_wavSize, false);
     juce::WavAudioFormat wavFormat3;
     juce::AudioFormatReader* formatReader3 = wavFormat.createReaderFor(&inputStream3, false);
-    //juce::File clickFile3 = juce::File(baseDir.getFullPathName() + "\\Samples\\rimshot_sub.wav");
-    //jassert(clickFile3.exists());
-    //auto formatReader3 = formatManager.createReaderFor(clickFile3);
     rimShotSub.reset(new juce::AudioFormatReaderSource(formatReader3, true));
     
 }

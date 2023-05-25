@@ -42,7 +42,6 @@ PolyRhythmMetronome::PolyRhythmMetronome(juce::AudioProcessorValueTreeState* _ap
     juce::WavAudioFormat wavFormat3;
     juce::AudioFormatReader* formatReader3 = wavFormat.createReaderFor(&inputStream3, false);
     rimShotSub.reset(new juce::AudioFormatReaderSource(formatReader3, true));
-    
 }
 
 PolyRhythmMetronome::~PolyRhythmMetronome()
