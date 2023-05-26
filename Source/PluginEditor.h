@@ -24,7 +24,7 @@ public:
 
     //==============================================================================
     void paint(juce::Graphics&) override;
-    void paintPolyRhythmMachineMode(juce::Graphics& g);
+    void paintPolyRhythmMachine(juce::Graphics& g);
     void changeMenuButtonColors(juce::TextButton *buttonOn);
 
     juce::Rectangle<int> getVisualArea();
@@ -58,17 +58,17 @@ private:
     juce::AudioProcessorValueTreeState::SliderAttachment bpmAttachment;
 
 
-    //polyrhythm machine buttons
-    juce::TextButton polyRhythmMachineButtons[MAX_MIDI_CHANNELS][MAX_LENGTH];
-    std::unique_ptr <juce::AudioProcessorValueTreeState::ButtonAttachment> polyRhythmMachineButtonAttachments[MAX_MIDI_CHANNELS][MAX_LENGTH];
-    juce::Slider polyRhythmMachineSubdivisionSliders[MAX_MIDI_CHANNELS];
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> polyRhythmMachineSubdivisionSliderAttachments[MAX_MIDI_CHANNELS];
-    juce::Slider polyRhythmMachineMidiSliders[MAX_MIDI_CHANNELS];
-    juce::TextEditor polyRhythmMachineMidiTextEditors[MAX_MIDI_CHANNELS];
-    juce::ToggleButton polyRhythmMachineMuteButtons[MAX_MIDI_CHANNELS];
+    //polytrack machine buttons
+    juce::TextButton beatButtons[MAX_MIDI_CHANNELS][MAX_LENGTH];
+    std::unique_ptr <juce::AudioProcessorValueTreeState::ButtonAttachment> beatButtonAttachments[MAX_MIDI_CHANNELS][MAX_LENGTH];
+    juce::Slider subdivisionSliders[MAX_MIDI_CHANNELS];
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> subdivisionSliderAttachments[MAX_MIDI_CHANNELS];
+    juce::Slider midiSliders[MAX_MIDI_CHANNELS];
+    juce::TextEditor midiTextEditors[MAX_MIDI_CHANNELS];
+    juce::ToggleButton muteButtons[MAX_MIDI_CHANNELS];
     std::unique_ptr <juce::AudioProcessorValueTreeState::ButtonAttachment> polyRhythmMachineMuteButtonAttachments[MAX_MIDI_CHANNELS];
 
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> polyRhythmMachineMidiSliderAttachments[MAX_MIDI_CHANNELS];
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> midiSliderAttachments[MAX_MIDI_CHANNELS];
 
 
     std::vector<juce::Component*> getVisibleComps();

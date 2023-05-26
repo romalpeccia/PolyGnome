@@ -17,11 +17,11 @@ using namespace std;
 /*
 */
 
-struct Rhythm {
+struct Track {
     //TODO rename these
-    int interval = 0; //samples per subdivided beat, updated when user changes a param. interval interval =  4 * ((60.0 / bpm) * sampleRate) / rhythms[i].subdivisions;
+    int samplesPerInterval = 0; //samples per subdivided beat, updated when user changes a param. samplesPerInterval =  4 * ((60.0 / bpm) * sampleRate) / tracks[i].subdivisions;
     int samplesProcessed = 0; //TODO do I need this? i think it can just be a single class variable
-    int counter = 0; // counts by 1 after each subdivided beat has been played (from 0 to num subdivisions) then resets to 0. 
+    int beatCounter = 0; // counts by 1 after each subdivided beat has been played (from 0 to num subdivisions) then resets to 0. 
     int subdivisions = 1;
     int midiValue = 36; 
 };        
@@ -41,13 +41,13 @@ public:
     void resetParams(juce::MidiBuffer& midiBuffer); 
     int getTotalSamples() { return totalSamples; }
 
-    Rhythm rhythms[MAX_MIDI_CHANNELS];
-    bool rhythmFlags[MAX_MIDI_CHANNELS];  //TRUE if a note has been triggered for respective midi channel //TODO rename this, add it to rhythm class
+    Track tracks[MAX_MIDI_CHANNELS];
+    bool trackFlags[MAX_MIDI_CHANNELS];  //TRUE if a note has been triggered for respective midi channel //TODO rename this, add it to track class
 
 
 private:
 
-    void PolyRhythmMachine::handleNoteTrigger(juce::MidiBuffer&, int noteNumber, int interval);
+    void PolyRhythmMachine::handleNoteTrigger(juce::MidiBuffer&, int noteNumber, int samplesPerInterval);
 
     int totalSamples = 0; //total samples since start time
     double sampleRate = 0; //sampleRate from DAW, usually 44100 samples/beat

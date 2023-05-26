@@ -52,26 +52,26 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
     auto bufferSize = buffer.getNumSamples(); //usually 16, 32, 64... 1024...
     totalSamples += bufferSize; 
 
-    //unit test
+    //test case. this may trigger when user changes the subdivisions during play time
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
-        if (rhythms[i].interval * rhythms[i].subdivisions != samplesPerBar) {
-            DBG("rhythm interval calculation error");
+        if (tracks[i].samplesPerInterval * tracks[i].subdivisions != samplesPerBar) {
+            DBG("track samplesPerInterval calculation error");
         }
     }
     
 
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
-        float samplesCounted = rhythms[i].interval * (rhythms[i].counter);
-        rhythms[i].samplesProcessed += bufferSize;
-        rhythmFlags[i] = (rhythms[i].samplesProcessed >= samplesCounted     );
+        float samplesCounted = tracks[i].samplesPerInterval * (tracks[i].beatCounter);
+        tracks[i].samplesProcessed += bufferSize;
+        trackFlags[i] = (tracks[i].samplesProcessed >= samplesCounted     );
 
-        if (rhythms[i].counter > rhythms[i].subdivisions) {
-            rhythms[i].counter = 0;
-            rhythms[i].samplesProcessed -= samplesPerBar;
+        if (tracks[i].beatCounter > tracks[i].subdivisions) {
+            tracks[i].beatCounter = 0;
+            tracks[i].samplesProcessed -= samplesPerBar;
         }
-        if (rhythmFlags[i]) {
-            if (rhythms[i].counter < MAX_MIDI_CHANNELS) {
-                if (apvts->getRawParameterValue("BEAT_" + to_string(i) + "_" + to_string(rhythms[i].counter) + "_TOGGLE")->load() == true ) {
+        if (trackFlags[i]) {
+            if (tracks[i].beatCounter < MAX_MIDI_CHANNELS) {
+                if (apvts->getRawParameterValue("BEAT_" + to_string(i) + "_" + to_string(tracks[i].beatCounter) + "_TOGGLE")->load() == true ) {
                     
                     //TODO: sort out this bufferPosition calculation error. possibly related to GUI error?. possibly completely irrelevant variable
 
@@ -82,23 +82,23 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
                     {
                         /*
                         DBG("midi buffer calculation error");
-                        DBG(rhythms[i].interval);
+                        DBG(tracks[i].samplesPerInterval);
                         DBG(totalSamples);
                         DBG(samplesCounted);
                         */
                         ;
                     }
                     if (apvts->getRawParameterValue("TRACK_" + to_string(i) + "_ENABLE")->load() == true) {
-                        handleNoteTrigger(midiBuffer, rhythms[i].midiValue, bufferPosition);
+                        handleNoteTrigger(midiBuffer, tracks[i].midiValue, bufferPosition);
                     }
                     else {
-                        auto messageOff = juce::MidiMessage::noteOff(1, rhythms[i].midiValue);
+                        auto messageOff = juce::MidiMessage::noteOff(1, tracks[i].midiValue);
                         midiBuffer.addEvent(messageOff, 0);
                     }
 
                 }
             }
-            rhythms[i].counter += 1;
+            tracks[i].beatCounter += 1;
         }
     }
 
@@ -108,11 +108,11 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
 
 }
 
-void PolyRhythmMachine::handleNoteTrigger(juce::MidiBuffer& midiBuffer, int noteNumber, int interval)
+void PolyRhythmMachine::handleNoteTrigger(juce::MidiBuffer& midiBuffer, int noteNumber, int samplesPerInterval)
 {
     auto message = juce::MidiMessage::noteOn(1, noteNumber, (juce::uint8)100);
     auto messageOff = juce::MidiMessage::noteOff(1, noteNumber);
-    if (!midiBuffer.addEvent(message, interval))
+    if (!midiBuffer.addEvent(message, samplesPerInterval))
     {
        DBG("error adding messages to midiBuffer");
     }
@@ -125,8 +125,8 @@ void PolyRhythmMachine::resetAll()
     totalSamples = 0;
 
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
-        rhythms[i].counter = 0;
-        rhythms[i].samplesProcessed = 0;
+        tracks[i].beatCounter = 0;
+        tracks[i].samplesProcessed = 0;
 
     }
 }
@@ -139,36 +139,36 @@ void PolyRhythmMachine::resetParams(juce::MidiBuffer& midiBuffer)
     bpm = apvts->getRawParameterValue("BPM")->load();
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
         int tempRhythmValue = apvts->getRawParameterValue("SUBDIVISIONS_" + to_string(i))->load();;
-        if (rhythms[i].subdivisions != tempRhythmValue)
+        if (tracks[i].subdivisions != tempRhythmValue)
         {
 
-            auto oldRatio = (double)(rhythms[i].counter + 1.0)/ (double)(rhythms[i].subdivisions);
+            auto oldRatio = (double)(tracks[i].beatCounter + 1.0)/ (double)(tracks[i].subdivisions);
             /*
             DBG("i:" << i);
             DBG("tempRhythmValue" << tempRhythmValue);
-            DBG("oldsubd: " << rhythms[i].subdivisions);
-            DBG("oldcounter: " <<  rhythms[i].counter);
+            DBG("oldsubd: " << tracks[i].subdivisions);
+            DBG("oldcounter: " <<  tracks[i].beatCounter);
             DBG("oldRatio:" << oldRatio);
             */
-            rhythms[i].subdivisions = tempRhythmValue;
-            //solve for new rhythms[i].counter
+            tracks[i].subdivisions = tempRhythmValue;
+            //solve for new tracks[i].beatCounter
             
-            rhythms[i].counter = (int)(oldRatio * rhythms[i].subdivisions);
+            tracks[i].beatCounter = (int)(oldRatio * tracks[i].subdivisions);
             /*
-            DBG("newsubd: " << rhythms[i].subdivisions);
-            DBG("newcounter: " << rhythms[i].counter);
+            DBG("newsubd: " << tracks[i].subdivisions);
+            DBG("newcounter: " << tracks[i].beatCounter);
             */
 
         }
         int tempMidiValue = apvts->getRawParameterValue("MIDI_VALUE_" + to_string(i))->load();
-        if (rhythms[i].midiValue != tempMidiValue)
+        if (tracks[i].midiValue != tempMidiValue)
         {
-            auto messageOff = juce::MidiMessage::noteOff(1, rhythms[i].midiValue);
+            auto messageOff = juce::MidiMessage::noteOff(1, tracks[i].midiValue);
             midiBuffer.addEvent(messageOff, 0);
-            rhythms[i].midiValue = tempMidiValue;
+            tracks[i].midiValue = tempMidiValue;
         }
         samplesPerBar = 4 * (60.0 / bpm) * sampleRate;
-        rhythms[i].interval = samplesPerBar / rhythms[i].subdivisions;
+        tracks[i].samplesPerInterval = samplesPerBar / tracks[i].subdivisions;
     }
 
 
@@ -177,25 +177,25 @@ void PolyRhythmMachine::resetParams(juce::MidiBuffer& midiBuffer)
 
 void PolyRhythmMachine::resetParams()
 {  //this should be called when params change in UI to reflect changes in logic
-   //the variables keeping track of time should be reset to reflect the new rhythm
+   //the variables keeping track of time should be reset to reflect the new track
    //TODO: maybe this gets deleted in favor of the overloaded version
 
     bpm = apvts->getRawParameterValue("BPM")->load();
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
         int tempRhythmValue = apvts->getRawParameterValue("SUBDIVISIONS_" + to_string(i))->load();;
-        if (rhythms[i].subdivisions != tempRhythmValue)
+        if (tracks[i].subdivisions != tempRhythmValue)
         {
-            rhythms[i].subdivisions = tempRhythmValue;
+            tracks[i].subdivisions = tempRhythmValue;
             //resetAll();
         }
         int tempMidiValue = apvts->getRawParameterValue("MIDI_VALUE_" + to_string(i))->load();
-        if (rhythms[i].midiValue != tempMidiValue)
+        if (tracks[i].midiValue != tempMidiValue)
         {
-            rhythms[i].midiValue = tempMidiValue;
+            tracks[i].midiValue = tempMidiValue;
             //resetAll();
         }
         samplesPerBar = 4 * (60.0 / bpm) * sampleRate;
-        rhythms[i].interval = samplesPerBar / rhythms[i].subdivisions;
+        tracks[i].samplesPerInterval = samplesPerBar / tracks[i].subdivisions;
        
     }
 }
