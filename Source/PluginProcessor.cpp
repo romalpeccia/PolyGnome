@@ -12,7 +12,7 @@
 
 using namespace std;
 //==============================================================================
-MetroGnomeAudioProcessor::MetroGnomeAudioProcessor()
+PolyGnomeAudioProcessor::PolyGnomeAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
     : AudioProcessor(BusesProperties()
 #if ! JucePlugin_IsMidiEffect
@@ -26,28 +26,26 @@ MetroGnomeAudioProcessor::MetroGnomeAudioProcessor()
 {
 }
 
-MetroGnomeAudioProcessor::~MetroGnomeAudioProcessor()
+PolyGnomeAudioProcessor::~PolyGnomeAudioProcessor()
 {
 }
 
 
-void MetroGnomeAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
+void PolyGnomeAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-    metronome.prepareToPlay(sampleRate, samplesPerBlock);
-    polyRhythmMetronome.prepareToPlay(sampleRate, samplesPerBlock);
     polyRhythmMachine.prepareToPlay(sampleRate, samplesPerBlock);
 }
 
-void MetroGnomeAudioProcessor::releaseResources()
+void PolyGnomeAudioProcessor::releaseResources()
 {
     // When playback stops, you can use this as an opportunity to free up any
     // spare memory, etc.
 }
 
 
-void MetroGnomeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
+void PolyGnomeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
    
     //check if the user is in a recognized DAW or other host
@@ -61,63 +59,39 @@ void MetroGnomeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
     }
    
     midiMessages.clear();
-    auto mode = apvts.getRawParameterValue("MODE")->load();
-
-    if (apvts.getRawParameterValue("ON/OFF")->load() == true && mode == 0)
-    {
-        metronome.getNextAudioBlock(buffer);
-    }
-    else if (apvts.getRawParameterValue("ON/OFF")->load() == true && mode == 1)
-    {
-        polyRhythmMetronome.getNextAudioBlock(buffer, midiMessages);
-    }
-    else if (apvts.getRawParameterValue("ON/OFF")->load() == true && mode == 3)
+if (apvts.getRawParameterValue("ON/OFF")->load() == true)
     {
         polyRhythmMachine.getNextAudioBlock(buffer, midiMessages);
     }
 }
 
 
-juce::AudioProcessorValueTreeState::ParameterLayout MetroGnomeAudioProcessor::createParameterLayout() {
+juce::AudioProcessorValueTreeState::ParameterLayout PolyGnomeAudioProcessor::createParameterLayout() {
     //Creates all the parameters that change based on the user input and returns them in a AudioProcessorValueTreeState::ParameterLayout object
 
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
 
-
+    //TODO: maybe use of format strings would make accessing these strings cleaner
 
     layout.add(std::make_unique<juce::AudioParameterBool>("ON/OFF", "On/Off", false));
     layout.add(std::make_unique<juce::AudioParameterBool>("HOST_CONNECTED", "Host Connected", false));
     layout.add(std::make_unique<juce::AudioParameterFloat>("BPM", "bpm", juce::NormalisableRange<float>(1.f, 300.f, 0.1f, 0.25f), 120.f));
-    layout.add(std::make_unique<juce::AudioParameterInt>("SUBDIVISION", "Subdivision", 1, MAX_LENGTH, 1));
-    layout.add(std::make_unique<juce::AudioParameterInt>("NUMERATOR", "Numerator", 1, MAX_LENGTH, 4));
 
-
-    juce::StringArray stringArray;
-    stringArray.add("Default");
-    stringArray.add("Polyrhythm");
-    stringArray.add("Polymeter");
-    stringArray.add("Machine");
-    layout.add(std::make_unique<juce::AudioParameterChoice>("MODE", "Mode", stringArray, 0));
-
-    for (int i = 0; i < MAX_LENGTH; i++) {
-        //Parameters for Polyrhythm Metronome RHYTHM<1,2>.<0-MAX_LENGTH>_TOGGLE
-        layout.add(std::make_unique<juce::AudioParameterBool>("RHYTHM1."+ to_string(i) + "_TOGGLE", "Rhythm1." + to_string(i) + " Toggle", false));
-        layout.add(std::make_unique<juce::AudioParameterBool>("RHYTHM2." + to_string(i) + "_TOGGLE", "Rhythm2." + to_string(i) + " Toggle", false));
-    }
 
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++)
     {
         //Parameters for Polyrhythm Machine 
-        //MACHINE<0-MAX_MIDI_CHANNELS>.<0-11>_TOGGLE
-        //MACHINE_SUBDIVISIONS<0-MAX_MIDI_CHANNELS>.<0-11>
-        //MACHINE_MIDI_VALUE<0-MAX_MIDI_CHANNELS>.<0-11>
+        //BEAT_<0-MAX_MIDI_CHANNELS>.<0-11>_TOGGLE
+        //SUBDIVISIONS_<0-MAX_MIDI_CHANNELS>
+        //MIDI_VALUE__<0-MAX_MIDI_CHANNELS>
+        //TRACK_<0-MAX_MIDI_CHANNELS>_ENABLE
         for (int j = 0; j < MAX_LENGTH; j++)
         {
-            layout.add(std::make_unique<juce::AudioParameterBool>("MACHINE" + to_string(i) + "." + to_string(j) + "_TOGGLE", "Machine" + to_string(i) + "." + to_string(j) + "Toggle", false));
+            layout.add(std::make_unique<juce::AudioParameterBool>("BEAT_" + to_string(i) + "_" + to_string(j) + "_TOGGLE", "Beat" + to_string(i) + "." + to_string(j) + "Toggle", false));
         }
-        layout.add(std::make_unique<juce::AudioParameterInt>("MACHINE_SUBDIVISIONS" + to_string(i), "Machine Subdivisions" + to_string(i), 1, MAX_LENGTH, 1));
-        layout.add(std::make_unique<juce::AudioParameterInt>("MACHINE_MIDI_VALUE" + to_string(i), "Machine Midi" + to_string(i), 0, 127, 36 + i));
-        layout.add(std::make_unique<juce::AudioParameterBool>("MACHINE_TRACK_ENABLE" + to_string(i), "Machine Mute" + to_string(i), true));
+        layout.add(std::make_unique<juce::AudioParameterInt>("SUBDIVISIONS_" + to_string(i), "Subdivisions " + to_string(i), 1, MAX_LENGTH, 1));
+        layout.add(std::make_unique<juce::AudioParameterInt>("MIDI_VALUE_" + to_string(i), "Midi Value " + to_string(i), 0, 127, 36 + i));
+        layout.add(std::make_unique<juce::AudioParameterBool>("TRACK_" + to_string(i) + "_ENABLE", "Track " + to_string(i) + " Enable", true));
     }
 
     return layout;
@@ -127,16 +101,16 @@ juce::AudioProcessorValueTreeState::ParameterLayout MetroGnomeAudioProcessor::cr
 
 
 
-juce::AudioProcessorEditor* MetroGnomeAudioProcessor::createEditor()
+juce::AudioProcessorEditor* PolyGnomeAudioProcessor::createEditor()
 {
     //uncomment first return for generic sliders used for debugging purposes
     //return new juce::GenericAudioProcessorEditor(*this);
 
-    return new MetroGnomeAudioProcessorEditor(*this);
+    return new PolyGnomeAudioProcessorEditor(*this);
 }
 
 //==============================================================================
-void MetroGnomeAudioProcessor::getStateInformation(juce::MemoryBlock& destData)
+void PolyGnomeAudioProcessor::getStateInformation(juce::MemoryBlock& destData)
 {
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
@@ -146,7 +120,7 @@ void MetroGnomeAudioProcessor::getStateInformation(juce::MemoryBlock& destData)
     apvts.state.writeToStream(mos);
 
 }
-void MetroGnomeAudioProcessor::setStateInformation(const void* data, int sizeInBytes)
+void PolyGnomeAudioProcessor::setStateInformation(const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
@@ -171,12 +145,12 @@ Default unchanged JUCE library code
 
 
 //==============================================================================
-const juce::String MetroGnomeAudioProcessor::getName() const
+const juce::String PolyGnomeAudioProcessor::getName() const
 {
     return JucePlugin_Name;
 }
 
-bool MetroGnomeAudioProcessor::acceptsMidi() const
+bool PolyGnomeAudioProcessor::acceptsMidi() const
 {
 #if JucePlugin_WantsMidiInput
     return true;
@@ -185,7 +159,7 @@ bool MetroGnomeAudioProcessor::acceptsMidi() const
 #endif
 }
 
-bool MetroGnomeAudioProcessor::producesMidi() const
+bool PolyGnomeAudioProcessor::producesMidi() const
 {
 #if JucePlugin_ProducesMidiOutput
     return true;
@@ -194,7 +168,7 @@ bool MetroGnomeAudioProcessor::producesMidi() const
 #endif
 }
 
-bool MetroGnomeAudioProcessor::isMidiEffect() const
+bool PolyGnomeAudioProcessor::isMidiEffect() const
 {
 #if JucePlugin_IsMidiEffect
     return true;
@@ -203,32 +177,32 @@ bool MetroGnomeAudioProcessor::isMidiEffect() const
 #endif
 }
 
-double MetroGnomeAudioProcessor::getTailLengthSeconds() const
+double PolyGnomeAudioProcessor::getTailLengthSeconds() const
 {
     return 0.0;
 }
 
-int MetroGnomeAudioProcessor::getNumPrograms()
+int PolyGnomeAudioProcessor::getNumPrograms()
 {
     return 1;   // NB: some hosts don't cope very well if you tell them there are 0 programs,
     // so this should be at least 1, even if you're not really implementing programs.
 }
 
-int MetroGnomeAudioProcessor::getCurrentProgram()
+int PolyGnomeAudioProcessor::getCurrentProgram()
 {
     return 0;
 }
 
-void MetroGnomeAudioProcessor::setCurrentProgram(int index)
+void PolyGnomeAudioProcessor::setCurrentProgram(int index)
 {
 }
 
-const juce::String MetroGnomeAudioProcessor::getProgramName(int index)
+const juce::String PolyGnomeAudioProcessor::getProgramName(int index)
 {
     return {};
 }
 
-void MetroGnomeAudioProcessor::changeProgramName(int index, const juce::String& newName)
+void PolyGnomeAudioProcessor::changeProgramName(int index, const juce::String& newName)
 {
 }
 
@@ -236,7 +210,7 @@ void MetroGnomeAudioProcessor::changeProgramName(int index, const juce::String& 
 
 
 #ifndef JucePlugin_PreferredChannelConfigurations
-bool MetroGnomeAudioProcessor::isBusesLayoutSupported(const BusesLayout& layouts) const
+bool PolyGnomeAudioProcessor::isBusesLayoutSupported(const BusesLayout& layouts) const
 {
 #if JucePlugin_IsMidiEffect
     juce::ignoreUnused(layouts);
@@ -263,7 +237,7 @@ bool MetroGnomeAudioProcessor::isBusesLayoutSupported(const BusesLayout& layouts
 
 
 //==============================================================================
-bool MetroGnomeAudioProcessor::hasEditor() const
+bool PolyGnomeAudioProcessor::hasEditor() const
 {
     return true; // (change this to false if you choose to not supply an editor)
 }
@@ -274,6 +248,6 @@ bool MetroGnomeAudioProcessor::hasEditor() const
 // This creates new instances of the plugin..
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
-    return new MetroGnomeAudioProcessor();
+    return new PolyGnomeAudioProcessor();
 }
 

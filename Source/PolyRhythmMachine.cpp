@@ -71,7 +71,7 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
         }
         if (rhythmFlags[i]) {
             if (rhythms[i].counter < MAX_MIDI_CHANNELS) {
-                if (apvts->getRawParameterValue("MACHINE" + to_string(i) + "." + to_string(rhythms[i].counter) + "_TOGGLE")->load() == true ) {
+                if (apvts->getRawParameterValue("BEAT_" + to_string(i) + "_" + to_string(rhythms[i].counter) + "_TOGGLE")->load() == true ) {
                     
                     //TODO: sort out this bufferPosition calculation error. possibly related to GUI error?. possibly completely irrelevant variable
 
@@ -88,7 +88,7 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
                         */
                         ;
                     }
-                    if (apvts->getRawParameterValue("MACHINE_TRACK_ENABLE" + to_string(i))->load() == true) {
+                    if (apvts->getRawParameterValue("TRACK_" + to_string(i) + "_ENABLE")->load() == true) {
                         handleNoteTrigger(midiBuffer, rhythms[i].midiValue, bufferPosition);
                     }
                     else {
@@ -138,7 +138,7 @@ void PolyRhythmMachine::resetParams(juce::MidiBuffer& midiBuffer)
   
     bpm = apvts->getRawParameterValue("BPM")->load();
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
-        int tempRhythmValue = apvts->getRawParameterValue("MACHINE_SUBDIVISIONS" + to_string(i))->load();;
+        int tempRhythmValue = apvts->getRawParameterValue("SUBDIVISIONS_" + to_string(i))->load();;
         if (rhythms[i].subdivisions != tempRhythmValue)
         {
 
@@ -160,7 +160,7 @@ void PolyRhythmMachine::resetParams(juce::MidiBuffer& midiBuffer)
             */
 
         }
-        int tempMidiValue = apvts->getRawParameterValue("MACHINE_MIDI_VALUE" + to_string(i))->load();
+        int tempMidiValue = apvts->getRawParameterValue("MIDI_VALUE_" + to_string(i))->load();
         if (rhythms[i].midiValue != tempMidiValue)
         {
             auto messageOff = juce::MidiMessage::noteOff(1, rhythms[i].midiValue);
@@ -182,13 +182,13 @@ void PolyRhythmMachine::resetParams()
 
     bpm = apvts->getRawParameterValue("BPM")->load();
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
-        int tempRhythmValue = apvts->getRawParameterValue("MACHINE_SUBDIVISIONS" + to_string(i))->load();;
+        int tempRhythmValue = apvts->getRawParameterValue("SUBDIVISIONS_" + to_string(i))->load();;
         if (rhythms[i].subdivisions != tempRhythmValue)
         {
             rhythms[i].subdivisions = tempRhythmValue;
             //resetAll();
         }
-        int tempMidiValue = apvts->getRawParameterValue("MACHINE_MIDI_VALUE" + to_string(i))->load();
+        int tempMidiValue = apvts->getRawParameterValue("MIDI_VALUE_" + to_string(i))->load();
         if (rhythms[i].midiValue != tempMidiValue)
         {
             rhythms[i].midiValue = tempMidiValue;

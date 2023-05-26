@@ -16,17 +16,14 @@
 //==============================================================================
 /**
 */
-class MetroGnomeAudioProcessorEditor : public juce::AudioProcessorEditor, juce::Timer
+class PolyGnomeAudioProcessorEditor : public juce::AudioProcessorEditor, juce::Timer
 {
 public:
-    MetroGnomeAudioProcessorEditor(MetroGnomeAudioProcessor&);
-    ~MetroGnomeAudioProcessorEditor() override;
+    PolyGnomeAudioProcessorEditor(PolyGnomeAudioProcessor&);
+    ~PolyGnomeAudioProcessorEditor() override;
 
     //==============================================================================
     void paint(juce::Graphics&) override;
-    void paintMetronomeMode(juce::Graphics&);
-    void paintPolyRhythmMetronomeMode(juce::Graphics&);
-    void drawPolyRhythmCircle(juce::Graphics& g, int radius, int width, int height, int X, int Y, int rhythmValue, float radiusSkew, juce::Colour color1, juce::Colour color, int index);
     void paintPolyRhythmMachineMode(juce::Graphics& g);
     void changeMenuButtonColors(juce::TextButton *buttonOn);
 
@@ -41,19 +38,13 @@ public:
     void togglePlayState();
     void togglePlayStateOff();
     void togglePlayStateOn();
-    void MetroGnomeAudioProcessorEditor::storePolyRhythmMachineParams();
 
 private:
-    MetroGnomeAudioProcessor& audioProcessor;
+    PolyGnomeAudioProcessor& audioProcessor;
 
     //persistent comps
     juce::Image logo;
     juce::TextButton playButton{ "Play" };
-    juce::TextButton metronomeButton{ "Default" };
-    juce::TextButton polyRhythmButton{ "PolyRhythm" };
-    juce::TextButton polyMeterButton{ "PolyMeter" };
-    juce::TextButton polyRhythmMachineButton{ "PolyRhythm Machine" };
-    juce::TextButton placeholderButton{ "Placeholder" };
     juce::TextButton loadPresetButton{ "load preset" };
     juce::TextButton savePresetButton{ "save preset" };
 
@@ -63,12 +54,8 @@ private:
 
     //Sliders
     //the attachment attaches an APVTS param to a slider
-    RotarySliderWithLabels    bpmSlider, subdivisionSlider, numeratorSlider;
-    juce::AudioProcessorValueTreeState::SliderAttachment bpmAttachment, subdivisionAttachment, numeratorAttachment;
-
-    //polyrhythm metronome buttons
-    juce::ToggleButton Rhythm1Buttons[MAX_LENGTH];
-    juce::ToggleButton Rhythm2Buttons[MAX_LENGTH];
+    RotarySliderWithLabels    bpmSlider;
+    juce::AudioProcessorValueTreeState::SliderAttachment bpmAttachment;
 
 
     //polyrhythm machine buttons
@@ -89,11 +76,7 @@ private:
 
 
 
-
-
-
-
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MetroGnomeAudioProcessorEditor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PolyGnomeAudioProcessorEditor)
 };
 
 

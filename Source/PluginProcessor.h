@@ -9,8 +9,6 @@
 #pragma once
 
 #include <JuceHeader.h>
-#include "Metronome.h"
-#include "PolyRhythmMetronome.h"
 #include "PolyRhythmMachine.h"
 #include "Utilities.h"
 
@@ -18,12 +16,12 @@
 //==============================================================================
 /**
 */
-class MetroGnomeAudioProcessor  : public juce::AudioProcessor
+class PolyGnomeAudioProcessor  : public juce::AudioProcessor
 {
 public:
     //==============================================================================
-    MetroGnomeAudioProcessor();
-    ~MetroGnomeAudioProcessor() override;
+    PolyGnomeAudioProcessor();
+    ~PolyGnomeAudioProcessor() override;
 
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
@@ -66,8 +64,6 @@ public:
  
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
     juce::AudioProcessorValueTreeState apvts{ *this, nullptr, "Parameters", createParameterLayout() };
-    Metronome metronome{ &apvts };
-    PolyRhythmMetronome polyRhythmMetronome{ &apvts };
     PolyRhythmMachine polyRhythmMachine{ &apvts };
 
 
@@ -78,5 +74,5 @@ private:
     juce::PluginHostType::HostType pluginHostType2;
 
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MetroGnomeAudioProcessor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PolyGnomeAudioProcessor)
 };
