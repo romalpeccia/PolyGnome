@@ -59,17 +59,18 @@ private:
 
 
     //polytrack machine buttons
+    juce::ToggleButton muteButtons[MAX_MIDI_CHANNELS];
     juce::TextButton beatButtons[MAX_MIDI_CHANNELS][MAX_LENGTH];
-    std::unique_ptr <juce::AudioProcessorValueTreeState::ButtonAttachment> beatButtonAttachments[MAX_MIDI_CHANNELS][MAX_LENGTH];
     juce::Slider subdivisionSliders[MAX_MIDI_CHANNELS];
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> subdivisionSliderAttachments[MAX_MIDI_CHANNELS];
     juce::Slider midiSliders[MAX_MIDI_CHANNELS];
     juce::TextEditor midiTextEditors[MAX_MIDI_CHANNELS];
-    juce::ToggleButton muteButtons[MAX_MIDI_CHANNELS];
-    std::unique_ptr <juce::AudioProcessorValueTreeState::ButtonAttachment> polyRhythmMachineMuteButtonAttachments[MAX_MIDI_CHANNELS];
+    juce::Slider velocitySliders[MAX_MIDI_CHANNELS];
 
+    std::unique_ptr <juce::AudioProcessorValueTreeState::ButtonAttachment> muteButtonAttachments[MAX_MIDI_CHANNELS];
+    std::unique_ptr <juce::AudioProcessorValueTreeState::ButtonAttachment> beatButtonAttachments[MAX_MIDI_CHANNELS][MAX_LENGTH];
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> subdivisionSliderAttachments[MAX_MIDI_CHANNELS];
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> midiSliderAttachments[MAX_MIDI_CHANNELS];
-
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> velocitySliderAttachments[MAX_MIDI_CHANNELS];
 
     std::vector<juce::Component*> getVisibleComps();
     std::vector<juce::Component*> getHiddenComps();

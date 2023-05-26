@@ -57,7 +57,7 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
 
         //initialize the mute buttons
         muteButtons[i].setClickingTogglesState(true);
-        polyRhythmMachineMuteButtonAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.apvts, "TRACK_" + to_string(i) + "_ENABLE", muteButtons[i]);
+        muteButtonAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.apvts, "TRACK_" + to_string(i) + "_ENABLE", muteButtons[i]);
 
 
         //initialize the subdivision sliders
@@ -66,11 +66,22 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
         subdivisionSliders[i].setColour(juce::Slider::ColourIds::textBoxTextColourId, juce::Colours::orange);
         subdivisionSliders[i].setColour(juce::Slider::ColourIds::textBoxBackgroundColourId, juce::Colours::steelblue);
         subdivisionSliders[i].setColour(juce::Slider::ColourIds::textBoxOutlineColourId, juce::Colours::orange);
-
         subdivisionSliderAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,
             "SUBDIVISIONS_" + to_string(i),
             subdivisionSliders[i]);
          
+
+        //initialize the velocity sliders
+        velocitySliders[i].setSliderStyle(juce::Slider::SliderStyle::Rotary);
+        velocitySliders[i].setColour(juce::Slider::ColourIds::thumbColourId, juce::Colours::orange);
+        velocitySliders[i].setColour(juce::Slider::ColourIds::textBoxTextColourId, juce::Colours::orange);
+        velocitySliders[i].setColour(juce::Slider::ColourIds::textBoxBackgroundColourId, juce::Colours::steelblue);
+        velocitySliders[i].setColour(juce::Slider::ColourIds::textBoxOutlineColourId, juce::Colours::orange);
+        velocitySliderAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,
+            "VELOCITY_" + to_string(i),
+            velocitySliders[i]);
+
+
 
         //initialize the MIDI control slider    
         midiSliders[i].setSliderStyle(juce::Slider::SliderStyle::Rotary);
@@ -223,7 +234,22 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
 
     int spacing = height / MAX_MIDI_CHANNELS;
     Y = Y + spacing;
+
+
+
+
+
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
+
+        //draw the components to the left of the tracks
+        juce::Rectangle<int> muteButtonBounds(X - 50, Y + spacing * (i - 1) + 13, 50, 50);
+        muteButtons[i].setBounds(muteButtonBounds);
+        muteButtons[i].setVisible(true);
+
+        juce::Rectangle<int> velocitySliderBounds(X - 125, Y + spacing * (i - 1), 75, 75);
+        velocitySliders[i].setBounds(velocitySliderBounds);
+        velocitySliders[i].setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxRight, false, 35, spacing / 2);
+        velocitySliders[i].setVisible(true);
 
         //draw the line segments representing each track
         juce::Path trackLine;
@@ -288,26 +314,20 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
             beatButtons[i][k].setVisible(false);
         }
 
-        //draw the sliders/texteditor
-        juce::Rectangle<int> subdivisionSliderBounds(X + width + 10, Y + spacing * (i-1) , 75, 75);
+        //draw the components to the right of the tracks
+        juce::Rectangle<int> subdivisionSliderBounds(X + width + 10, Y + spacing * (i - 1), 75, 75);
         subdivisionSliders[i].setBounds(subdivisionSliderBounds);
         subdivisionSliders[i].setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxRight, false, 25, spacing / 2);
         subdivisionSliders[i].setVisible(true);
 
-
-        juce::Rectangle<int> midiTextEditorBounds(X + width + 10 + 85, Y + spacing * (i-1) + 25, 75, 25);
+        juce::Rectangle<int> midiTextEditorBounds(X + width + 10 + 85, Y + spacing * (i - 1) + 25, 75, 25);
         midiTextEditors[i].setBounds(midiTextEditorBounds);
         midiTextEditors[i].setVisible(true);
 
-               
-        juce::Rectangle<int> midiSliderBounds(X + width + 10 + 160, Y + spacing * (i-1) + 13, 50, 50);
+        juce::Rectangle<int> midiSliderBounds(X + width + 10 + 170, Y + spacing * (i - 1) + 13, 50, 50);
         midiSliders[i].setBounds(midiSliderBounds);
         midiSliders[i].setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, false, 0, 0);
         midiSliders[i].setVisible(true);
-
-        juce::Rectangle<int> muteButtonBounds(X - 50, Y + spacing * (i - 1) + 13, 50, 50);
-        muteButtons[i].setBounds(muteButtonBounds);
-        muteButtons[i].setVisible(true);
 
     }
 
@@ -344,6 +364,7 @@ std::vector<juce::Component*> PolyGnomeAudioProcessorEditor::getVisibleComps() {
 
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
         comps.push_back(&subdivisionSliders[i]);
+        comps.push_back(&velocitySliders[i]);
         comps.push_back(&midiSliders[i]);
         comps.push_back(&midiTextEditors[i]);
         comps.push_back(&muteButtons[i]);

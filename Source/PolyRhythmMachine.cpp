@@ -89,7 +89,7 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
                         ;
                     }
                     if (apvts->getRawParameterValue("TRACK_" + to_string(i) + "_ENABLE")->load() == true) {
-                        handleNoteTrigger(midiBuffer, tracks[i].midiValue, bufferPosition);
+                        handleNoteTrigger(midiBuffer, tracks[i].midiValue, tracks[i].velocity, bufferPosition);
                     }
                     else {
                         auto messageOff = juce::MidiMessage::noteOff(1, tracks[i].midiValue);
@@ -108,11 +108,11 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
 
 }
 
-void PolyRhythmMachine::handleNoteTrigger(juce::MidiBuffer& midiBuffer, int noteNumber, int samplesPerInterval)
+void PolyRhythmMachine::handleNoteTrigger(juce::MidiBuffer& midiBuffer, int noteNumber, int velocity, int bufferPosition)
 {
-    auto message = juce::MidiMessage::noteOn(1, noteNumber, (juce::uint8)100);
+    auto message = juce::MidiMessage::noteOn(1, noteNumber, (juce::uint8)velocity);
     auto messageOff = juce::MidiMessage::noteOff(1, noteNumber);
-    if (!midiBuffer.addEvent(message, samplesPerInterval))
+    if (!midiBuffer.addEvent(message, bufferPosition))
     {
        DBG("error adding messages to midiBuffer");
     }
@@ -167,6 +167,13 @@ void PolyRhythmMachine::resetParams(juce::MidiBuffer& midiBuffer)
             midiBuffer.addEvent(messageOff, 0);
             tracks[i].midiValue = tempMidiValue;
         }
+
+
+        int tempVelocity = apvts->getRawParameterValue("VELOCITY_" + to_string(i))->load();
+        if (tracks[i].velocity != tempVelocity) {
+                tracks[i].velocity = tempVelocity;
+        }
+
         samplesPerBar = 4 * (60.0 / bpm) * sampleRate;
         tracks[i].samplesPerInterval = samplesPerBar / tracks[i].subdivisions;
     }
@@ -182,7 +189,10 @@ void PolyRhythmMachine::resetParams()
 
     bpm = apvts->getRawParameterValue("BPM")->load();
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
-        int tempRhythmValue = apvts->getRawParameterValue("SUBDIVISIONS_" + to_string(i))->load();;
+
+
+
+        int tempRhythmValue = apvts->getRawParameterValue("SUBDIVISIONS_" + to_string(i))->load();
         if (tracks[i].subdivisions != tempRhythmValue)
         {
             tracks[i].subdivisions = tempRhythmValue;
@@ -194,6 +204,13 @@ void PolyRhythmMachine::resetParams()
             tracks[i].midiValue = tempMidiValue;
             //resetAll();
         }
+
+        int tempVelocity = apvts->getRawParameterValue("VELOCITY_" + to_string(i))->load();
+        if (tracks[i].velocity != tempVelocity) {
+                tracks[i].velocity = tempVelocity;
+        }
+
+
         samplesPerBar = 4 * (60.0 / bpm) * sampleRate;
         tracks[i].samplesPerInterval = samplesPerBar / tracks[i].subdivisions;
        
