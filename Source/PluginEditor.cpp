@@ -328,14 +328,11 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
         midiSliders[i].setVisible(true);
 
         //adjust the colors of any components belonging to tracks that have been muted
-        /*
+
+        //TODO: make colouring these into a function since you do it multiple times in the plugineditor
+        //one for texteditor, one for either slider
         if (trackEnabled == false) {
-            for (int j = 0; j < subdivisions; j++) {
-                beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_DARK_COLOUR.brighter(0.9));
-                beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonOnColourId, MAIN_COLOUR.brighter(0.9));
-                beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonOnColourId, ENABLED_COLOUR.brighter(0.9));
-                beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR.brighter(0.9));
-            }
+
             midiTextEditors[i].setColour(juce::TextEditor::ColourIds::textColourId, ACCENT_COLOUR.brighter(0.9));
             midiTextEditors[i].setColour(juce::TextEditor::ColourIds::focusedOutlineColourId, ACCENT_COLOUR.brighter(0.9));
             midiTextEditors[i].setColour(juce::TextEditor::ColourIds::outlineColourId, ACCENT_COLOUR.brighter(0.9));
@@ -346,11 +343,33 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
             subdivisionSliders[i].setColour(juce::Slider::ColourIds::textBoxBackgroundColourId, SECONDARY_COLOUR.brighter(0.9));
             subdivisionSliders[i].setColour(juce::Slider::ColourIds::textBoxOutlineColourId, ACCENT_COLOUR.brighter(0.9));
 
+            velocitySliders[i].setColour(juce::Slider::ColourIds::thumbColourId, ACCENT_COLOUR.brighter(0.9));
+            velocitySliders[i].setColour(juce::Slider::ColourIds::textBoxTextColourId, ACCENT_COLOUR.brighter(0.9));
+            velocitySliders[i].setColour(juce::Slider::ColourIds::textBoxBackgroundColourId, SECONDARY_COLOUR.brighter(0.9));
+            velocitySliders[i].setColour(juce::Slider::ColourIds::textBoxOutlineColourId, ACCENT_COLOUR.brighter(0.9));
         }
-        */
+        else {
+            midiTextEditors[i].setColour(juce::TextEditor::ColourIds::textColourId, ACCENT_COLOUR);
+            midiTextEditors[i].setColour(juce::TextEditor::ColourIds::focusedOutlineColourId, ACCENT_COLOUR);
+            midiTextEditors[i].setColour(juce::TextEditor::ColourIds::outlineColourId, ACCENT_COLOUR);
+            midiTextEditors[i].setColour(juce::TextEditor::ColourIds::backgroundColourId, MAIN_COLOUR);
+
+            subdivisionSliders[i].setColour(juce::Slider::ColourIds::thumbColourId, ACCENT_COLOUR);
+            subdivisionSliders[i].setColour(juce::Slider::ColourIds::textBoxTextColourId, ACCENT_COLOUR);
+            subdivisionSliders[i].setColour(juce::Slider::ColourIds::textBoxBackgroundColourId, SECONDARY_COLOUR);
+            subdivisionSliders[i].setColour(juce::Slider::ColourIds::textBoxOutlineColourId, ACCENT_COLOUR);
+
+            velocitySliders[i].setColour(juce::Slider::ColourIds::thumbColourId, ACCENT_COLOUR);
+            velocitySliders[i].setColour(juce::Slider::ColourIds::textBoxTextColourId, ACCENT_COLOUR);
+            velocitySliders[i].setColour(juce::Slider::ColourIds::textBoxBackgroundColourId, SECONDARY_COLOUR);
+            velocitySliders[i].setColour(juce::Slider::ColourIds::textBoxOutlineColourId, ACCENT_COLOUR);
+        }
+ 
     }
 
 }
+
+
 
 void PolyGnomeAudioProcessorEditor::toggleAudioProcessorChildrenStates()
 {
@@ -391,6 +410,20 @@ std::vector<juce::Component*> PolyGnomeAudioProcessorEditor::getVisibleComps() {
 
     return{ comps };
 }
+
+std::vector<juce::Component*> PolyGnomeAudioProcessorEditor::getTrackComps(int index) {
+    std::vector<juce::Component*> comps;
+    comps.push_back(&subdivisionSliders[index]);
+    comps.push_back(&velocitySliders[index]);
+    comps.push_back(&midiSliders[index]);
+    comps.push_back(&midiTextEditors[index]);
+    comps.push_back(&muteButtons[index]);
+    for (int j = 0; j < MAX_TRACK_LENGTH; j++) {
+        comps.push_back(&beatButtons[index][j]);
+    }
+    return{ comps };
+}
+
 
 std::vector<juce::Component*> PolyGnomeAudioProcessorEditor::getHiddenComps() {
 

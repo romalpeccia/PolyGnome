@@ -74,7 +74,7 @@ private:
 
     std::vector<juce::Component*> getVisibleComps();
     std::vector<juce::Component*> getHiddenComps();
-
+    std::vector<juce::Component*> getTrackComps(int index);
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PolyGnomeAudioProcessorEditor)
