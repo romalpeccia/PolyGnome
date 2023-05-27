@@ -21,7 +21,7 @@ struct Track {
     int samplesPerInterval = 0; //samples per subdivided beat, updated when user changes a param. samplesPerInterval =  4 * ((60.0 / bpm) * sampleRate) / tracks[i].subdivisions;
     int samplesProcessed = 0; //TODO do I need this? i think it can just be a single class variable
     int beatCounter = 0; // counts by 1 after each subdivided beat has been played (from 0 to num subdivisions) then resets to 0. 
-    int subdivisions = 1;
+    int subdivisions = DEFAULT_SUBDIVISIONS;
     int midiValue = DEFAULT_MIDI_VALUE; 
     int velocity = DEFAULT_VELOCITY;
 };        

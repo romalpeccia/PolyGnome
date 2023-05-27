@@ -9,9 +9,7 @@
 */
 
 #include "LookAndFeel.h"
-
-
-
+#include "Utilities.h"
 
 void CustomLookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int width, int height, float sliderPosProportional, float rotaryStartAngle,
     float rotaryEndAngle, juce::Slider& slider)
@@ -22,18 +20,18 @@ void CustomLookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int wi
 
     if (enabled)
     {
-        g.setColour(juce::Colours::indigo);
+        g.setColour(MAIN_COLOUR);
         g.fillEllipse(bounds);
 
-        g.setColour(juce::Colours::orange);
+        g.setColour(ACCENT_COLOUR);
         g.drawEllipse(bounds, 1.f);
     }
     else
     {
-        g.setColour(Colours::darkgrey);
+        g.setColour(DISABLED_DARK_COLOUR);
         g.fillEllipse(bounds);
 
-        g.setColour(Colours::black);
+        g.setColour(BACKGROUND_COLOUR);
         g.drawEllipse(bounds, 1.f);
     }
     //TODO: if we can cast rswl to rotaryslider with labels then we can use its functions??? why is this needed

@@ -33,24 +33,24 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
     };
 
 
-    playButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::steelblue);
+    playButton.setColour(juce::TextButton::ColourIds::buttonColourId, SECONDARY_COLOUR);
 
     //initialize the polytrack Machine buttons and sliders
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
-        for (int j = 0; j < MAX_LENGTH; j++)
+        for (int j = 0; j < MAX_TRACK_LENGTH; j++)
         { //initialize the track buttons
             juce::String name = "BEAT_" + to_string(i) + "_" + to_string(j) + "_TOGGLE";
             beatButtons[i][j].onClick = [this, name, i, j]() {
                 if (audioProcessor.apvts.getRawParameterValue(name)->load() == true) {
                     //audioProcessor.apvts.getRawParameterValue(name)->store(false);
-                    beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::grey);
+                    beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR);
                 }
                 else {
                     //audioProcessor.apvts.getRawParameterValue(name)->store(true);
-                    beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonOnColourId, juce::Colours::indigo);
+                    beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonOnColourId, MAIN_COLOUR);
                 }
             };
-            beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::grey);
+            beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR);
             beatButtons[i][j].setClickingTogglesState(true);
             beatButtonAttachments[i][j] = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.apvts, name,beatButtons[i][j]);
         }
@@ -62,10 +62,10 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
 
         //initialize the subdivision sliders
         subdivisionSliders[i].setSliderStyle(juce::Slider::SliderStyle::Rotary);
-        subdivisionSliders[i].setColour(juce::Slider::ColourIds::thumbColourId, juce::Colours::orange);
-        subdivisionSliders[i].setColour(juce::Slider::ColourIds::textBoxTextColourId, juce::Colours::orange);
-        subdivisionSliders[i].setColour(juce::Slider::ColourIds::textBoxBackgroundColourId, juce::Colours::steelblue);
-        subdivisionSliders[i].setColour(juce::Slider::ColourIds::textBoxOutlineColourId, juce::Colours::orange);
+        subdivisionSliders[i].setColour(juce::Slider::ColourIds::thumbColourId, ACCENT_COLOUR);
+        subdivisionSliders[i].setColour(juce::Slider::ColourIds::textBoxTextColourId, ACCENT_COLOUR);
+        subdivisionSliders[i].setColour(juce::Slider::ColourIds::textBoxBackgroundColourId, SECONDARY_COLOUR);
+        subdivisionSliders[i].setColour(juce::Slider::ColourIds::textBoxOutlineColourId, ACCENT_COLOUR);
         subdivisionSliderAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,
             "SUBDIVISIONS_" + to_string(i),
             subdivisionSliders[i]);
@@ -73,10 +73,10 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
 
         //initialize the velocity sliders
         velocitySliders[i].setSliderStyle(juce::Slider::SliderStyle::Rotary);
-        velocitySliders[i].setColour(juce::Slider::ColourIds::thumbColourId, juce::Colours::orange);
-        velocitySliders[i].setColour(juce::Slider::ColourIds::textBoxTextColourId, juce::Colours::orange);
-        velocitySliders[i].setColour(juce::Slider::ColourIds::textBoxBackgroundColourId, juce::Colours::steelblue);
-        velocitySliders[i].setColour(juce::Slider::ColourIds::textBoxOutlineColourId, juce::Colours::orange);
+        velocitySliders[i].setColour(juce::Slider::ColourIds::thumbColourId, ACCENT_COLOUR);
+        velocitySliders[i].setColour(juce::Slider::ColourIds::textBoxTextColourId, ACCENT_COLOUR);
+        velocitySliders[i].setColour(juce::Slider::ColourIds::textBoxBackgroundColourId, SECONDARY_COLOUR);
+        velocitySliders[i].setColour(juce::Slider::ColourIds::textBoxOutlineColourId, ACCENT_COLOUR);
         velocitySliderAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,
             "VELOCITY_" + to_string(i),
             velocitySliders[i]);
@@ -93,10 +93,10 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
         int currentIntValue = audioProcessor.apvts.getRawParameterValue("MIDI_VALUE_" + to_string(i))->load();
         midiTextEditors[i].setText(midiIntToString(currentIntValue) + " / " + to_string(currentIntValue));
         midiTextEditors[i].setReadOnly(false);
-        midiTextEditors[i].setColour(juce::TextEditor::ColourIds::textColourId, juce::Colours::orange);
-        midiTextEditors[i].setColour(juce::TextEditor::ColourIds::focusedOutlineColourId, juce::Colours::orange);
-        midiTextEditors[i].setColour(juce::TextEditor::ColourIds::outlineColourId, juce::Colours::orange);
-        midiTextEditors[i].setColour(juce::TextEditor::ColourIds::backgroundColourId, juce::Colours::indigo);
+        midiTextEditors[i].setColour(juce::TextEditor::ColourIds::textColourId, ACCENT_COLOUR);
+        midiTextEditors[i].setColour(juce::TextEditor::ColourIds::focusedOutlineColourId, ACCENT_COLOUR);
+        midiTextEditors[i].setColour(juce::TextEditor::ColourIds::outlineColourId, ACCENT_COLOUR);
+        midiTextEditors[i].setColour(juce::TextEditor::ColourIds::backgroundColourId, MAIN_COLOUR);
         midiTextEditors[i].onReturnKey = [this, i]() {
             juce::String input = midiTextEditors[i].getText();
             string inputString = input.toStdString();
@@ -193,7 +193,7 @@ PolyGnomeAudioProcessorEditor::~PolyGnomeAudioProcessorEditor()
 //==============================================================================
 void PolyGnomeAudioProcessorEditor::paint(juce::Graphics& g)
 {
-    g.fillAll(juce::Colours::black);
+    g.fillAll(BACKGROUND_COLOUR);
     g.drawImageAt(logo, 0, 0);
 
 
@@ -220,8 +220,6 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
     //TODO look into only calling redraws of specific elements if needed
     auto visualArea = getVisualArea();
 
-    //uncomment for debugging purposes    
-    //g.setColour(juce::Colours::lightgrey);
 
     g.drawRect(visualArea);
 
@@ -254,7 +252,7 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
         //draw the line segments representing each track
         juce::Path trackLine;
         trackLine.addLineSegment(juce::Line<float>(X, Y + spacing * i, X + width, Y + spacing * i), 1.f);
-        g.setColour(juce::Colours::steelblue);
+        g.setColour(SECONDARY_COLOUR);
         g.strokePath(trackLine, juce::PathStrokeType(2.0f));
         bool trackEnabled = audioProcessor.apvts.getRawParameterValue("TRACK_" + to_string(i) + "_ENABLE")->load();
 
@@ -272,45 +270,45 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
             if (audioProcessor.apvts.getRawParameterValue("BEAT_" + to_string(i) + "_" + to_string(j) + "_TOGGLE")->load() == true) {
                 if (j == audioProcessor.polyRhythmMachine.tracks[i].beatCounter - 1) {
                     if (trackEnabled == true) {
-                        beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonOnColourId, juce::Colours::green);
+                        beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonOnColourId, ENABLED_COLOUR);
                     }
                     else {
-                        beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonOnColourId, juce::Colours::green.brighter(0.9));
+                        beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonOnColourId, ENABLED_COLOUR.brighter(0.9));
                     }
 
                 }
                 else {
                     if (trackEnabled == true){
-                        beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonOnColourId, juce::Colours::indigo);
+                        beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonOnColourId, MAIN_COLOUR);
                     }
                     else {
-                        beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonOnColourId, juce::Colours::indigo.brighter(0.9));
+                        beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonOnColourId, MAIN_COLOUR.brighter(0.9));
                     }
                 }
             }
             else {
                 if (j == audioProcessor.polyRhythmMachine.tracks[i].beatCounter - 1 && audioProcessor.polyRhythmMachine.tracks[i].subdivisions != 1) {
                     if (trackEnabled == true) {
-                        beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::darkgrey);
+                        beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_DARK_COLOUR);
                     }
                     else {
-                        beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::darkgrey.brighter(0.9));
+                        beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_DARK_COLOUR.brighter(0.9));
                     }
                     
                 }
                 else {
                     if (trackEnabled == true) {
-                        beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::grey);
+                        beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR);
                     }
                     else {
-                        beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::grey.brighter(0.9));
+                        beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR.brighter(0.9));
                     }
                     
                 }
             }
         }
         //hide any hidden buttons
-        for (int k = subdivisions; k < MAX_LENGTH; k++) {
+        for (int k = subdivisions; k < MAX_TRACK_LENGTH; k++) {
             beatButtons[i][k].setVisible(false);
         }
 
@@ -329,6 +327,27 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
         midiSliders[i].setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, false, 0, 0);
         midiSliders[i].setVisible(true);
 
+        //adjust the colors of any components belonging to tracks that have been muted
+        /*
+        if (trackEnabled == false) {
+            for (int j = 0; j < subdivisions; j++) {
+                beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_DARK_COLOUR.brighter(0.9));
+                beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonOnColourId, MAIN_COLOUR.brighter(0.9));
+                beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonOnColourId, ENABLED_COLOUR.brighter(0.9));
+                beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR.brighter(0.9));
+            }
+            midiTextEditors[i].setColour(juce::TextEditor::ColourIds::textColourId, ACCENT_COLOUR.brighter(0.9));
+            midiTextEditors[i].setColour(juce::TextEditor::ColourIds::focusedOutlineColourId, ACCENT_COLOUR.brighter(0.9));
+            midiTextEditors[i].setColour(juce::TextEditor::ColourIds::outlineColourId, ACCENT_COLOUR.brighter(0.9));
+            midiTextEditors[i].setColour(juce::TextEditor::ColourIds::backgroundColourId, MAIN_COLOUR.brighter(0.9));
+
+            subdivisionSliders[i].setColour(juce::Slider::ColourIds::thumbColourId, ACCENT_COLOUR.brighter(0.9));
+            subdivisionSliders[i].setColour(juce::Slider::ColourIds::textBoxTextColourId, ACCENT_COLOUR.brighter(0.9));
+            subdivisionSliders[i].setColour(juce::Slider::ColourIds::textBoxBackgroundColourId, SECONDARY_COLOUR.brighter(0.9));
+            subdivisionSliders[i].setColour(juce::Slider::ColourIds::textBoxOutlineColourId, ACCENT_COLOUR.brighter(0.9));
+
+        }
+        */
     }
 
 }
@@ -349,11 +368,11 @@ void PolyGnomeAudioProcessorEditor::togglePlayState() {
 }
 void PolyGnomeAudioProcessorEditor::togglePlayStateOff() {
     audioProcessor.apvts.getRawParameterValue("ON/OFF")->store(false);
-    playButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::steelblue);
+    playButton.setColour(juce::TextButton::ColourIds::buttonColourId, SECONDARY_COLOUR);
 }
 void PolyGnomeAudioProcessorEditor::togglePlayStateOn() {
     audioProcessor.apvts.getRawParameterValue("ON/OFF")->store(true);
-    playButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::indigo);
+    playButton.setColour(juce::TextButton::ColourIds::buttonColourId, MAIN_COLOUR);
 }
 std::vector<juce::Component*> PolyGnomeAudioProcessorEditor::getVisibleComps() {
 
@@ -380,7 +399,7 @@ std::vector<juce::Component*> PolyGnomeAudioProcessorEditor::getHiddenComps() {
     comps.push_back(&savePresetButton);
 
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
-        for (int j = 0; j < MAX_LENGTH; j++) {
+        for (int j = 0; j < MAX_TRACK_LENGTH; j++) {
             comps.push_back(&beatButtons[i][j]);
         }
     }
@@ -390,7 +409,7 @@ std::vector<juce::Component*> PolyGnomeAudioProcessorEditor::getHiddenComps() {
 
 void PolyGnomeAudioProcessorEditor::changeMenuButtonColors(juce::TextButton *buttonOn) {
     auto buttonColourId = juce::TextButton::ColourIds::buttonColourId;
-    buttonOn->setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::indigo);
+    buttonOn->setColour(juce::TextButton::ColourIds::buttonColourId, MAIN_COLOUR);
 }
 
 void PolyGnomeAudioProcessorEditor::savePreset() {
