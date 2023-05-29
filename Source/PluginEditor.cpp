@@ -58,31 +58,19 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
         //initialize the mute buttons
         muteButtons[i].setClickingTogglesState(true);
         muteButtonAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.apvts, "TRACK_" + to_string(i) + "_ENABLE", muteButtons[i]);
-
-
+ 
         //initialize the subdivision sliders
         subdivisionSliders[i].setSliderStyle(juce::Slider::SliderStyle::Rotary);
-        subdivisionSliders[i].setColour(juce::Slider::ColourIds::thumbColourId, ACCENT_COLOUR);
-        subdivisionSliders[i].setColour(juce::Slider::ColourIds::textBoxTextColourId, ACCENT_COLOUR);
-        subdivisionSliders[i].setColour(juce::Slider::ColourIds::textBoxBackgroundColourId, SECONDARY_COLOUR);
-        subdivisionSliders[i].setColour(juce::Slider::ColourIds::textBoxOutlineColourId, ACCENT_COLOUR);
+        colorSlider(subdivisionSliders[i], ACCENT_COLOUR, ACCENT_COLOUR, SECONDARY_COLOUR, ACCENT_COLOUR, true);
         subdivisionSliderAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"SUBDIVISIONS_" + to_string(i), subdivisionSliders[i]);
          
-
         //initialize the velocity sliders
         velocitySliders[i].setSliderStyle(juce::Slider::SliderStyle::Rotary);
-        velocitySliders[i].setColour(juce::Slider::ColourIds::thumbColourId, ACCENT_COLOUR);
-        velocitySliders[i].setColour(juce::Slider::ColourIds::textBoxTextColourId, ACCENT_COLOUR);
-        velocitySliders[i].setColour(juce::Slider::ColourIds::textBoxBackgroundColourId, SECONDARY_COLOUR);
-        velocitySliders[i].setColour(juce::Slider::ColourIds::textBoxOutlineColourId, ACCENT_COLOUR);
+        colorSlider(velocitySliders[i], ACCENT_COLOUR, ACCENT_COLOUR, SECONDARY_COLOUR, ACCENT_COLOUR, true);
         velocitySliderAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"VELOCITY_" + to_string(i), velocitySliders[i]);
 
         //initialize the sustain sliders
-        sustainSliders[i].setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
-        sustainSliders[i].setColour(juce::Slider::ColourIds::thumbColourId, ACCENT_COLOUR);
-        sustainSliders[i].setColour(juce::Slider::ColourIds::textBoxTextColourId, ACCENT_COLOUR);
-        sustainSliders[i].setColour(juce::Slider::ColourIds::textBoxBackgroundColourId, SECONDARY_COLOUR);
-        sustainSliders[i].setColour(juce::Slider::ColourIds::textBoxOutlineColourId, ACCENT_COLOUR);
+        colorSlider(sustainSliders[i], ACCENT_COLOUR, ACCENT_COLOUR, SECONDARY_COLOUR, ACCENT_COLOUR, true);
         sustainSliderAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"SUSTAIN_" + to_string(i),sustainSliders[i]);
 
         //initialize the MIDI control slider    
@@ -93,10 +81,7 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
         int currentIntValue = audioProcessor.apvts.getRawParameterValue("MIDI_VALUE_" + to_string(i))->load();
         midiTextEditors[i].setText(midiIntToString(currentIntValue) + " / " + to_string(currentIntValue));
         midiTextEditors[i].setReadOnly(false);
-        midiTextEditors[i].setColour(juce::TextEditor::ColourIds::textColourId, ACCENT_COLOUR);
-        midiTextEditors[i].setColour(juce::TextEditor::ColourIds::focusedOutlineColourId, ACCENT_COLOUR);
-        midiTextEditors[i].setColour(juce::TextEditor::ColourIds::outlineColourId, ACCENT_COLOUR);
-        midiTextEditors[i].setColour(juce::TextEditor::ColourIds::backgroundColourId, MAIN_COLOUR);
+        colorTextEditor(midiTextEditors[i], ACCENT_COLOUR, ACCENT_COLOUR, ACCENT_COLOUR, MAIN_COLOUR, true);
         midiTextEditors[i].onReturnKey = [this, i]() {
             juce::String input = midiTextEditors[i].getText();
             string inputString = input.toStdString();
@@ -158,6 +143,7 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
 
 void PolyGnomeAudioProcessorEditor::resized()
 {
+    //TODO: change how all of this is laid out
 
     juce::Rectangle<int> bounds = getLocalBounds();
     juce::Rectangle<int> playBounds(100, 100);
@@ -200,7 +186,7 @@ void PolyGnomeAudioProcessorEditor::paint(juce::Graphics& g)
     if (audioProcessor.apvts.getRawParameterValue("HOST_CONNECTED")->load()){
         bpmSlider.setEnabled(false);
     }
-        paintPolyRhythmMachine(g);
+    paintPolyRhythmMachine(g);
 }
 
 juce::Rectangle<int> PolyGnomeAudioProcessorEditor::getVisualArea()
@@ -233,10 +219,7 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
     int spacing = height / MAX_MIDI_CHANNELS;
     Y = Y + spacing;
 
-
-
-
-
+    //main loop to draw the tracks and all of its components
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
 
         //draw the components to the left of the tracks
@@ -260,7 +243,7 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
         trackLine.addLineSegment(juce::Line<float>(X, Y + spacing * i, X + width, Y + spacing * i), 1.f);
         g.setColour(SECONDARY_COLOUR);
         g.strokePath(trackLine, juce::PathStrokeType(2.0f));
-        bool trackEnabled = audioProcessor.apvts.getRawParameterValue("TRACK_" + to_string(i) + "_ENABLE")->load();
+        bool isTrackEnabled = audioProcessor.apvts.getRawParameterValue("TRACK_" + to_string(i) + "_ENABLE")->load();
 
         //draw the buttons for each note of the track
         int subdivisions = audioProcessor.apvts.getRawParameterValue("SUBDIVISIONS_" + to_string(i))->load();
@@ -275,7 +258,7 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
             //TODO : clean this?
             if (audioProcessor.apvts.getRawParameterValue("BEAT_" + to_string(i) + "_" + to_string(j) + "_TOGGLE")->load() == true) {
                 if (j == audioProcessor.polyRhythmMachine.tracks[i].beatCounter - 1) {
-                    if (trackEnabled == true) {
+                    if (isTrackEnabled == true) {
                         beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonOnColourId, ENABLED_COLOUR);
                     }
                     else {
@@ -284,7 +267,7 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
 
                 }
                 else {
-                    if (trackEnabled == true){
+                    if (isTrackEnabled == true){
                         beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonOnColourId, MAIN_COLOUR);
                     }
                     else {
@@ -294,7 +277,7 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
             }
             else {
                 if (j == audioProcessor.polyRhythmMachine.tracks[i].beatCounter - 1 && audioProcessor.polyRhythmMachine.tracks[i].subdivisions != 1) {
-                    if (trackEnabled == true) {
+                    if (isTrackEnabled == true) {
                         beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_DARK_COLOUR);
                     }
                     else {
@@ -303,7 +286,7 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
                     
                 }
                 else {
-                    if (trackEnabled == true) {
+                    if (isTrackEnabled == true) {
                         beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR);
                     }
                     else {
@@ -333,53 +316,11 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
         midiSliders[i].setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, false, 0, 0);
         midiSliders[i].setVisible(true);
 
-        //adjust the colors of any components belonging to tracks that have been muted
-
-        //TODO: make colouring these into a function since you do it multiple times in the plugineditor
-        //one for texteditor, one for either slider
-        if (trackEnabled == false) {
-
-            midiTextEditors[i].setColour(juce::TextEditor::ColourIds::textColourId, ACCENT_COLOUR.brighter(0.9));
-            midiTextEditors[i].setColour(juce::TextEditor::ColourIds::focusedOutlineColourId, ACCENT_COLOUR.brighter(0.9));
-            midiTextEditors[i].setColour(juce::TextEditor::ColourIds::outlineColourId, ACCENT_COLOUR.brighter(0.9));
-            midiTextEditors[i].setColour(juce::TextEditor::ColourIds::backgroundColourId, MAIN_COLOUR.brighter(0.9));
-
-            subdivisionSliders[i].setColour(juce::Slider::ColourIds::thumbColourId, ACCENT_COLOUR.brighter(0.9));
-            subdivisionSliders[i].setColour(juce::Slider::ColourIds::textBoxTextColourId, ACCENT_COLOUR.brighter(0.9));
-            subdivisionSliders[i].setColour(juce::Slider::ColourIds::textBoxBackgroundColourId, SECONDARY_COLOUR.brighter(0.9));
-            subdivisionSliders[i].setColour(juce::Slider::ColourIds::textBoxOutlineColourId, ACCENT_COLOUR.brighter(0.9));
-
-            velocitySliders[i].setColour(juce::Slider::ColourIds::thumbColourId, ACCENT_COLOUR.brighter(0.9));
-            velocitySliders[i].setColour(juce::Slider::ColourIds::textBoxTextColourId, ACCENT_COLOUR.brighter(0.9));
-            velocitySliders[i].setColour(juce::Slider::ColourIds::textBoxBackgroundColourId, SECONDARY_COLOUR.brighter(0.9));
-            velocitySliders[i].setColour(juce::Slider::ColourIds::textBoxOutlineColourId, ACCENT_COLOUR.brighter(0.9));
-
-            sustainSliders[i].setColour(juce::Slider::ColourIds::thumbColourId, ACCENT_COLOUR.brighter(0.9));
-            sustainSliders[i].setColour(juce::Slider::ColourIds::textBoxTextColourId, ACCENT_COLOUR.brighter(0.9));
-            sustainSliders[i].setColour(juce::Slider::ColourIds::textBoxBackgroundColourId, SECONDARY_COLOUR.brighter(0.9));
-            sustainSliders[i].setColour(juce::Slider::ColourIds::textBoxOutlineColourId, ACCENT_COLOUR.brighter(0.9));
-        }
-        else {
-            midiTextEditors[i].setColour(juce::TextEditor::ColourIds::textColourId, ACCENT_COLOUR);
-            midiTextEditors[i].setColour(juce::TextEditor::ColourIds::focusedOutlineColourId, ACCENT_COLOUR);
-            midiTextEditors[i].setColour(juce::TextEditor::ColourIds::outlineColourId, ACCENT_COLOUR);
-            midiTextEditors[i].setColour(juce::TextEditor::ColourIds::backgroundColourId, MAIN_COLOUR);
-
-            subdivisionSliders[i].setColour(juce::Slider::ColourIds::thumbColourId, ACCENT_COLOUR);
-            subdivisionSliders[i].setColour(juce::Slider::ColourIds::textBoxTextColourId, ACCENT_COLOUR);
-            subdivisionSliders[i].setColour(juce::Slider::ColourIds::textBoxBackgroundColourId, SECONDARY_COLOUR);
-            subdivisionSliders[i].setColour(juce::Slider::ColourIds::textBoxOutlineColourId, ACCENT_COLOUR);
-
-            velocitySliders[i].setColour(juce::Slider::ColourIds::thumbColourId, ACCENT_COLOUR);
-            velocitySliders[i].setColour(juce::Slider::ColourIds::textBoxTextColourId, ACCENT_COLOUR);
-            velocitySliders[i].setColour(juce::Slider::ColourIds::textBoxBackgroundColourId, SECONDARY_COLOUR);
-            velocitySliders[i].setColour(juce::Slider::ColourIds::textBoxOutlineColourId, ACCENT_COLOUR);
-
-            sustainSliders[i].setColour(juce::Slider::ColourIds::thumbColourId, ACCENT_COLOUR);
-            sustainSliders[i].setColour(juce::Slider::ColourIds::textBoxTextColourId, ACCENT_COLOUR);
-            sustainSliders[i].setColour(juce::Slider::ColourIds::textBoxBackgroundColourId, SECONDARY_COLOUR);
-            sustainSliders[i].setColour(juce::Slider::ColourIds::textBoxOutlineColourId, ACCENT_COLOUR);
-        }
+        //adjust the colors of any components belonging to tracks
+        colorSlider(subdivisionSliders[i], ACCENT_COLOUR, ACCENT_COLOUR, SECONDARY_COLOUR, ACCENT_COLOUR, isTrackEnabled);
+        colorSlider(velocitySliders[i], ACCENT_COLOUR, ACCENT_COLOUR, SECONDARY_COLOUR, ACCENT_COLOUR, isTrackEnabled);
+        colorSlider(sustainSliders[i], ACCENT_COLOUR, ACCENT_COLOUR, SECONDARY_COLOUR, ACCENT_COLOUR, isTrackEnabled);
+        colorTextEditor(midiTextEditors[i], ACCENT_COLOUR, ACCENT_COLOUR, ACCENT_COLOUR, MAIN_COLOUR, isTrackEnabled);
  
     }
 
@@ -459,10 +400,39 @@ std::vector<juce::Component*> PolyGnomeAudioProcessorEditor::getHiddenComps() {
     return{ comps };
 }
 
+void PolyGnomeAudioProcessorEditor::colorSlider(juce::Slider& slider, juce::Colour thumbColour, juce::Colour textBoxTextColour, juce::Colour textBoxBackgroundColour, juce::Colour textBoxOutlineColour, bool trackEnabled) {
+    //any further customization to slider colors should be added here
+    if (trackEnabled == false) {
+        thumbColour = thumbColour.brighter(0.9);
+        textBoxTextColour = textBoxTextColour.brighter(0.9);
+        textBoxBackgroundColour = textBoxBackgroundColour.brighter(0.9);
+        textBoxOutlineColour = textBoxOutlineColour.brighter(0.9);
+    }
+    slider.setColour(juce::Slider::ColourIds::thumbColourId, thumbColour);
+    slider.setColour(juce::Slider::ColourIds::textBoxTextColourId, textBoxTextColour);
+    slider.setColour(juce::Slider::ColourIds::textBoxBackgroundColourId, textBoxBackgroundColour);
+    slider.setColour(juce::Slider::ColourIds::textBoxOutlineColourId, textBoxOutlineColour);
+}
+
+void PolyGnomeAudioProcessorEditor::colorTextEditor(juce::TextEditor& textEditor, juce::Colour textColour, juce::Colour focusedOutlineColour, juce::Colour outlineColour, juce::Colour backgroundColour, bool trackEnabled) {
+    if (trackEnabled == false) {
+        textColour = textColour.brighter(0.9);
+        focusedOutlineColour = focusedOutlineColour.brighter(0.9);
+        outlineColour = outlineColour.brighter(0.9);
+        backgroundColour = backgroundColour.brighter(0.9);
+    }
+
+    textEditor.setColour(juce::TextEditor::ColourIds::textColourId, textColour);
+    textEditor.setColour(juce::TextEditor::ColourIds::focusedOutlineColourId, focusedOutlineColour);
+    textEditor.setColour(juce::TextEditor::ColourIds::outlineColourId, outlineColour);
+    textEditor.setColour(juce::TextEditor::ColourIds::backgroundColourId, backgroundColour);
+}
+
 void PolyGnomeAudioProcessorEditor::changeMenuButtonColors(juce::TextButton *buttonOn) {
     auto buttonColourId = juce::TextButton::ColourIds::buttonColourId;
     buttonOn->setColour(juce::TextButton::ColourIds::buttonColourId, MAIN_COLOUR);
 }
+
 
 void PolyGnomeAudioProcessorEditor::savePreset() {
     

@@ -66,19 +66,13 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
         tracks[i].samplesProcessed += bufferSize;
 
         //turn any previously played notes off 
-        if (i == 0) {
-            float samplesAfterBeat = (((tracks[i].beatCounter - 1) * tracks[i].samplesPerInterval) + ((tracks[i].sustain / 100) * tracks[i].samplesPerInterval)); // the amount of samples for all intervals that have happened + the amount of samples after the latest interval
-            if (tracks[i].samplesProcessed > samplesAfterBeat && tracks->noteOffFlag == true) {
-                auto messageOff = juce::MidiMessage::noteOff(1, tracks[i].midiValue);
-                midiBuffer.addEvent(messageOff, totalSamples - samplesAfterBeat);
-                tracks->noteOffFlag = false;
-                DBG("noteoff");
-            }
-
+        float samplesAfterBeat = (((tracks[i].beatCounter - 1) * tracks[i].samplesPerInterval) + ((tracks[i].sustain / 100) * tracks[i].samplesPerInterval)); // the amount of samples for all intervals that have happened + the amount of samples after the latest interval
+        if (tracks[i].samplesProcessed > samplesAfterBeat && tracks->noteOffFlag == true) {
+            auto messageOff = juce::MidiMessage::noteOff(1, tracks[i].midiValue);
+            midiBuffer.addEvent(messageOff, totalSamples - samplesAfterBeat);
+            tracks->noteOffFlag = false;
+            DBG("noteoff");
         }
-
-
-
         if (tracks[i].beatCounter > tracks[i].subdivisions) {
             tracks[i].beatCounter = 0;
             tracks[i].samplesProcessed -= samplesPerBar;
