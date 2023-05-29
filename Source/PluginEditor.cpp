@@ -66,9 +66,7 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
         subdivisionSliders[i].setColour(juce::Slider::ColourIds::textBoxTextColourId, ACCENT_COLOUR);
         subdivisionSliders[i].setColour(juce::Slider::ColourIds::textBoxBackgroundColourId, SECONDARY_COLOUR);
         subdivisionSliders[i].setColour(juce::Slider::ColourIds::textBoxOutlineColourId, ACCENT_COLOUR);
-        subdivisionSliderAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,
-            "SUBDIVISIONS_" + to_string(i),
-            subdivisionSliders[i]);
+        subdivisionSliderAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"SUBDIVISIONS_" + to_string(i), subdivisionSliders[i]);
          
 
         //initialize the velocity sliders
@@ -77,17 +75,19 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
         velocitySliders[i].setColour(juce::Slider::ColourIds::textBoxTextColourId, ACCENT_COLOUR);
         velocitySliders[i].setColour(juce::Slider::ColourIds::textBoxBackgroundColourId, SECONDARY_COLOUR);
         velocitySliders[i].setColour(juce::Slider::ColourIds::textBoxOutlineColourId, ACCENT_COLOUR);
-        velocitySliderAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,
-            "VELOCITY_" + to_string(i),
-            velocitySliders[i]);
+        velocitySliderAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"VELOCITY_" + to_string(i), velocitySliders[i]);
 
-
+        //initialize the sustain sliders
+        sustainSliders[i].setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
+        sustainSliders[i].setColour(juce::Slider::ColourIds::thumbColourId, ACCENT_COLOUR);
+        sustainSliders[i].setColour(juce::Slider::ColourIds::textBoxTextColourId, ACCENT_COLOUR);
+        sustainSliders[i].setColour(juce::Slider::ColourIds::textBoxBackgroundColourId, SECONDARY_COLOUR);
+        sustainSliders[i].setColour(juce::Slider::ColourIds::textBoxOutlineColourId, ACCENT_COLOUR);
+        sustainSliderAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"SUSTAIN_" + to_string(i),sustainSliders[i]);
 
         //initialize the MIDI control slider    
         midiSliders[i].setSliderStyle(juce::Slider::SliderStyle::Rotary);
-        midiSliderAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,
-            "MIDI_VALUE_" + to_string(i),
-            midiSliders[i]);
+        midiSliderAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"MIDI_VALUE_" + to_string(i), midiSliders[i]);
 
         //initialize the text entry logic and UI for MIDI Values
         int currentIntValue = audioProcessor.apvts.getRawParameterValue("MIDI_VALUE_" + to_string(i))->load();
@@ -246,8 +246,14 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
 
         juce::Rectangle<int> velocitySliderBounds(X - 125, Y + spacing * (i - 1), 75, 75);
         velocitySliders[i].setBounds(velocitySliderBounds);
-        velocitySliders[i].setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxRight, false, 35, spacing / 2);
+        velocitySliders[i].setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxLeft, false, 35, spacing / 2);
         velocitySliders[i].setVisible(true);
+
+        juce::Rectangle<int> sustainSliderBounds(X - 200, Y + spacing * (i - 1) + 13, 50, 50);
+        sustainSliders[i].setBounds(sustainSliderBounds);
+        sustainSliders[i].setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, false, 35, spacing / 2);
+        sustainSliders[i].setVisible(true);
+
 
         //draw the line segments representing each track
         juce::Path trackLine;
@@ -347,6 +353,11 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
             velocitySliders[i].setColour(juce::Slider::ColourIds::textBoxTextColourId, ACCENT_COLOUR.brighter(0.9));
             velocitySliders[i].setColour(juce::Slider::ColourIds::textBoxBackgroundColourId, SECONDARY_COLOUR.brighter(0.9));
             velocitySliders[i].setColour(juce::Slider::ColourIds::textBoxOutlineColourId, ACCENT_COLOUR.brighter(0.9));
+
+            sustainSliders[i].setColour(juce::Slider::ColourIds::thumbColourId, ACCENT_COLOUR.brighter(0.9));
+            sustainSliders[i].setColour(juce::Slider::ColourIds::textBoxTextColourId, ACCENT_COLOUR.brighter(0.9));
+            sustainSliders[i].setColour(juce::Slider::ColourIds::textBoxBackgroundColourId, SECONDARY_COLOUR.brighter(0.9));
+            sustainSliders[i].setColour(juce::Slider::ColourIds::textBoxOutlineColourId, ACCENT_COLOUR.brighter(0.9));
         }
         else {
             midiTextEditors[i].setColour(juce::TextEditor::ColourIds::textColourId, ACCENT_COLOUR);
@@ -363,6 +374,11 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
             velocitySliders[i].setColour(juce::Slider::ColourIds::textBoxTextColourId, ACCENT_COLOUR);
             velocitySliders[i].setColour(juce::Slider::ColourIds::textBoxBackgroundColourId, SECONDARY_COLOUR);
             velocitySliders[i].setColour(juce::Slider::ColourIds::textBoxOutlineColourId, ACCENT_COLOUR);
+
+            sustainSliders[i].setColour(juce::Slider::ColourIds::thumbColourId, ACCENT_COLOUR);
+            sustainSliders[i].setColour(juce::Slider::ColourIds::textBoxTextColourId, ACCENT_COLOUR);
+            sustainSliders[i].setColour(juce::Slider::ColourIds::textBoxBackgroundColourId, SECONDARY_COLOUR);
+            sustainSliders[i].setColour(juce::Slider::ColourIds::textBoxOutlineColourId, ACCENT_COLOUR);
         }
  
     }
@@ -394,11 +410,13 @@ void PolyGnomeAudioProcessorEditor::togglePlayStateOn() {
     playButton.setColour(juce::TextButton::ColourIds::buttonColourId, MAIN_COLOUR);
 }
 std::vector<juce::Component*> PolyGnomeAudioProcessorEditor::getVisibleComps() {
-
+    //returns components that do not need to be hidden
 
     std::vector<juce::Component*> comps;
     comps.push_back(&playButton);
     comps.push_back(&bpmSlider);
+    comps.push_back(&loadPresetButton);
+    comps.push_back(&savePresetButton);
 
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
         comps.push_back(&subdivisionSliders[i]);
@@ -406,18 +424,21 @@ std::vector<juce::Component*> PolyGnomeAudioProcessorEditor::getVisibleComps() {
         comps.push_back(&midiSliders[i]);
         comps.push_back(&midiTextEditors[i]);
         comps.push_back(&muteButtons[i]);
+        comps.push_back(&sustainSliders[i]);
     }
 
     return{ comps };
 }
 
 std::vector<juce::Component*> PolyGnomeAudioProcessorEditor::getTrackComps(int index) {
+    //returns components for track[i]
     std::vector<juce::Component*> comps;
     comps.push_back(&subdivisionSliders[index]);
     comps.push_back(&velocitySliders[index]);
     comps.push_back(&midiSliders[index]);
     comps.push_back(&midiTextEditors[index]);
     comps.push_back(&muteButtons[index]);
+    comps.push_back(&sustainSliders[index]);
     for (int j = 0; j < MAX_TRACK_LENGTH; j++) {
         comps.push_back(&beatButtons[index][j]);
     }
@@ -426,11 +447,9 @@ std::vector<juce::Component*> PolyGnomeAudioProcessorEditor::getTrackComps(int i
 
 
 std::vector<juce::Component*> PolyGnomeAudioProcessorEditor::getHiddenComps() {
+    //returns components that sometimes have their state changed to hidden
 
     std::vector<juce::Component*> comps;
-    comps.push_back(&loadPresetButton);
-    comps.push_back(&savePresetButton);
-
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
         for (int j = 0; j < MAX_TRACK_LENGTH; j++) {
             comps.push_back(&beatButtons[i][j]);

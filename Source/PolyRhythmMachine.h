@@ -19,11 +19,15 @@ using namespace std;
 
 struct Track {
     int samplesPerInterval = 0; //samples per subdivided beat, updated when user changes a param. samplesPerInterval =  4 * ((60.0 / bpm) * sampleRate) / tracks[i].subdivisions;
-    int samplesProcessed = 0; //TODO do I need this? i think it can just be a single class variable
+    int samplesProcessed = 0; //TODO remove this, make it a single class variable
     int beatCounter = 0; // counts by 1 after each subdivided beat has been played (from 0 to num subdivisions) then resets to 0. 
+
+    //user adjustable values
     int subdivisions = DEFAULT_SUBDIVISIONS;
     int midiValue = DEFAULT_MIDI_VALUE; 
     int velocity = DEFAULT_VELOCITY;
+    float sustain = DEFAULT_SUSTAIN; //noteOffInterval = sustain * samplesPerInterval - 1
+    bool noteOffFlag = false;
 };        
 
 
@@ -42,8 +46,6 @@ public:
     int getTotalSamples() { return totalSamples; }
 
     Track tracks[MAX_MIDI_CHANNELS];
-    bool trackFlags[MAX_MIDI_CHANNELS];  //TRUE if a note has been triggered for respective midi channel //TODO rename this, add it to track class
-
 
 private:
 

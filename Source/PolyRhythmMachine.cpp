@@ -52,24 +52,40 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
     auto bufferSize = buffer.getNumSamples(); //usually 16, 32, 64... 1024...
     totalSamples += bufferSize; 
 
-    //test case. this may trigger when user changes the subdivisions during play time
+    //TODO: old test case, possibly no longer relevant, double check
+    /*
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
         if (tracks[i].samplesPerInterval * tracks[i].subdivisions != samplesPerBar) {
             DBG("track samplesPerInterval calculation error");
         }
     }
-    
+    */
 
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
-        float samplesCounted = tracks[i].samplesPerInterval * (tracks[i].beatCounter);
+
         tracks[i].samplesProcessed += bufferSize;
-        trackFlags[i] = (tracks[i].samplesProcessed >= samplesCounted     );
+
+        //turn any previously played notes off 
+        if (i == 0) {
+            float samplesAfterBeat = (((tracks[i].beatCounter - 1) * tracks[i].samplesPerInterval) + ((tracks[i].sustain / 100) * tracks[i].samplesPerInterval)); // the amount of samples for all intervals that have happened + the amount of samples after the latest interval
+            if (tracks[i].samplesProcessed > samplesAfterBeat && tracks->noteOffFlag == true) {
+                auto messageOff = juce::MidiMessage::noteOff(1, tracks[i].midiValue);
+                midiBuffer.addEvent(messageOff, totalSamples - samplesAfterBeat);
+                tracks->noteOffFlag = false;
+                DBG("noteoff");
+            }
+
+        }
+
+
 
         if (tracks[i].beatCounter > tracks[i].subdivisions) {
             tracks[i].beatCounter = 0;
             tracks[i].samplesProcessed -= samplesPerBar;
         }
-        if (trackFlags[i]) {
+
+        float samplesCounted = tracks[i].samplesPerInterval * (tracks[i].beatCounter);
+        if (tracks[i].samplesProcessed >= samplesCounted) {
             if (tracks[i].beatCounter < MAX_MIDI_CHANNELS) {
                 if (apvts->getRawParameterValue("BEAT_" + to_string(i) + "_" + to_string(tracks[i].beatCounter) + "_TOGGLE")->load() == true ) {
                     
@@ -91,15 +107,15 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
                     if (apvts->getRawParameterValue("TRACK_" + to_string(i) + "_ENABLE")->load() == true) {
                         handleNoteTrigger(midiBuffer, tracks[i].midiValue, tracks[i].velocity, bufferPosition);
                     }
-                    else {
-                        auto messageOff = juce::MidiMessage::noteOff(1, tracks[i].midiValue);
-                        midiBuffer.addEvent(messageOff, 0);
-                    }
-
                 }
+
             }
             tracks[i].beatCounter += 1;
         }
+
+
+
+
     }
 
     if (totalSamples > samplesPerBar) {
@@ -111,11 +127,11 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
 void PolyRhythmMachine::handleNoteTrigger(juce::MidiBuffer& midiBuffer, int noteNumber, int velocity, int bufferPosition)
 {
     auto message = juce::MidiMessage::noteOn(1, noteNumber, (juce::uint8)velocity);
-    auto messageOff = juce::MidiMessage::noteOff(1, noteNumber);
     if (!midiBuffer.addEvent(message, bufferPosition))
     {
        DBG("error adding messages to midiBuffer");
     }
+    tracks->noteOffFlag = true;
 }
 
 
@@ -174,6 +190,12 @@ void PolyRhythmMachine::resetParams(juce::MidiBuffer& midiBuffer)
                 tracks[i].velocity = tempVelocity;
         }
 
+        int tempSustain = apvts->getRawParameterValue("SUSTAIN_" + to_string(i))->load();
+        if (tracks[i].sustain != tempSustain) {
+            tracks[i].sustain = tempSustain;
+        }
+
+
         samplesPerBar = 4 * (60.0 / bpm) * sampleRate;
         tracks[i].samplesPerInterval = samplesPerBar / tracks[i].subdivisions;
     }
@@ -185,7 +207,6 @@ void PolyRhythmMachine::resetParams(juce::MidiBuffer& midiBuffer)
 void PolyRhythmMachine::resetParams()
 {  //this should be called when params change in UI to reflect changes in logic
    //the variables keeping track of time should be reset to reflect the new track
-   //TODO: maybe this gets deleted in favor of the overloaded version
 
     bpm = apvts->getRawParameterValue("BPM")->load();
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
@@ -210,7 +231,10 @@ void PolyRhythmMachine::resetParams()
                 tracks[i].velocity = tempVelocity;
         }
 
-
+        int tempSustain = apvts->getRawParameterValue("SUSTAIN_" + to_string(i))->load();
+        if (tracks[i].sustain != tempSustain) {
+            tracks[i].sustain = tempSustain;
+        }
         samplesPerBar = 4 * (60.0 / bpm) * sampleRate;
         tracks[i].samplesPerInterval = samplesPerBar / tracks[i].subdivisions;
        

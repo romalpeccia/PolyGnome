@@ -92,6 +92,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PolyGnomeAudioProcessor::cre
         layout.add(std::make_unique<juce::AudioParameterInt>("SUBDIVISIONS_" + to_string(i), "Subdivisions " + to_string(i), 1, MAX_TRACK_LENGTH, DEFAULT_SUBDIVISIONS));
         layout.add(std::make_unique<juce::AudioParameterInt>("MIDI_VALUE_" + to_string(i), "Midi Value " + to_string(i), 0, 127, DEFAULT_MIDI_VALUE + i));
         layout.add(std::make_unique<juce::AudioParameterInt>("VELOCITY_" + to_string(i), "Velocity " + to_string(i), 0, 127, DEFAULT_VELOCITY));
+        layout.add(std::make_unique<juce::AudioParameterFloat>("SUSTAIN_" + to_string(i), "Sustain " + to_string(i), 0, 100.0, DEFAULT_SUSTAIN));
         layout.add(std::make_unique<juce::AudioParameterBool>("TRACK_" + to_string(i) + "_ENABLE", "Track " + to_string(i) + " Enable", true));
     }
 

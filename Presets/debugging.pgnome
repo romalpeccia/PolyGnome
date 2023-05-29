@@ -1,0 +1,519 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Parameters>
+  <PARAM id="BPM" value="111.7000045776367"/>
+  <PARAM id="HOST_CONNECTED" value="0.0"/>
+  <PARAM id="MACHINE0.0_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE0.10_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE0.11_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE0.1_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE0.2_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE0.3_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE0.4_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE0.5_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE0.6_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE0.7_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE0.8_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE0.9_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE1.0_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE1.10_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE1.11_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE1.1_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE1.2_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE1.3_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE1.4_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE1.5_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE1.6_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE1.7_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE1.8_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE1.9_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE10.0_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE10.10_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE10.11_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE10.1_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE10.2_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE10.3_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE10.4_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE10.5_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE10.6_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE10.7_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE10.8_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE10.9_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE11.0_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE11.10_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE11.11_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE11.1_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE11.2_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE11.3_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE11.4_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE11.5_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE11.6_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE11.7_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE11.8_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE11.9_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE2.0_TOGGLE" value="1.0"/>
+  <PARAM id="MACHINE2.10_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE2.11_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE2.1_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE2.2_TOGGLE" value="1.0"/>
+  <PARAM id="MACHINE2.3_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE2.4_TOGGLE" value="1.0"/>
+  <PARAM id="MACHINE2.5_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE2.6_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE2.7_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE2.8_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE2.9_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE3.0_TOGGLE" value="1.0"/>
+  <PARAM id="MACHINE3.10_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE3.11_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE3.1_TOGGLE" value="1.0"/>
+  <PARAM id="MACHINE3.2_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE3.3_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE3.4_TOGGLE" value="1.0"/>
+  <PARAM id="MACHINE3.5_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE3.6_TOGGLE" value="1.0"/>
+  <PARAM id="MACHINE3.7_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE3.8_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE3.9_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE4.0_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE4.10_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE4.11_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE4.1_TOGGLE" value="1.0"/>
+  <PARAM id="MACHINE4.2_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE4.3_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE4.4_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE4.5_TOGGLE" value="1.0"/>
+  <PARAM id="MACHINE4.6_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE4.7_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE4.8_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE4.9_TOGGLE" value="1.0"/>
+  <PARAM id="MACHINE5.0_TOGGLE" value="1.0"/>
+  <PARAM id="MACHINE5.10_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE5.11_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE5.1_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE5.2_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE5.3_TOGGLE" value="1.0"/>
+  <PARAM id="MACHINE5.4_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE5.5_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE5.6_TOGGLE" value="1.0"/>
+  <PARAM id="MACHINE5.7_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE5.8_TOGGLE" value="1.0"/>
+  <PARAM id="MACHINE5.9_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE6.0_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE6.10_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE6.11_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE6.1_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE6.2_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE6.3_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE6.4_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE6.5_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE6.6_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE6.7_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE6.8_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE6.9_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE7.0_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE7.10_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE7.11_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE7.1_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE7.2_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE7.3_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE7.4_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE7.5_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE7.6_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE7.7_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE7.8_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE7.9_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE8.0_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE8.10_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE8.11_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE8.1_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE8.2_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE8.3_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE8.4_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE8.5_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE8.6_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE8.7_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE8.8_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE8.9_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE9.0_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE9.10_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE9.11_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE9.1_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE9.2_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE9.3_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE9.4_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE9.5_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE9.6_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE9.7_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE9.8_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE9.9_TOGGLE" value="0.0"/>
+  <PARAM id="MACHINE_MIDI_VALUE0" value="36.0"/>
+  <PARAM id="MACHINE_MIDI_VALUE1" value="37.0"/>
+  <PARAM id="MACHINE_MIDI_VALUE10" value="46.0"/>
+  <PARAM id="MACHINE_MIDI_VALUE11" value="47.0"/>
+  <PARAM id="MACHINE_MIDI_VALUE2" value="38.0"/>
+  <PARAM id="MACHINE_MIDI_VALUE3" value="39.0"/>
+  <PARAM id="MACHINE_MIDI_VALUE4" value="40.0"/>
+  <PARAM id="MACHINE_MIDI_VALUE5" value="41.0"/>
+  <PARAM id="MACHINE_MIDI_VALUE6" value="42.0"/>
+  <PARAM id="MACHINE_MIDI_VALUE7" value="43.0"/>
+  <PARAM id="MACHINE_MIDI_VALUE8" value="44.0"/>
+  <PARAM id="MACHINE_MIDI_VALUE9" value="45.0"/>
+  <PARAM id="MACHINE_SUBDIVISIONS0" value="1.0"/>
+  <PARAM id="MACHINE_SUBDIVISIONS1" value="1.0"/>
+  <PARAM id="MACHINE_SUBDIVISIONS10" value="1.0"/>
+  <PARAM id="MACHINE_SUBDIVISIONS11" value="1.0"/>
+  <PARAM id="MACHINE_SUBDIVISIONS2" value="8.0"/>
+  <PARAM id="MACHINE_SUBDIVISIONS3" value="9.0"/>
+  <PARAM id="MACHINE_SUBDIVISIONS4" value="10.0"/>
+  <PARAM id="MACHINE_SUBDIVISIONS5" value="10.0"/>
+  <PARAM id="MACHINE_SUBDIVISIONS6" value="1.0"/>
+  <PARAM id="MACHINE_SUBDIVISIONS7" value="1.0"/>
+  <PARAM id="MACHINE_SUBDIVISIONS8" value="1.0"/>
+  <PARAM id="MACHINE_SUBDIVISIONS9" value="1.0"/>
+  <PARAM id="MACHINE_TRACK_ENABLE0" value="1.0"/>
+  <PARAM id="MACHINE_TRACK_ENABLE1" value="1.0"/>
+  <PARAM id="MACHINE_TRACK_ENABLE10" value="1.0"/>
+  <PARAM id="MACHINE_TRACK_ENABLE11" value="1.0"/>
+  <PARAM id="MACHINE_TRACK_ENABLE2" value="1.0"/>
+  <PARAM id="MACHINE_TRACK_ENABLE3" value="1.0"/>
+  <PARAM id="MACHINE_TRACK_ENABLE4" value="1.0"/>
+  <PARAM id="MACHINE_TRACK_ENABLE5" value="1.0"/>
+  <PARAM id="MACHINE_TRACK_ENABLE6" value="1.0"/>
+  <PARAM id="MACHINE_TRACK_ENABLE7" value="1.0"/>
+  <PARAM id="MACHINE_TRACK_ENABLE8" value="1.0"/>
+  <PARAM id="MACHINE_TRACK_ENABLE9" value="1.0"/>
+  <PARAM id="ON/OFF" value="0.0"/>
+  <PARAM id="BEAT_0_0_TOGGLE" value="1.0"/>
+  <PARAM id="BEAT_0_10_TOGGLE"/>
+  <PARAM id="BEAT_0_11_TOGGLE"/>
+  <PARAM id="BEAT_0_1_TOGGLE"/>
+  <PARAM id="BEAT_0_2_TOGGLE" value="1.0"/>
+  <PARAM id="BEAT_0_3_TOGGLE"/>
+  <PARAM id="BEAT_0_4_TOGGLE" value="1.0"/>
+  <PARAM id="BEAT_0_5_TOGGLE" value="1.0"/>
+  <PARAM id="BEAT_0_6_TOGGLE"/>
+  <PARAM id="BEAT_0_7_TOGGLE" value="1.0"/>
+  <PARAM id="BEAT_0_8_TOGGLE" value="0.0"/>
+  <PARAM id="BEAT_0_9_TOGGLE"/>
+  <PARAM id="BEAT_10_0_TOGGLE"/>
+  <PARAM id="BEAT_10_10_TOGGLE"/>
+  <PARAM id="BEAT_10_11_TOGGLE"/>
+  <PARAM id="BEAT_10_1_TOGGLE"/>
+  <PARAM id="BEAT_10_2_TOGGLE"/>
+  <PARAM id="BEAT_10_3_TOGGLE"/>
+  <PARAM id="BEAT_10_4_TOGGLE"/>
+  <PARAM id="BEAT_10_5_TOGGLE"/>
+  <PARAM id="BEAT_10_6_TOGGLE"/>
+  <PARAM id="BEAT_10_7_TOGGLE"/>
+  <PARAM id="BEAT_10_8_TOGGLE"/>
+  <PARAM id="BEAT_10_9_TOGGLE"/>
+  <PARAM id="BEAT_11_0_TOGGLE"/>
+  <PARAM id="BEAT_11_10_TOGGLE"/>
+  <PARAM id="BEAT_11_11_TOGGLE"/>
+  <PARAM id="BEAT_11_1_TOGGLE"/>
+  <PARAM id="BEAT_11_2_TOGGLE"/>
+  <PARAM id="BEAT_11_3_TOGGLE"/>
+  <PARAM id="BEAT_11_4_TOGGLE"/>
+  <PARAM id="BEAT_11_5_TOGGLE"/>
+  <PARAM id="BEAT_11_6_TOGGLE"/>
+  <PARAM id="BEAT_11_7_TOGGLE"/>
+  <PARAM id="BEAT_11_8_TOGGLE"/>
+  <PARAM id="BEAT_11_9_TOGGLE"/>
+  <PARAM id="BEAT_1_0_TOGGLE"/>
+  <PARAM id="BEAT_1_10_TOGGLE"/>
+  <PARAM id="BEAT_1_11_TOGGLE"/>
+  <PARAM id="BEAT_1_1_TOGGLE"/>
+  <PARAM id="BEAT_1_2_TOGGLE"/>
+  <PARAM id="BEAT_1_3_TOGGLE"/>
+  <PARAM id="BEAT_1_4_TOGGLE"/>
+  <PARAM id="BEAT_1_5_TOGGLE"/>
+  <PARAM id="BEAT_1_6_TOGGLE"/>
+  <PARAM id="BEAT_1_7_TOGGLE"/>
+  <PARAM id="BEAT_1_8_TOGGLE"/>
+  <PARAM id="BEAT_1_9_TOGGLE"/>
+  <PARAM id="BEAT_2_0_TOGGLE"/>
+  <PARAM id="BEAT_2_10_TOGGLE"/>
+  <PARAM id="BEAT_2_11_TOGGLE"/>
+  <PARAM id="BEAT_2_1_TOGGLE"/>
+  <PARAM id="BEAT_2_2_TOGGLE"/>
+  <PARAM id="BEAT_2_3_TOGGLE"/>
+  <PARAM id="BEAT_2_4_TOGGLE"/>
+  <PARAM id="BEAT_2_5_TOGGLE"/>
+  <PARAM id="BEAT_2_6_TOGGLE"/>
+  <PARAM id="BEAT_2_7_TOGGLE"/>
+  <PARAM id="BEAT_2_8_TOGGLE"/>
+  <PARAM id="BEAT_2_9_TOGGLE"/>
+  <PARAM id="BEAT_3_0_TOGGLE"/>
+  <PARAM id="BEAT_3_10_TOGGLE"/>
+  <PARAM id="BEAT_3_11_TOGGLE"/>
+  <PARAM id="BEAT_3_1_TOGGLE"/>
+  <PARAM id="BEAT_3_2_TOGGLE"/>
+  <PARAM id="BEAT_3_3_TOGGLE"/>
+  <PARAM id="BEAT_3_4_TOGGLE"/>
+  <PARAM id="BEAT_3_5_TOGGLE"/>
+  <PARAM id="BEAT_3_6_TOGGLE"/>
+  <PARAM id="BEAT_3_7_TOGGLE"/>
+  <PARAM id="BEAT_3_8_TOGGLE"/>
+  <PARAM id="BEAT_3_9_TOGGLE"/>
+  <PARAM id="BEAT_4_0_TOGGLE"/>
+  <PARAM id="BEAT_4_10_TOGGLE"/>
+  <PARAM id="BEAT_4_11_TOGGLE"/>
+  <PARAM id="BEAT_4_1_TOGGLE"/>
+  <PARAM id="BEAT_4_2_TOGGLE"/>
+  <PARAM id="BEAT_4_3_TOGGLE"/>
+  <PARAM id="BEAT_4_4_TOGGLE"/>
+  <PARAM id="BEAT_4_5_TOGGLE"/>
+  <PARAM id="BEAT_4_6_TOGGLE"/>
+  <PARAM id="BEAT_4_7_TOGGLE"/>
+  <PARAM id="BEAT_4_8_TOGGLE"/>
+  <PARAM id="BEAT_4_9_TOGGLE"/>
+  <PARAM id="BEAT_5_0_TOGGLE"/>
+  <PARAM id="BEAT_5_10_TOGGLE"/>
+  <PARAM id="BEAT_5_11_TOGGLE"/>
+  <PARAM id="BEAT_5_1_TOGGLE" value="1.0"/>
+  <PARAM id="BEAT_5_2_TOGGLE"/>
+  <PARAM id="BEAT_5_3_TOGGLE" value="1.0"/>
+  <PARAM id="BEAT_5_4_TOGGLE"/>
+  <PARAM id="BEAT_5_5_TOGGLE" value="1.0"/>
+  <PARAM id="BEAT_5_6_TOGGLE"/>
+  <PARAM id="BEAT_5_7_TOGGLE"/>
+  <PARAM id="BEAT_5_8_TOGGLE"/>
+  <PARAM id="BEAT_5_9_TOGGLE"/>
+  <PARAM id="BEAT_6_0_TOGGLE"/>
+  <PARAM id="BEAT_6_10_TOGGLE"/>
+  <PARAM id="BEAT_6_11_TOGGLE"/>
+  <PARAM id="BEAT_6_1_TOGGLE"/>
+  <PARAM id="BEAT_6_2_TOGGLE"/>
+  <PARAM id="BEAT_6_3_TOGGLE"/>
+  <PARAM id="BEAT_6_4_TOGGLE"/>
+  <PARAM id="BEAT_6_5_TOGGLE"/>
+  <PARAM id="BEAT_6_6_TOGGLE"/>
+  <PARAM id="BEAT_6_7_TOGGLE"/>
+  <PARAM id="BEAT_6_8_TOGGLE"/>
+  <PARAM id="BEAT_6_9_TOGGLE"/>
+  <PARAM id="BEAT_7_0_TOGGLE" value="0.0"/>
+  <PARAM id="BEAT_7_10_TOGGLE"/>
+  <PARAM id="BEAT_7_11_TOGGLE"/>
+  <PARAM id="BEAT_7_1_TOGGLE" value="1.0"/>
+  <PARAM id="BEAT_7_2_TOGGLE" value="1.0"/>
+  <PARAM id="BEAT_7_3_TOGGLE" value="1.0"/>
+  <PARAM id="BEAT_7_4_TOGGLE" value="1.0"/>
+  <PARAM id="BEAT_7_5_TOGGLE"/>
+  <PARAM id="BEAT_7_6_TOGGLE" value="1.0"/>
+  <PARAM id="BEAT_7_7_TOGGLE"/>
+  <PARAM id="BEAT_7_8_TOGGLE"/>
+  <PARAM id="BEAT_7_9_TOGGLE"/>
+  <PARAM id="BEAT_8_0_TOGGLE" value="0.0"/>
+  <PARAM id="BEAT_8_10_TOGGLE"/>
+  <PARAM id="BEAT_8_11_TOGGLE"/>
+  <PARAM id="BEAT_8_1_TOGGLE" value="0.0"/>
+  <PARAM id="BEAT_8_2_TOGGLE"/>
+  <PARAM id="BEAT_8_3_TOGGLE"/>
+  <PARAM id="BEAT_8_4_TOGGLE" value="1.0"/>
+  <PARAM id="BEAT_8_5_TOGGLE"/>
+  <PARAM id="BEAT_8_6_TOGGLE" value="0.0"/>
+  <PARAM id="BEAT_8_7_TOGGLE"/>
+  <PARAM id="BEAT_8_8_TOGGLE" value="1.0"/>
+  <PARAM id="BEAT_8_9_TOGGLE" value="0.0"/>
+  <PARAM id="BEAT_9_0_TOGGLE"/>
+  <PARAM id="BEAT_9_10_TOGGLE"/>
+  <PARAM id="BEAT_9_11_TOGGLE" value="1.0"/>
+  <PARAM id="BEAT_9_1_TOGGLE" value="1.0"/>
+  <PARAM id="BEAT_9_2_TOGGLE"/>
+  <PARAM id="BEAT_9_3_TOGGLE"/>
+  <PARAM id="BEAT_9_4_TOGGLE"/>
+  <PARAM id="BEAT_9_5_TOGGLE"/>
+  <PARAM id="BEAT_9_6_TOGGLE" value="1.0"/>
+  <PARAM id="BEAT_9_7_TOGGLE"/>
+  <PARAM id="BEAT_9_8_TOGGLE"/>
+  <PARAM id="BEAT_9_9_TOGGLE"/>
+  <PARAM id="MIDI_VALUE_0"/>
+  <PARAM id="MIDI_VALUE_1"/>
+  <PARAM id="MIDI_VALUE_10"/>
+  <PARAM id="MIDI_VALUE_11"/>
+  <PARAM id="MIDI_VALUE_2"/>
+  <PARAM id="MIDI_VALUE_3"/>
+  <PARAM id="MIDI_VALUE_4"/>
+  <PARAM id="MIDI_VALUE_5"/>
+  <PARAM id="MIDI_VALUE_6"/>
+  <PARAM id="MIDI_VALUE_7"/>
+  <PARAM id="MIDI_VALUE_8"/>
+  <PARAM id="MIDI_VALUE_9"/>
+  <PARAM id="SUBDIVISIONS_0" value="1.0"/>
+  <PARAM id="SUBDIVISIONS_1" value="1.0"/>
+  <PARAM id="SUBDIVISIONS_10" value="1.0"/>
+  <PARAM id="SUBDIVISIONS_11" value="1.0"/>
+  <PARAM id="SUBDIVISIONS_2" value="1.0"/>
+  <PARAM id="SUBDIVISIONS_3" value="1.0"/>
+  <PARAM id="SUBDIVISIONS_4" value="1.0"/>
+  <PARAM id="SUBDIVISIONS_5" value="1.0"/>
+  <PARAM id="SUBDIVISIONS_6" value="1.0"/>
+  <PARAM id="SUBDIVISIONS_7" value="1.0"/>
+  <PARAM id="SUBDIVISIONS_8" value="1.0"/>
+  <PARAM id="SUBDIVISIONS_9" value="1.0"/>
+  <PARAM id="TRACK_0_ENABLE" value="1.0"/>
+  <PARAM id="TRACK_10_ENABLE"/>
+  <PARAM id="TRACK_11_ENABLE"/>
+  <PARAM id="TRACK_1_ENABLE"/>
+  <PARAM id="TRACK_2_ENABLE"/>
+  <PARAM id="TRACK_3_ENABLE"/>
+  <PARAM id="TRACK_4_ENABLE"/>
+  <PARAM id="TRACK_5_ENABLE"/>
+  <PARAM id="TRACK_6_ENABLE"/>
+  <PARAM id="TRACK_7_ENABLE"/>
+  <PARAM id="TRACK_8_ENABLE" value="1.0"/>
+  <PARAM id="TRACK_9_ENABLE"/>
+  <PARAM id="VELOCITY_0"/>
+  <PARAM id="VELOCITY_1"/>
+  <PARAM id="VELOCITY_10"/>
+  <PARAM id="VELOCITY_11"/>
+  <PARAM id="VELOCITY_2"/>
+  <PARAM id="VELOCITY_3" value="41.0"/>
+  <PARAM id="VELOCITY_4"/>
+  <PARAM id="VELOCITY_5"/>
+  <PARAM id="VELOCITY_6"/>
+  <PARAM id="VELOCITY_7"/>
+  <PARAM id="VELOCITY_8"/>
+  <PARAM id="VELOCITY_9"/>
+  <PARAM id="BEAT_0_12_TOGGLE"/>
+  <PARAM id="BEAT_0_13_TOGGLE"/>
+  <PARAM id="BEAT_0_14_TOGGLE"/>
+  <PARAM id="BEAT_0_15_TOGGLE"/>
+  <PARAM id="BEAT_10_12_TOGGLE"/>
+  <PARAM id="BEAT_10_13_TOGGLE"/>
+  <PARAM id="BEAT_10_14_TOGGLE"/>
+  <PARAM id="BEAT_10_15_TOGGLE"/>
+  <PARAM id="BEAT_11_12_TOGGLE"/>
+  <PARAM id="BEAT_11_13_TOGGLE"/>
+  <PARAM id="BEAT_11_14_TOGGLE"/>
+  <PARAM id="BEAT_11_15_TOGGLE"/>
+  <PARAM id="BEAT_1_12_TOGGLE"/>
+  <PARAM id="BEAT_1_13_TOGGLE"/>
+  <PARAM id="BEAT_1_14_TOGGLE"/>
+  <PARAM id="BEAT_1_15_TOGGLE"/>
+  <PARAM id="BEAT_2_12_TOGGLE"/>
+  <PARAM id="BEAT_2_13_TOGGLE"/>
+  <PARAM id="BEAT_2_14_TOGGLE"/>
+  <PARAM id="BEAT_2_15_TOGGLE"/>
+  <PARAM id="BEAT_3_12_TOGGLE"/>
+  <PARAM id="BEAT_3_13_TOGGLE"/>
+  <PARAM id="BEAT_3_14_TOGGLE"/>
+  <PARAM id="BEAT_3_15_TOGGLE"/>
+  <PARAM id="BEAT_4_12_TOGGLE"/>
+  <PARAM id="BEAT_4_13_TOGGLE"/>
+  <PARAM id="BEAT_4_14_TOGGLE"/>
+  <PARAM id="BEAT_4_15_TOGGLE"/>
+  <PARAM id="BEAT_5_12_TOGGLE"/>
+  <PARAM id="BEAT_5_13_TOGGLE"/>
+  <PARAM id="BEAT_5_14_TOGGLE"/>
+  <PARAM id="BEAT_5_15_TOGGLE"/>
+  <PARAM id="BEAT_6_12_TOGGLE"/>
+  <PARAM id="BEAT_6_13_TOGGLE"/>
+  <PARAM id="BEAT_6_14_TOGGLE"/>
+  <PARAM id="BEAT_6_15_TOGGLE"/>
+  <PARAM id="BEAT_7_12_TOGGLE"/>
+  <PARAM id="BEAT_7_13_TOGGLE"/>
+  <PARAM id="BEAT_7_14_TOGGLE"/>
+  <PARAM id="BEAT_7_15_TOGGLE"/>
+  <PARAM id="BEAT_8_12_TOGGLE" value="1.0"/>
+  <PARAM id="BEAT_8_13_TOGGLE" value="0.0"/>
+  <PARAM id="BEAT_8_14_TOGGLE"/>
+  <PARAM id="BEAT_8_15_TOGGLE"/>
+  <PARAM id="BEAT_9_12_TOGGLE"/>
+  <PARAM id="BEAT_9_13_TOGGLE"/>
+  <PARAM id="BEAT_9_14_TOGGLE"/>
+  <PARAM id="BEAT_9_15_TOGGLE"/>
+  <PARAM id="BEAT_12_0_TOGGLE"/>
+  <PARAM id="BEAT_12_10_TOGGLE"/>
+  <PARAM id="BEAT_12_11_TOGGLE"/>
+  <PARAM id="BEAT_12_12_TOGGLE"/>
+  <PARAM id="BEAT_12_13_TOGGLE"/>
+  <PARAM id="BEAT_12_14_TOGGLE"/>
+  <PARAM id="BEAT_12_15_TOGGLE"/>
+  <PARAM id="BEAT_12_1_TOGGLE"/>
+  <PARAM id="BEAT_12_2_TOGGLE"/>
+  <PARAM id="BEAT_12_3_TOGGLE"/>
+  <PARAM id="BEAT_12_4_TOGGLE"/>
+  <PARAM id="BEAT_12_5_TOGGLE"/>
+  <PARAM id="BEAT_12_6_TOGGLE"/>
+  <PARAM id="BEAT_12_7_TOGGLE"/>
+  <PARAM id="BEAT_12_8_TOGGLE"/>
+  <PARAM id="BEAT_12_9_TOGGLE"/>
+  <PARAM id="BEAT_13_0_TOGGLE"/>
+  <PARAM id="BEAT_13_10_TOGGLE"/>
+  <PARAM id="BEAT_13_11_TOGGLE"/>
+  <PARAM id="BEAT_13_12_TOGGLE"/>
+  <PARAM id="BEAT_13_13_TOGGLE"/>
+  <PARAM id="BEAT_13_14_TOGGLE"/>
+  <PARAM id="BEAT_13_15_TOGGLE"/>
+  <PARAM id="BEAT_13_1_TOGGLE"/>
+  <PARAM id="BEAT_13_2_TOGGLE"/>
+  <PARAM id="BEAT_13_3_TOGGLE"/>
+  <PARAM id="BEAT_13_4_TOGGLE"/>
+  <PARAM id="BEAT_13_5_TOGGLE"/>
+  <PARAM id="BEAT_13_6_TOGGLE"/>
+  <PARAM id="BEAT_13_7_TOGGLE"/>
+  <PARAM id="BEAT_13_8_TOGGLE"/>
+  <PARAM id="BEAT_13_9_TOGGLE"/>
+  <PARAM id="BEAT_14_0_TOGGLE"/>
+  <PARAM id="BEAT_14_10_TOGGLE"/>
+  <PARAM id="BEAT_14_11_TOGGLE"/>
+  <PARAM id="BEAT_14_12_TOGGLE"/>
+  <PARAM id="BEAT_14_13_TOGGLE"/>
+  <PARAM id="BEAT_14_14_TOGGLE"/>
+  <PARAM id="BEAT_14_15_TOGGLE"/>
+  <PARAM id="BEAT_14_1_TOGGLE"/>
+  <PARAM id="BEAT_14_2_TOGGLE"/>
+  <PARAM id="BEAT_14_3_TOGGLE"/>
+  <PARAM id="BEAT_14_4_TOGGLE"/>
+  <PARAM id="BEAT_14_5_TOGGLE"/>
+  <PARAM id="BEAT_14_6_TOGGLE"/>
+  <PARAM id="BEAT_14_7_TOGGLE"/>
+  <PARAM id="BEAT_14_8_TOGGLE"/>
+  <PARAM id="BEAT_14_9_TOGGLE"/>
+  <PARAM id="BEAT_15_0_TOGGLE"/>
+  <PARAM id="BEAT_15_10_TOGGLE"/>
+  <PARAM id="BEAT_15_11_TOGGLE"/>
+  <PARAM id="BEAT_15_12_TOGGLE"/>
+  <PARAM id="BEAT_15_13_TOGGLE"/>
+  <PARAM id="BEAT_15_14_TOGGLE"/>
+  <PARAM id="BEAT_15_15_TOGGLE"/>
+  <PARAM id="BEAT_15_1_TOGGLE"/>
+  <PARAM id="BEAT_15_2_TOGGLE"/>
+  <PARAM id="BEAT_15_3_TOGGLE"/>
+  <PARAM id="BEAT_15_4_TOGGLE"/>
+  <PARAM id="BEAT_15_5_TOGGLE"/>
+  <PARAM id="BEAT_15_6_TOGGLE"/>
+  <PARAM id="BEAT_15_7_TOGGLE"/>
+  <PARAM id="BEAT_15_8_TOGGLE"/>
+  <PARAM id="BEAT_15_9_TOGGLE"/>
+  <PARAM id="MIDI_VALUE_12"/>
+  <PARAM id="MIDI_VALUE_13"/>
+  <PARAM id="MIDI_VALUE_14"/>
+  <PARAM id="MIDI_VALUE_15" value="56.0"/>
+  <PARAM id="SUBDIVISIONS_12"/>
+  <PARAM id="SUBDIVISIONS_13"/>
+  <PARAM id="SUBDIVISIONS_14"/>
+  <PARAM id="SUBDIVISIONS_15" value="2.0"/>
+  <PARAM id="TRACK_12_ENABLE"/>
+  <PARAM id="TRACK_13_ENABLE"/>
+  <PARAM id="TRACK_14_ENABLE"/>
+  <PARAM id="TRACK_15_ENABLE"/>
+  <PARAM id="VELOCITY_12"/>
+  <PARAM id="VELOCITY_13"/>
+  <PARAM id="VELOCITY_14"/>
+  <PARAM id="VELOCITY_15"/>
+  <PARAM id="SUSTAIN_0"/>
+  <PARAM id="SUSTAIN_1"/>
+  <PARAM id="SUSTAIN_10" value="100.0"/>
+  <PARAM id="SUSTAIN_11"/>
+  <PARAM id="SUSTAIN_2"/>
+  <PARAM id="SUSTAIN_3"/>
+  <PARAM id="SUSTAIN_4"/>
+  <PARAM id="SUSTAIN_5"/>
+  <PARAM id="SUSTAIN_6"/>
+  <PARAM id="SUSTAIN_7" value="100.0"/>
+  <PARAM id="SUSTAIN_8"/>
+  <PARAM id="SUSTAIN_9" value="100.0"/>
+</Parameters>

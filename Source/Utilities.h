@@ -17,8 +17,9 @@ using std::string;
 const int MAX_TRACK_LENGTH = 16;
 const int MAX_MIDI_CHANNELS = 12;
 const int DEFAULT_VELOCITY = 100;
-const int DEFAULT_MIDI_VALUE = 36; //should never be greater than (128 - MAX_MIDI_CHANNELS)
-const int DEFAULT_SUBDIVISIONS = 4; //should never be greater than MAX_TRACK_LENGTH
+const int DEFAULT_MIDI_VALUE = 36; //0 - (128 - MAX_MIDI_CHANNELS)
+const int DEFAULT_SUBDIVISIONS = 4; //1 -  MAX_TRACK_LENGTH
+const int DEFAULT_SUSTAIN = 50.00; // 0 - 100
 
 const juce::Colour BACKGROUND_COLOUR = juce::Colours::black;
 const juce::Colour MAIN_COLOUR = juce::Colours::indigo;//default purple
