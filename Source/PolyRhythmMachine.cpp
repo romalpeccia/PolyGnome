@@ -67,10 +67,10 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
 
         //turn any previously played notes off 
         float samplesAfterBeat = (((tracks[i].beatCounter - 1) * tracks[i].samplesPerInterval) + ((tracks[i].sustain / 100) * tracks[i].samplesPerInterval)); // the amount of samples for all intervals that have happened + the amount of samples after the latest interval
-        if (tracks[i].samplesProcessed > samplesAfterBeat && tracks->noteOffFlag == true) {
+        if (tracks[i].samplesProcessed > samplesAfterBeat && tracks[i].noteOffFlag == true) {
             auto messageOff = juce::MidiMessage::noteOff(1, tracks[i].midiValue);
             midiBuffer.addEvent(messageOff, totalSamples - samplesAfterBeat);
-            tracks->noteOffFlag = false;
+            tracks[i].noteOffFlag = false;
             DBG("noteoff");
         }
         if (tracks[i].beatCounter > tracks[i].subdivisions) {
@@ -80,7 +80,7 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
 
         float samplesCounted = tracks[i].samplesPerInterval * (tracks[i].beatCounter);
         if (tracks[i].samplesProcessed >= samplesCounted) {
-            if (tracks[i].beatCounter < MAX_MIDI_CHANNELS) {
+            if (tracks[i].beatCounter < MAX_TRACK_LENGTH) {
                 if (apvts->getRawParameterValue("BEAT_" + to_string(i) + "_" + to_string(tracks[i].beatCounter) + "_TOGGLE")->load() == true ) {
                     
                     //TODO: sort out this bufferPosition calculation error. possibly related to GUI error?. possibly completely irrelevant variable
@@ -100,18 +100,14 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
                     }
                     if (apvts->getRawParameterValue("TRACK_" + to_string(i) + "_ENABLE")->load() == true) {
                         handleNoteTrigger(midiBuffer, tracks[i].midiValue, tracks[i].velocity, bufferPosition);
+                        tracks[i].noteOffFlag = true;
                     }
                 }
 
             }
             tracks[i].beatCounter += 1;
         }
-
-
-
-
     }
-
     if (totalSamples > samplesPerBar) {
         totalSamples -= samplesPerBar;
     }
@@ -125,7 +121,7 @@ void PolyRhythmMachine::handleNoteTrigger(juce::MidiBuffer& midiBuffer, int note
     {
        DBG("error adding messages to midiBuffer");
     }
-    tracks->noteOffFlag = true;
+
 }
 
 
