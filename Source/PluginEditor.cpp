@@ -11,9 +11,7 @@
 using namespace std;
 //==============================================================================
 PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProcessor& p)
-    : AudioProcessorEditor(&p), audioProcessor(p),
-    bpmSlider(*audioProcessor.apvts.getParameter("BPM"), "bpm"),
-    bpmAttachment(audioProcessor.apvts, "BPM", bpmSlider)
+    : AudioProcessorEditor(&p), audioProcessor(p)
 {
     //images are stored in binary using projucer
     logo = juce::ImageCache::getFromMemory(BinaryData::OSRS_gnome_png, BinaryData::OSRS_gnome_pngSize);
@@ -24,16 +22,27 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
         togglePlayState();
         toggleAudioProcessorChildrenStates();
     };
+    playButton.setButtonText("Play");
+    playButton.setColour(juce::TextButton::ColourIds::buttonColourId, SECONDARY_COLOUR);
+    playButton.setHelpText(PLAY_BUTTON_REMINDER);
 
     loadPresetButton.onClick = [this]() {
         loadPreset();
     };
+    loadPresetButton.setButtonText("Load Preset");
+    loadPresetButton.setHelpText(LOAD_PRESET_BUTTON_REMINDER);
+
     savePresetButton.onClick = [this]() {
         savePreset();
     };
+    savePresetButton.setButtonText("Save Preset");
+    savePresetButton.setHelpText(SAVE_PRESET_BUTTON_REMINDER);
+
+    colorSlider(bpmSlider, MAIN_COLOUR, ACCENT_COLOUR, MAIN_COLOUR, ACCENT_COLOUR, true);
+    bpmSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "BPM", bpmSlider);
+    bpmSlider.setHelpText(BPM_SLIDER_REMINDER);
 
 
-    playButton.setColour(juce::TextButton::ColourIds::buttonColourId, SECONDARY_COLOUR);
 
     //initialize the polytrack Machine buttons and sliders
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
@@ -53,35 +62,45 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
             beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR);
             beatButtons[i][j].setClickingTogglesState(true);
             beatButtonAttachments[i][j] = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.apvts, name,beatButtons[i][j]);
+            beatButtons[i][j].setHelpText(BEAT_BUTTON_REMINDER);
         }
 
         //initialize the mute buttons
         muteButtons[i].setClickingTogglesState(true);
         muteButtonAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.apvts, "TRACK_" + to_string(i) + "_ENABLE", muteButtons[i]);
- 
+        muteButtons[i].setHelpText(MUTE_BUTTON_REMINDER);
+
         //initialize the subdivision sliders
         subdivisionSliders[i].setSliderStyle(juce::Slider::SliderStyle::Rotary);
         colorSlider(subdivisionSliders[i], ACCENT_COLOUR, ACCENT_COLOUR, SECONDARY_COLOUR, ACCENT_COLOUR, true);
         subdivisionSliderAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"SUBDIVISIONS_" + to_string(i), subdivisionSliders[i]);
-         
+        subdivisionSliders[i].setHelpText(SUBDIVISION_SLIDER_REMINDER);
+
         //initialize the velocity sliders
         velocitySliders[i].setSliderStyle(juce::Slider::SliderStyle::Rotary);
         colorSlider(velocitySliders[i], ACCENT_COLOUR, ACCENT_COLOUR, SECONDARY_COLOUR, ACCENT_COLOUR, true);
         velocitySliderAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"VELOCITY_" + to_string(i), velocitySliders[i]);
+        velocitySliders[i].setHelpText(VELOCITY_SLIDER_REMINDER);
 
         //initialize the sustain sliders
         colorSlider(sustainSliders[i], ACCENT_COLOUR, ACCENT_COLOUR, SECONDARY_COLOUR, ACCENT_COLOUR, true);
         sustainSliderAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"SUSTAIN_" + to_string(i),sustainSliders[i]);
+        sustainSliders[i].setHelpText(SUSTAIN_SLIDER_REMINDER);
+
 
         //initialize the MIDI control slider    
         midiSliders[i].setSliderStyle(juce::Slider::SliderStyle::Rotary);
         midiSliderAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"MIDI_VALUE_" + to_string(i), midiSliders[i]);
+        midiSliders[i].setHelpText(MIDI_SLIDER_REMINDER);
 
         //initialize the text entry logic and UI for MIDI Values
         int currentIntValue = audioProcessor.apvts.getRawParameterValue("MIDI_VALUE_" + to_string(i))->load();
         midiTextEditors[i].setText(midiIntToString(currentIntValue) + " / " + to_string(currentIntValue));
         midiTextEditors[i].setReadOnly(false);
         colorTextEditor(midiTextEditors[i], ACCENT_COLOUR, ACCENT_COLOUR, ACCENT_COLOUR, MAIN_COLOUR, true);
+        midiTextEditors[i].setHelpText(MIDI_TEXTEDITOR_REMINDER);
+
+
         midiTextEditors[i].onReturnKey = [this, i]() {
             juce::String input = midiTextEditors[i].getText();
             string inputString = input.toStdString();
@@ -127,6 +146,10 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
 
 
 
+    colorTextEditor(reminderTextEditor, REMINDER_COLOUR, juce::Colours::white, juce::Colours::white, BACKGROUND_COLOUR, true);
+    reminderTextEditor.setMultiLine(true);
+
+
     for (auto* comp : getVisibleComps())
     {
         addAndMakeVisible(comp);
@@ -145,31 +168,19 @@ void PolyGnomeAudioProcessorEditor::resized()
 {
     //TODO: change how all of this is laid out
 
-    juce::Rectangle<int> bounds = getLocalBounds();
-    juce::Rectangle<int> playBounds(100, 100);
-    playBounds.removeFromTop(50);
-    playBounds.removeFromRight(50);
+    juce::Rectangle<int> menuBounds(100, 100);
+    menuBounds.removeFromTop(50);
 
     juce::FlexBox flexBox;
     flexBox.flexWrap = juce::FlexBox::Wrap::wrap;
-    flexBox.items.add(juce::FlexItem(50, 50, playButton));
-    flexBox.items.add(juce::FlexItem(75, 50, loadPresetButton));
-    flexBox.items.add(juce::FlexItem(100, 50, savePresetButton));
-    flexBox.performLayout(playBounds);
+    flexBox.items.add(juce::FlexItem(100, 50, playButton));
+    flexBox.items.add(juce::FlexItem(100, 25, loadPresetButton));
+    flexBox.items.add(juce::FlexItem(100, 25, savePresetButton));
+    flexBox.items.add(juce::FlexItem(100, 50, bpmSlider));
+    flexBox.items.add(juce::FlexItem(100, 100, reminderTextEditor));
+    flexBox.performLayout(menuBounds);
 
 
-
-    auto visualArea = bounds.removeFromTop(bounds.getHeight() * 0.66);
-    //unused variable, this call cuts away space used by the visual area from bounds, may be used later
-
-
-    bounds.removeFromTop(5);
-    //every time we remove from bounds, the area of bounds changes 
-    //first we remove 1/3 * 1 unit area, then we remove 0.5 * 2/3rd unit area
-    auto leftArea = bounds.removeFromLeft(bounds.getWidth() * 0.33);
-    auto rightArea = bounds.removeFromRight(bounds.getWidth() * 0.5);
-
-    bpmSlider.setBounds(leftArea);
 }
 
 PolyGnomeAudioProcessorEditor::~PolyGnomeAudioProcessorEditor()
@@ -177,10 +188,71 @@ PolyGnomeAudioProcessorEditor::~PolyGnomeAudioProcessorEditor()
 }
 
 //==============================================================================
+
+juce::String PolyGnomeAudioProcessorEditor::getReminderText() {
+    juce::String   reminderText = "";
+
+    if (playButton.isHoveredOver == true) {
+        reminderText = playButton.getHelpText();
+    }
+    else  if (loadPresetButton.isHoveredOver == true) {
+        reminderText = loadPresetButton.getHelpText();
+    }
+    else  if (savePresetButton.isHoveredOver == true) {
+        reminderText = savePresetButton.getHelpText();
+    }
+    else  if (bpmSlider.isHoveredOver == true) {
+        reminderText = bpmSlider.getHelpText();
+    }
+    else {
+        for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
+            if (muteButtons[i].isHoveredOver == true) {
+                reminderText = muteButtons[i].getHelpText();
+                break;
+            }
+            else if (subdivisionSliders[i].isHoveredOver == true) {
+                reminderText = subdivisionSliders[i].getHelpText();
+                break;
+            }
+            else if (midiSliders[i].isHoveredOver == true) {
+                reminderText = midiSliders[i].getHelpText();
+                break;
+            }
+            else if (midiTextEditors[i].isHoveredOver == true) {
+                reminderText = midiTextEditors[i].getHelpText();
+                break;
+            }
+            else if (velocitySliders[i].isHoveredOver == true) {
+                reminderText = velocitySliders[i].getHelpText();
+                break;
+            }
+            else if (sustainSliders[i].isHoveredOver == true) {
+                reminderText = sustainSliders[i].getHelpText();
+                break;
+            }
+            else {
+                for (int j = 0; j < MAX_TRACK_LENGTH; j++) {
+                    if (beatButtons[i][j].isHoveredOver == true) {
+                        reminderText = beatButtons[i][j].getHelpText();
+                        break;
+                    }
+                }
+            }
+        }
+
+    }
+    return reminderText;
+}
 void PolyGnomeAudioProcessorEditor::paint(juce::Graphics& g)
 {
     g.fillAll(BACKGROUND_COLOUR);
     g.drawImageAt(logo, 0, 0);
+
+
+    //TODO: make this process more efficient (try goto statement after text is changed? maybe put these into a vector? having issues with that since i created custom juce components with overrides
+    
+    reminderTextEditor.setText(getReminderText());
+
 
 
     if (audioProcessor.apvts.getRawParameterValue("HOST_CONNECTED")->load()){
@@ -201,12 +273,9 @@ juce::Rectangle<int> PolyGnomeAudioProcessorEditor::getVisualArea()
 
 void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
 
-    loadPresetButton.setVisible(true);
-    savePresetButton.setVisible(true);
     //TODO look into only calling redraws of specific elements if needed
     auto visualArea = getVisualArea();
-
-
+    g.setColour(juce::Colours::white);
     g.drawRect(visualArea);
 
     int X = visualArea.getX(); //top left corner X
@@ -350,26 +419,7 @@ void PolyGnomeAudioProcessorEditor::togglePlayStateOn() {
     audioProcessor.apvts.getRawParameterValue("ON/OFF")->store(true);
     playButton.setColour(juce::TextButton::ColourIds::buttonColourId, MAIN_COLOUR);
 }
-std::vector<juce::Component*> PolyGnomeAudioProcessorEditor::getVisibleComps() {
-    //returns components that do not need to be hidden
 
-    std::vector<juce::Component*> comps;
-    comps.push_back(&playButton);
-    comps.push_back(&bpmSlider);
-    comps.push_back(&loadPresetButton);
-    comps.push_back(&savePresetButton);
-
-    for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
-        comps.push_back(&subdivisionSliders[i]);
-        comps.push_back(&velocitySliders[i]);
-        comps.push_back(&midiSliders[i]);
-        comps.push_back(&midiTextEditors[i]);
-        comps.push_back(&muteButtons[i]);
-        comps.push_back(&sustainSliders[i]);
-    }
-
-    return{ comps };
-}
 
 std::vector<juce::Component*> PolyGnomeAudioProcessorEditor::getTrackComps(int index) {
     //returns components for track[i]
@@ -386,6 +436,27 @@ std::vector<juce::Component*> PolyGnomeAudioProcessorEditor::getTrackComps(int i
     return{ comps };
 }
 
+std::vector<juce::Component*> PolyGnomeAudioProcessorEditor::getVisibleComps() {
+    //returns components that do not need to be hidden
+
+    std::vector<juce::Component*> comps;
+    comps.push_back(&playButton);
+    comps.push_back(&bpmSlider);
+    comps.push_back(&loadPresetButton);
+    comps.push_back(&savePresetButton);
+    comps.push_back(&reminderTextEditor);
+
+    for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
+        comps.push_back(&subdivisionSliders[i]);
+        comps.push_back(&velocitySliders[i]);
+        comps.push_back(&midiSliders[i]);
+        comps.push_back(&midiTextEditors[i]);
+        comps.push_back(&muteButtons[i]);
+        comps.push_back(&sustainSliders[i]);
+    }
+
+    return{ comps };
+}
 
 std::vector<juce::Component*> PolyGnomeAudioProcessorEditor::getHiddenComps() {
     //returns components that sometimes have their state changed to hidden
@@ -398,6 +469,13 @@ std::vector<juce::Component*> PolyGnomeAudioProcessorEditor::getHiddenComps() {
     }
 
     return{ comps };
+}
+
+std::vector<juce::Component*> PolyGnomeAudioProcessorEditor::getAllComps() {
+    std::vector<juce::Component*> comps = getHiddenComps();
+    std::vector<juce::Component*> comps2 = getVisibleComps();
+    comps.insert(comps.end(), comps2.begin(), comps2.end());
+    return { comps };
 }
 
 void PolyGnomeAudioProcessorEditor::colorSlider(juce::Slider& slider, juce::Colour thumbColour, juce::Colour textBoxTextColour, juce::Colour textBoxBackgroundColour, juce::Colour textBoxOutlineColour, bool trackEnabled) {

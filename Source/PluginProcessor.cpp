@@ -81,7 +81,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PolyGnomeAudioProcessor::cre
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++)
     {
         //Parameters for Polytrack Machine 
-        //BEAT_<0-MAX_MIDI_CHANNELS>.<0-11>_TOGGLE
+        //BEAT_<0-MAX_MIDI_CHANNELS>.<0-MAX_TRACK_LENGTH>_TOGGLE
         //SUBDIVISIONS_<0-MAX_MIDI_CHANNELS>
         //MIDI_VALUE__<0-MAX_MIDI_CHANNELS>
         //TRACK_<0-MAX_MIDI_CHANNELS>_ENABLE
