@@ -69,9 +69,7 @@ public:
 
 
 private:
-    juce::AudioPlayHead *playHead;
-    juce::PluginHostType pluginHostType;
-    juce::PluginHostType::HostType pluginHostType2;
+
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PolyGnomeAudioProcessor)

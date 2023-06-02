@@ -47,18 +47,31 @@ void PolyGnomeAudioProcessor::releaseResources()
 
 void PolyGnomeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-   
-    //check if the user is in a recognized DAW or other host
-    if (juce::String(pluginHostType.getHostDescription()) != "Unknown") {
-        //apvts.getRawParameterValue("HOST_CONNECTED")->store(true);
-        /*
-        if (double bpm = playHead->getPosition()->getBpm() != 0) {
-            
+
+
+    auto positionInfo = getPlayHead()->getPosition();
+    if (positionInfo) {
+        auto bpmInfo = (*positionInfo).getBpm();
+        auto timeInfo = (*positionInfo).getTimeInSamples();
+        if (bpmInfo && timeInfo) {
+            apvts.getRawParameterValue("BPM")->store(*bpmInfo);
+            apvts.getRawParameterValue("SAMPLES_ELAPSED")->store(*timeInfo);
+            apvts.getRawParameterValue("DAW_CONNECTED")->store(true);
+
+            /*
+            if (auto playingInfo = (*positionInfo).getIsPlaying()) {
+                apvts.getRawParameterValue("ON/OFF")->store(true);
+            }
+            */
         }
-        */
+        else {
+            ;// apvts.getRawParameterValue("DAW_CONNECTED")->store(false);
+        }
+
     }
+    
    
-    midiMessages.clear();
+    midiMessages.clear(); //clear any noise in the midiBuffer
 if (apvts.getRawParameterValue("ON/OFF")->load() == true)
     {
         polyRhythmMachine.getNextAudioBlock(buffer, midiMessages);
@@ -74,8 +87,9 @@ juce::AudioProcessorValueTreeState::ParameterLayout PolyGnomeAudioProcessor::cre
     //TODO: maybe use of format strings would make accessing these strings cleaner
 
     layout.add(std::make_unique<juce::AudioParameterBool>("ON/OFF", "On/Off", false));
-    layout.add(std::make_unique<juce::AudioParameterBool>("HOST_CONNECTED", "Host Connected", false));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("BPM", "bpm", juce::NormalisableRange<float>(1.f, 300.f, 0.1f, 0.25f), 120.f));
+    layout.add(std::make_unique<juce::AudioParameterBool>("DAW_CONNECTED", "DAW Connected", false));
+    layout.add(std::make_unique<juce::AudioParameterInt>("SAMPLES_ELAPSED", "samples elapsed", 0, 2147483647, 0));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("BPM", "bpm", juce::NormalisableRange<float>(1.f, 480.f, 0.1f, 0.25f), 120.f));
 
 
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++)

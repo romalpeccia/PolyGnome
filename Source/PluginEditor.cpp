@@ -38,12 +38,6 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
     savePresetButton.setButtonText("Save Preset");
     savePresetButton.setHelpText(SAVE_PRESET_BUTTON_REMINDER);
 
-    colorSlider(bpmSlider, MAIN_COLOUR, ACCENT_COLOUR, MAIN_COLOUR, ACCENT_COLOUR, true);
-    bpmSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "BPM", bpmSlider);
-    bpmSlider.setHelpText(BPM_SLIDER_REMINDER);
-
-
-
     //initialize the polytrack Machine buttons and sliders
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
         for (int j = 0; j < MAX_TRACK_LENGTH; j++)
@@ -176,11 +170,8 @@ void PolyGnomeAudioProcessorEditor::resized()
     flexBox.items.add(juce::FlexItem(100, 50, playButton));
     flexBox.items.add(juce::FlexItem(100, 25, loadPresetButton));
     flexBox.items.add(juce::FlexItem(100, 25, savePresetButton));
-    flexBox.items.add(juce::FlexItem(100, 50, bpmSlider));
-    flexBox.items.add(juce::FlexItem(100, 100, reminderTextEditor));
+    flexBox.items.add(juce::FlexItem(100, 200, reminderTextEditor));
     flexBox.performLayout(menuBounds);
-
-
 }
 
 PolyGnomeAudioProcessorEditor::~PolyGnomeAudioProcessorEditor()
@@ -189,7 +180,7 @@ PolyGnomeAudioProcessorEditor::~PolyGnomeAudioProcessorEditor()
 
 //==============================================================================
 
-juce::String PolyGnomeAudioProcessorEditor::getReminderText() {
+juce::String PolyGnomeAudioProcessorEditor::getCurrentMouseOverText() {
     juce::String   reminderText = "";
 
     if (playButton.isHoveredOver == true) {
@@ -200,9 +191,6 @@ juce::String PolyGnomeAudioProcessorEditor::getReminderText() {
     }
     else  if (savePresetButton.isHoveredOver == true) {
         reminderText = savePresetButton.getHelpText();
-    }
-    else  if (bpmSlider.isHoveredOver == true) {
-        reminderText = bpmSlider.getHelpText();
     }
     else {
         for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
@@ -243,21 +231,16 @@ juce::String PolyGnomeAudioProcessorEditor::getReminderText() {
     }
     return reminderText;
 }
+
 void PolyGnomeAudioProcessorEditor::paint(juce::Graphics& g)
 {
     g.fillAll(BACKGROUND_COLOUR);
     g.drawImageAt(logo, 0, 0);
 
 
-    //TODO: make this process more efficient (try goto statement after text is changed? maybe put these into a vector? having issues with that since i created custom juce components with overrides
+
     
-    reminderTextEditor.setText(getReminderText());
-
-
-
-    if (audioProcessor.apvts.getRawParameterValue("HOST_CONNECTED")->load()){
-        bpmSlider.setEnabled(false);
-    }
+    reminderTextEditor.setText(getCurrentMouseOverText());
     paintPolyRhythmMachine(g);
 }
 

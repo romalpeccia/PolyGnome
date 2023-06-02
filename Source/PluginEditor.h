@@ -39,7 +39,7 @@ public:
     void togglePlayState();
     void togglePlayStateOff();
     void togglePlayStateOn();
-    juce::String getReminderText()
+    juce::String getCurrentMouseOverText();
 
     void colorSlider(juce::Slider &slider, juce::Colour thumbColour, juce::Colour textBoxTextColour, juce::Colour textBoxBackgroundColour, juce::Colour textBoxOutlineColour, bool trackEnabled);
     void colorTextEditor(juce::TextEditor &textEditor, juce::Colour textColour, juce::Colour focusedOutlineColour, juce::Colour outlineColour, juce::Colour backgroundColour, bool trackEnabled);
@@ -61,7 +61,6 @@ private:
     CustomTextButton playButton;
     CustomTextButton loadPresetButton;
     CustomTextButton savePresetButton;
-    CustomSlider bpmSlider;
 
     //MIDDLE COMPONENTS
     CustomTextButton beatButtons[MAX_MIDI_CHANNELS][MAX_TRACK_LENGTH];
@@ -87,7 +86,6 @@ private:
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> midiSliderAttachments[MAX_MIDI_CHANNELS];
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> velocitySliderAttachments[MAX_MIDI_CHANNELS];
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> sustainSliderAttachments[MAX_MIDI_CHANNELS];
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> bpmSliderAttachment;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PolyGnomeAudioProcessorEditor)
 };

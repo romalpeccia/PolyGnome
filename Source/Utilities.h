@@ -16,6 +16,7 @@ using std::string;
 
 const int MAX_TRACK_LENGTH = 16;
 const int MAX_MIDI_CHANNELS = 12;
+const float MAX_BPM = 480;
 const int DEFAULT_VELOCITY = 100;
 const int DEFAULT_MIDI_VALUE = 36; //0 - (128 - MAX_MIDI_CHANNELS)
 const int DEFAULT_SUBDIVISIONS = 4; //1 -  MAX_TRACK_LENGTH

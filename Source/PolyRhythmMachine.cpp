@@ -63,7 +63,13 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
 
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
 
-        tracks[i].samplesProcessed += bufferSize;
+        if (apvts->getRawParameterValue("DAW_CONNECTED")->load() == false) {
+            tracks[i].samplesProcessed += bufferSize;
+        }
+        else {
+            tracks[i].samplesProcessed = ((int)apvts->getRawParameterValue("SAMPLES_ELAPSED")->load() % (int)samplesPerBar) + (int)bufferSize;
+        }
+        
 
         //turn any previously played notes off 
         float samplesAfterBeat = (((tracks[i].beatCounter - 1) * tracks[i].samplesPerInterval) + ((tracks[i].sustain / 100) * tracks[i].samplesPerInterval)); // the amount of samples for all intervals that have happened + the amount of samples after the latest interval
@@ -73,9 +79,11 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
             tracks[i].noteOffFlag = false;
             DBG("noteoff");
         }
+
+        //reset the bar counter if it's been looped
         if (tracks[i].beatCounter > tracks[i].subdivisions) {
             tracks[i].beatCounter = 0;
-            tracks[i].samplesProcessed -= samplesPerBar;
+                tracks[i].samplesProcessed -= samplesPerBar;
         }
 
         float samplesCounted = tracks[i].samplesPerInterval * (tracks[i].beatCounter);
