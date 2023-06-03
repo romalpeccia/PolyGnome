@@ -10,6 +10,34 @@
 
 #include "Utilities.h"
 #include <JuceHeader.h>
+
+
+juce::String getBeatToggleString(int i, int j) {
+    return "BEAT_" + to_string(i) + "_" + to_string(j) + "_TOGGLE";
+}
+
+juce::String getSubdivisionsString(int i) {
+    return "SUBDIVISIONS_" + to_string(i);
+}
+juce::String getVelocityString(int i) {
+    return "VELOCITY_" + to_string(i);
+}
+juce::String getMidiValueString(int i) {
+    return "MIDI_VALUE" + to_string(i);
+}
+juce::String getSustainString(int i) {
+    return "SUSTAIN_" + to_string(i);
+}
+juce::String getTrackEnableString(int i) {
+    return "TRACK_" + to_string(i) + "_ENABLE";
+}
+
+
+
+
+
+
+
 string midiIntToString(int midiValue) {
     //takes an integer and returns it's cooresponding MIDI string value
     if (midiValue > 127 || midiValue < 0)

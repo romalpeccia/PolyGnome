@@ -102,20 +102,18 @@ juce::AudioProcessorValueTreeState::ParameterLayout PolyGnomeAudioProcessor::cre
         //TRACK_<0-MAX_MIDI_CHANNELS>_ENABLE
         for (int j = 0; j < MAX_TRACK_LENGTH; j++)
         {
-            layout.add(std::make_unique<juce::AudioParameterBool>("BEAT_" + to_string(i) + "_" + to_string(j) + "_TOGGLE", "Beat" + to_string(i) + "." + to_string(j) + "Toggle", false));
+            layout.add(std::make_unique<juce::AudioParameterBool>(getBeatToggleString(i, j), "Beat" + to_string(i) + "." + to_string(j) + "Toggle", false));
         }
-        layout.add(std::make_unique<juce::AudioParameterInt>("SUBDIVISIONS_" + to_string(i), "Subdivisions " + to_string(i), 1, MAX_TRACK_LENGTH, DEFAULT_SUBDIVISIONS));
-        layout.add(std::make_unique<juce::AudioParameterInt>("MIDI_VALUE_" + to_string(i), "Midi Value " + to_string(i), 0, 127, DEFAULT_MIDI_VALUE + i));
-        layout.add(std::make_unique<juce::AudioParameterInt>("VELOCITY_" + to_string(i), "Velocity " + to_string(i), 0, 127, DEFAULT_VELOCITY));
-        layout.add(std::make_unique<juce::AudioParameterFloat>("SUSTAIN_" + to_string(i), "Sustain " + to_string(i), 0, 100.0, DEFAULT_SUSTAIN));
-        layout.add(std::make_unique<juce::AudioParameterBool>("TRACK_" + to_string(i) + "_ENABLE", "Track " + to_string(i) + " Enable", true));
+        layout.add(std::make_unique<juce::AudioParameterInt>(getSubdivisionsString(i), "Subdivisions " + to_string(i), 1, MAX_TRACK_LENGTH, DEFAULT_SUBDIVISIONS));
+        layout.add(std::make_unique<juce::AudioParameterInt>(getMidiValueString(i), "Midi Value " + to_string(i), 0, 127, DEFAULT_MIDI_VALUE + i));
+        layout.add(std::make_unique<juce::AudioParameterInt>(getVelocityString(i), "Velocity " + to_string(i), 0, 127, DEFAULT_VELOCITY));
+        layout.add(std::make_unique<juce::AudioParameterFloat>(getSustainString(i), "Sustain " + to_string(i), 0, 100.0, DEFAULT_SUSTAIN));
+        layout.add(std::make_unique<juce::AudioParameterBool>(getTrackEnableString(i), "Track " + to_string(i) + " Enable", true));
     }
 
     return layout;
 
 }
-
-
 
 
 juce::AudioProcessorEditor* PolyGnomeAudioProcessor::createEditor()

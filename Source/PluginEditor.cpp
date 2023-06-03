@@ -63,7 +63,7 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
         for (int j = 0; j < MAX_TRACK_LENGTH; j++)
         { //initialize the track buttons
-            juce::String name = "BEAT_" + to_string(i) + "_" + to_string(j) + "_TOGGLE";
+            juce::String name = getBeatToggleString(i, j);
             beatButtons[i][j].onClick = [this, name, i, j]() {
                 if (audioProcessor.apvts.getRawParameterValue(name)->load() == true) {
                     beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR);
@@ -80,34 +80,34 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
 
         //initialize the mute buttons
         muteButtons[i].setClickingTogglesState(true);
-        muteButtonAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.apvts, "TRACK_" + to_string(i) + "_ENABLE", muteButtons[i]);
+        muteButtonAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.apvts, getTrackEnableString(i), muteButtons[i]);
         muteButtons[i].setHelpText(MUTE_BUTTON_REMINDER);
 
         //initialize the subdivision sliders
         subdivisionSliders[i].setSliderStyle(juce::Slider::SliderStyle::Rotary);
         colorSlider(subdivisionSliders[i], ACCENT_COLOUR, ACCENT_COLOUR, SECONDARY_COLOUR, ACCENT_COLOUR, true);
-        subdivisionSliderAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"SUBDIVISIONS_" + to_string(i), subdivisionSliders[i]);
+        subdivisionSliderAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, getSubdivisionsString(i), subdivisionSliders[i]);
         subdivisionSliders[i].setHelpText(SUBDIVISION_SLIDER_REMINDER);
 
         //initialize the velocity sliders
         velocitySliders[i].setSliderStyle(juce::Slider::SliderStyle::Rotary);
         colorSlider(velocitySliders[i], ACCENT_COLOUR, ACCENT_COLOUR, SECONDARY_COLOUR, ACCENT_COLOUR, true);
-        velocitySliderAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"VELOCITY_" + to_string(i), velocitySliders[i]);
+        velocitySliderAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, getVelocityString(i), velocitySliders[i]);
         velocitySliders[i].setHelpText(VELOCITY_SLIDER_REMINDER);
 
         //initialize the sustain sliders
         colorSlider(sustainSliders[i], ACCENT_COLOUR, ACCENT_COLOUR, SECONDARY_COLOUR, ACCENT_COLOUR, true);
-        sustainSliderAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"SUSTAIN_" + to_string(i),sustainSliders[i]);
+        sustainSliderAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, getSustainString(i),sustainSliders[i]);
         sustainSliders[i].setHelpText(SUSTAIN_SLIDER_REMINDER);
 
 
         //initialize the MIDI control slider    
         midiSliders[i].setSliderStyle(juce::Slider::SliderStyle::Rotary);
-        midiSliderAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"MIDI_VALUE_" + to_string(i), midiSliders[i]);
+        midiSliderAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, getMidiValueString(i), midiSliders[i]);
         midiSliders[i].setHelpText(MIDI_SLIDER_REMINDER);
 
         //initialize the text entry logic and UI for MIDI Values
-        int currentIntValue = audioProcessor.apvts.getRawParameterValue("MIDI_VALUE_" + to_string(i))->load();
+        int currentIntValue = audioProcessor.apvts.getRawParameterValue(getMidiValueString(i))->load();
         midiTextEditors[i].setText(midiIntToString(currentIntValue) + " / " + to_string(currentIntValue));
         midiTextEditors[i].setReadOnly(false);
         colorTextEditor(midiTextEditors[i], ACCENT_COLOUR, ACCENT_COLOUR, ACCENT_COLOUR, MAIN_COLOUR, true);
@@ -119,13 +119,13 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
             string inputString = input.toStdString();
             int inputInt;
             string convertedString;
-            int currentIntValue = audioProcessor.apvts.getRawParameterValue("MIDI_VALUE_" + to_string(i))->load();
+            int currentIntValue = audioProcessor.apvts.getRawParameterValue(getMidiValueString(i))->load();
             if (sscanf(inputString.c_str(), "%d", &inputInt) == 1)
             {   //if the user inputted an int
                 convertedString = midiIntToString(inputInt);
                 if (convertedString != "") {
                     midiTextEditors[i].setText(convertedString + " / " + to_string(inputInt));
-                    audioProcessor.apvts.getRawParameterValue("MIDI_VALUE_" + to_string(i))->store(inputInt);
+                    audioProcessor.apvts.getRawParameterValue(getMidiValueString(i))->store(inputInt);
                     //add control of MIDI slider to textbox
                     midiSliders[i].setValue(inputInt);
                 }
@@ -138,7 +138,7 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
                 int convertedInt = midiStringToInt(inputString);
                 if (convertedInt != -1) {
                     midiTextEditors[i].setText(inputString + " / " + to_string(convertedInt));
-                    audioProcessor.apvts.getRawParameterValue("MIDI_VALUE_" + to_string(i))->store(convertedInt);
+                    audioProcessor.apvts.getRawParameterValue(getMidiValueString(i))->store(convertedInt);
                     //add control of MIDI slider to textbox
                     midiSliders[i].setValue(convertedInt);
                 }
@@ -335,10 +335,10 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
         trackLine.addLineSegment(juce::Line<float>(X, Y + spacing * i, X + width, Y + spacing * i), 1.f);
         g.setColour(SECONDARY_COLOUR);
         g.strokePath(trackLine, juce::PathStrokeType(2.0f));
-        bool isTrackEnabled = audioProcessor.apvts.getRawParameterValue("TRACK_" + to_string(i) + "_ENABLE")->load();
+        bool isTrackEnabled = audioProcessor.apvts.getRawParameterValue(getTrackEnableString(i))->load();
 
         //draw the buttons for each note of the track
-        int subdivisions = audioProcessor.apvts.getRawParameterValue("SUBDIVISIONS_" + to_string(i))->load();
+        int subdivisions = audioProcessor.apvts.getRawParameterValue(getSubdivisionsString(i))->load();
         for (int j = 0; j < subdivisions; j++) {
 
             float distanceOnPath = (width / subdivisions) * j;
@@ -348,7 +348,7 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
 
 
             //TODO : clean this?
-            if (audioProcessor.apvts.getRawParameterValue("BEAT_" + to_string(i) + "_" + to_string(j) + "_TOGGLE")->load() == true) {
+            if (audioProcessor.apvts.getRawParameterValue(getBeatToggleString(i, j))->load() == true) {
                 if (j == audioProcessor.polyRhythmMachine.tracks[i].beatCounter - 1) {
                     if (isTrackEnabled == true) {
                         beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonOnColourId, ENABLED_COLOUR);

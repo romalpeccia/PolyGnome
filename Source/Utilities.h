@@ -11,8 +11,8 @@
 #include <string>
 #include <JuceHeader.h>
 
+using namespace std;
 
-using std::string;
 
 const int MAX_TRACK_LENGTH = 16;
 const int MAX_MIDI_CHANNELS = 12;
@@ -50,6 +50,12 @@ const string RACK_BUTTON_REMINDER = "select a bar of the loop";
 string midiIntToString(int midiValue);
 int midiStringToInt(string midiValue);
 
+juce::String getBeatToggleString(int i, int j);
+juce::String getSubdivisionsString(int i);
+juce::String getVelocityString(int i);
+juce::String getMidiValueString(int i);
+juce::String getSustainString(int i);
+juce::String getTrackEnableString(int i);
 
 /*
 class CustomComponent : public virtual juce::Component {

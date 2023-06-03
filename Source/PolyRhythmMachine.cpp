@@ -87,11 +87,9 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
         float samplesCounted = tracks[i].samplesPerInterval * (tracks[i].beatCounter);
         if (tracks[i].samplesProcessed >= samplesCounted) {
             if (tracks[i].beatCounter < MAX_TRACK_LENGTH) {
-                if (apvts->getRawParameterValue("BEAT_" + to_string(i) + "_" + to_string(tracks[i].beatCounter) + "_TOGGLE")->load() == true ) {
+                if (apvts->getRawParameterValue(getBeatToggleString(i, tracks[i].beatCounter))->load() == true ) {
                     
                     //TODO: sort out this bufferPosition calculation error. possibly related to GUI error?. possibly completely irrelevant variable
-
-
                     int bufferPosition = totalSamples - samplesCounted; //TODO: maybe this should be samplesProcessed instead of totalSamples
                     //bufferPosition = 0; //for debugging
                     if (bufferPosition > bufferSize)
@@ -104,7 +102,7 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
                         */
                         ;
                     }
-                    if (apvts->getRawParameterValue("TRACK_" + to_string(i) + "_ENABLE")->load() == true) {
+                    if (apvts->getRawParameterValue(getTrackEnableString(i))->load() == true) {
                         handleNoteTrigger(midiBuffer, tracks[i].midiValue, tracks[i].velocity, bufferPosition);
                         tracks[i].noteOffFlag = true;
                     }
@@ -150,7 +148,7 @@ void PolyRhythmMachine::resetParams(juce::MidiBuffer& midiBuffer)
   
     bpm = apvts->getRawParameterValue("BPM")->load();
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
-        int tempRhythmValue = apvts->getRawParameterValue("SUBDIVISIONS_" + to_string(i))->load();;
+        int tempRhythmValue = apvts->getRawParameterValue(getSubdivisionsString(i))->load();;
         if (tracks[i].subdivisions != tempRhythmValue)
         {
 
@@ -172,7 +170,7 @@ void PolyRhythmMachine::resetParams(juce::MidiBuffer& midiBuffer)
             */
 
         }
-        int tempMidiValue = apvts->getRawParameterValue("MIDI_VALUE_" + to_string(i))->load();
+        int tempMidiValue = apvts->getRawParameterValue(getMidiValueString(i))->load();
         if (tracks[i].midiValue != tempMidiValue)
         {
             auto messageOff = juce::MidiMessage::noteOff(1, tracks[i].midiValue);
@@ -181,12 +179,12 @@ void PolyRhythmMachine::resetParams(juce::MidiBuffer& midiBuffer)
         }
 
 
-        int tempVelocity = apvts->getRawParameterValue("VELOCITY_" + to_string(i))->load();
+        int tempVelocity = apvts->getRawParameterValue(getVelocityString(i))->load();
         if (tracks[i].velocity != tempVelocity) {
                 tracks[i].velocity = tempVelocity;
         }
 
-        int tempSustain = apvts->getRawParameterValue("SUSTAIN_" + to_string(i))->load();
+        int tempSustain = apvts->getRawParameterValue(getSustainString(i))->load();
         if (tracks[i].sustain != tempSustain) {
             tracks[i].sustain = tempSustain;
         }
@@ -209,25 +207,25 @@ void PolyRhythmMachine::resetParams()
 
 
 
-        int tempRhythmValue = apvts->getRawParameterValue("SUBDIVISIONS_" + to_string(i))->load();
+        int tempRhythmValue = apvts->getRawParameterValue(getSubdivisionsString(i))->load();
         if (tracks[i].subdivisions != tempRhythmValue)
         {
             tracks[i].subdivisions = tempRhythmValue;
             //resetAll();
         }
-        int tempMidiValue = apvts->getRawParameterValue("MIDI_VALUE_" + to_string(i))->load();
+        int tempMidiValue = apvts->getRawParameterValue(getMidiValueString(i))->load();
         if (tracks[i].midiValue != tempMidiValue)
         {
             tracks[i].midiValue = tempMidiValue;
             //resetAll();
         }
 
-        int tempVelocity = apvts->getRawParameterValue("VELOCITY_" + to_string(i))->load();
+        int tempVelocity = apvts->getRawParameterValue(getVelocityString(i))->load();
         if (tracks[i].velocity != tempVelocity) {
                 tracks[i].velocity = tempVelocity;
         }
 
-        int tempSustain = apvts->getRawParameterValue("SUSTAIN_" + to_string(i))->load();
+        int tempSustain = apvts->getRawParameterValue(getSustainString(i))->load();
         if (tracks[i].sustain != tempSustain) {
             tracks[i].sustain = tempSustain;
         }
