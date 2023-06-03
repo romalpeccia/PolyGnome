@@ -59,7 +59,6 @@ private:
     //apvts of caller that created this instance of polyRhythmMachine
     juce::AudioProcessorValueTreeState* apvts;
 
-
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PolyRhythmMachine)
 };
 

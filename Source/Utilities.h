@@ -16,6 +16,8 @@ using std::string;
 
 const int MAX_TRACK_LENGTH = 16;
 const int MAX_MIDI_CHANNELS = 12;
+const int MAX_RACKS = 8;
+
 const float MAX_BPM = 480;
 const int DEFAULT_VELOCITY = 100;
 const int DEFAULT_MIDI_VALUE = 36; //0 - (128 - MAX_MIDI_CHANNELS)
@@ -42,8 +44,8 @@ const string PLAY_BUTTON_REMINDER = "start/stop polygnome";
 const string LOAD_PRESET_BUTTON_REMINDER = "load a .pgnome file";
 const string SAVE_PRESET_BUTTON_REMINDER = "save a .pgnome file";
 const string BPM_SLIDER_REMINDER = "change bpm";
-
-
+const string RACK_SLIDER_REMINDER = "adjust how many bars per loop";
+const string RACK_BUTTON_REMINDER = "select a bar of the loop";
 
 string midiIntToString(int midiValue);
 int midiStringToInt(string midiValue);

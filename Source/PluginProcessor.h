@@ -64,6 +64,9 @@ public:
  
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
     juce::AudioProcessorValueTreeState apvts{ *this, nullptr, "Parameters", createParameterLayout() };
+
+    
+
     PolyRhythmMachine polyRhythmMachine{ &apvts };
 
 

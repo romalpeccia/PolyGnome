@@ -38,6 +38,27 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
     savePresetButton.setButtonText("Save Preset");
     savePresetButton.setHelpText(SAVE_PRESET_BUTTON_REMINDER);
 
+    //initialize the rack options
+    rackSlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
+    colorSlider(rackSlider, MAIN_COLOUR, MAIN_COLOUR, SECONDARY_COLOUR, MAIN_COLOUR, true);
+    rackSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "NUM_RACKS", rackSlider);
+    rackSlider.setHelpText(RACK_SLIDER_REMINDER);
+
+    for (int i = 0; i < MAX_RACKS; i++)
+    { //initialize the track buttons
+        juce::String name = "SELECTED_RACK";
+        rackButtons[i].onClick = [this, name, i]() {
+            audioProcessor.apvts.getRawParameterValue(name)->store(i);
+            for (int j = 0; j < MAX_RACKS; j++) {
+                rackButtons[j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR);
+            }
+            rackButtons[i].setColour(juce::TextButton::ColourIds::buttonColourId, MAIN_COLOUR);
+        };
+        rackButtons[i].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR);
+        rackButtons[i].setHelpText(RACK_BUTTON_REMINDER);
+    }
+
+
     //initialize the polytrack Machine buttons and sliders
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
         for (int j = 0; j < MAX_TRACK_LENGTH; j++)
@@ -45,16 +66,14 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
             juce::String name = "BEAT_" + to_string(i) + "_" + to_string(j) + "_TOGGLE";
             beatButtons[i][j].onClick = [this, name, i, j]() {
                 if (audioProcessor.apvts.getRawParameterValue(name)->load() == true) {
-                    //audioProcessor.apvts.getRawParameterValue(name)->store(false);
                     beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR);
                 }
                 else {
-                    //audioProcessor.apvts.getRawParameterValue(name)->store(true);
                     beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonOnColourId, MAIN_COLOUR);
                 }
             };
             beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR);
-            beatButtons[i][j].setClickingTogglesState(true);
+            beatButtons[i][j].setClickingTogglesState(true); //what does this do?
             beatButtonAttachments[i][j] = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.apvts, name,beatButtons[i][j]);
             beatButtons[i][j].setHelpText(BEAT_BUTTON_REMINDER);
         }
@@ -171,7 +190,12 @@ void PolyGnomeAudioProcessorEditor::resized()
     flexBox.items.add(juce::FlexItem(100, 25, loadPresetButton));
     flexBox.items.add(juce::FlexItem(100, 25, savePresetButton));
     flexBox.items.add(juce::FlexItem(100, 200, reminderTextEditor));
+    flexBox.items.add(juce::FlexItem(100, 200, rackSlider));
+    for (int i = 0; i < MAX_RACKS; i++) {
+        flexBox.items.add(juce::FlexItem(25, 25, rackButtons[i]));
+    }
     flexBox.performLayout(menuBounds);
+  
 }
 
 PolyGnomeAudioProcessorEditor::~PolyGnomeAudioProcessorEditor()
@@ -192,7 +216,16 @@ juce::String PolyGnomeAudioProcessorEditor::getCurrentMouseOverText() {
     else  if (savePresetButton.isHoveredOver == true) {
         reminderText = savePresetButton.getHelpText();
     }
+    else if (rackSlider.isHoveredOver == true) {
+        reminderText = rackSlider.getHelpText();
+    }
     else {
+        for (int i = 0; i < MAX_RACKS; i++) {
+            if (rackButtons[i].isHoveredOver == true) {
+                reminderText = rackButtons[i].getHelpText();
+                break;
+            }
+        }
         for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
             if (muteButtons[i].isHoveredOver == true) {
                 reminderText = muteButtons[i].getHelpText();
@@ -238,6 +271,13 @@ void PolyGnomeAudioProcessorEditor::paint(juce::Graphics& g)
     g.drawImageAt(logo, 0, 0);
 
 
+    int numRacks = audioProcessor.apvts.getRawParameterValue("NUM_RACKS")->load();
+    for (int j = 0; j < numRacks; j++) {
+        rackButtons[j].setVisible(true);
+    }
+    for (int j = numRacks; j < MAX_RACKS; j++) {
+        rackButtons[j].setVisible(false);
+    }
 
     
     reminderTextEditor.setText(getCurrentMouseOverText());
@@ -424,11 +464,10 @@ std::vector<juce::Component*> PolyGnomeAudioProcessorEditor::getVisibleComps() {
 
     std::vector<juce::Component*> comps;
     comps.push_back(&playButton);
-    comps.push_back(&bpmSlider);
     comps.push_back(&loadPresetButton);
     comps.push_back(&savePresetButton);
     comps.push_back(&reminderTextEditor);
-
+    comps.push_back(&rackSlider);
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
         comps.push_back(&subdivisionSliders[i]);
         comps.push_back(&velocitySliders[i]);
@@ -449,6 +488,9 @@ std::vector<juce::Component*> PolyGnomeAudioProcessorEditor::getHiddenComps() {
         for (int j = 0; j < MAX_TRACK_LENGTH; j++) {
             comps.push_back(&beatButtons[i][j]);
         }
+    }
+    for (int i = 0; i < MAX_RACKS; i++) {
+        comps.push_back(&rackButtons[i]);
     }
 
     return{ comps };
@@ -489,8 +531,7 @@ void PolyGnomeAudioProcessorEditor::colorTextEditor(juce::TextEditor& textEditor
     textEditor.setColour(juce::TextEditor::ColourIds::backgroundColourId, backgroundColour);
 }
 
-void PolyGnomeAudioProcessorEditor::changeMenuButtonColors(juce::TextButton *buttonOn) {
-    auto buttonColourId = juce::TextButton::ColourIds::buttonColourId;
+void PolyGnomeAudioProcessorEditor::changeOptionsButtonColors(juce::TextButton *buttonOn) {
     buttonOn->setColour(juce::TextButton::ColourIds::buttonColourId, MAIN_COLOUR);
 }
 

@@ -26,7 +26,7 @@ public:
     //==============================================================================
     void paint(juce::Graphics&) override;
     void paintPolyRhythmMachine(juce::Graphics& g);
-    void changeMenuButtonColors(juce::TextButton *buttonOn);
+    void changeOptionsButtonColors(juce::TextButton *buttonOn);
 
     juce::Rectangle<int> getVisualArea();
 
@@ -61,6 +61,7 @@ private:
     CustomTextButton playButton;
     CustomTextButton loadPresetButton;
     CustomTextButton savePresetButton;
+    CustomTextEditor reminderTextEditor;
 
     //MIDDLE COMPONENTS
     CustomTextButton beatButtons[MAX_MIDI_CHANNELS][MAX_TRACK_LENGTH];
@@ -76,8 +77,8 @@ private:
     CustomSlider sustainSliders[MAX_MIDI_CHANNELS];
 
     //BOTTOM COMPONENTS
-    CustomTextEditor reminderTextEditor;
-
+    CustomTextButton rackButtons[MAX_RACKS];
+    CustomSlider rackSlider;
 
     //ATTACHMENTS
     std::unique_ptr <juce::AudioProcessorValueTreeState::ButtonAttachment> muteButtonAttachments[MAX_MIDI_CHANNELS];
@@ -86,7 +87,7 @@ private:
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> midiSliderAttachments[MAX_MIDI_CHANNELS];
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> velocitySliderAttachments[MAX_MIDI_CHANNELS];
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> sustainSliderAttachments[MAX_MIDI_CHANNELS];
-
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> rackSliderAttachment;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PolyGnomeAudioProcessorEditor)
 };
 
