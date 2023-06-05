@@ -59,6 +59,7 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
     { //initialize the bar buttons
         barSelectButtons[i].onClick = [this, i]() {
             audioProcessor.apvts.getRawParameterValue("SELECTED_BAR")->store(i);
+            audioProcessor.apvts.getRawParameterValue("AUTO_LOOP")->store(false);
         };
         barSelectButtons[i].setHelpText(BAR_SELECT_BUTTON_REMINDER);
         barSelectButtons[i].setButtonText(to_string(i+1));
@@ -339,13 +340,7 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
     int numBars = audioProcessor.apvts.getRawParameterValue("NUM_BARS")->load();
     int activeBar = audioProcessor.apvts.getRawParameterValue("ACTIVE_BAR")->load();
     int selectedBar = audioProcessor.apvts.getRawParameterValue("SELECTED_BAR")->load();
-
-    //possibly unecessary
-    bool isBarLoopEnabled = audioProcessor.apvts.getRawParameterValue("AUTO_LOOP")->load();
-    if (isBarLoopEnabled) {
-        selectedBar = activeBar;
-    }
-
+    bool isProccessorOn = (audioProcessor.apvts.getRawParameterValue("ON/OFF")->load() == true);
     //hide any hidden components
     for (int j = 0; j < MAX_BARS; j++) {
         if (j != selectedBar){
@@ -384,7 +379,7 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
 
         bool isTrackEnabled = audioProcessor.apvts.getRawParameterValue(getTrackEnableString(selectedBar, i))->load();
         bool isBarEnabled = (selectedBar == activeBar);
-        bool isBeatenabled = (isTrackEnabled && isBarEnabled);
+        bool isBeatEnabled = (isTrackEnabled && (isBarEnabled || !isProccessorOn));
         int subdivisions = audioProcessor.apvts.getRawParameterValue(getSubdivisionsString(selectedBar, i))->load();
         //draw the buttons for each note of the track
         for (int j = 0; j < subdivisions; j++) {
@@ -398,7 +393,7 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
             //TODO : clean this?
             if (audioProcessor.apvts.getRawParameterValue(getBeatToggleString(selectedBar, i, j))->load() == true) {
                 if (j == audioProcessor.polyRhythmMachine.tracks[i].beatCounter - 1) {
-                    if (isBeatenabled) {
+                    if (isBeatEnabled) {
                         bars[selectedBar].tracks[i].beatButtons[j].setColour(juce::TextButton::ColourIds::buttonOnColourId, ENABLED_COLOUR);
                     }
                     else {
@@ -407,7 +402,7 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
 
                 }
                 else {
-                    if (isBeatenabled) {
+                    if (isBeatEnabled) {
                         bars[selectedBar].tracks[i].beatButtons[j].setColour(juce::TextButton::ColourIds::buttonOnColourId, MAIN_COLOUR);
                     }
                     else {
@@ -417,7 +412,7 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
             }
             else {
                 if (j == audioProcessor.polyRhythmMachine.tracks[i].beatCounter - 1 && audioProcessor.polyRhythmMachine.tracks[i].subdivisions != 1) {
-                    if (isBeatenabled) {
+                    if (isBeatEnabled) {
                         bars[selectedBar].tracks[i].beatButtons[j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_DARK_COLOUR);
                     }
                     else {
@@ -426,7 +421,7 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
 
                 }
                 else {
-                    if (isBeatenabled) {
+                    if (isBeatEnabled) {
                         bars[selectedBar].tracks[i].beatButtons[j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR);
                     }
                     else {

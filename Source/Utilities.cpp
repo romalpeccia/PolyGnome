@@ -118,7 +118,11 @@ string midiIntToString(int midiValue) {
     case 10:
         noteInt = "9";
         break;
+    case 11:
+        noteInt = "10";
+        break;
     }
+
     string midiString = noteName.append(noteInt);
     return midiString;
 }
@@ -231,6 +235,12 @@ int midiStringToInt(string midiValue) {
     else {
         return -1;
     }
+    int result = 12 * noteMultiplier + noteAddition;
+    if (result > 127 || result < 0) {
+        return -1;
+    }
+    else {
+        return result;
+    }
 
-    return 12 * noteMultiplier + noteAddition;
 }

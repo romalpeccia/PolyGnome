@@ -84,7 +84,18 @@ void PolyGnomeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
     if (apvts.getRawParameterValue("ON/OFF")->load() == true)
     {
         polyRhythmMachine.getNextAudioBlock(buffer, midiMessages);
+        midiNeedsClearing = true;
     }
+    else {
+        if (midiNeedsClearing == true) {
+            for (int i = 0; i < MAX_MIDI_VALUE; i++) {
+                auto messageOff = juce::MidiMessage::noteOff(MIDI_CHANNEL, i);
+                midiMessages.addEvent(messageOff, 0);
+            }
+            midiNeedsClearing = false;
+        }
+    }
+
 }
 
 
@@ -117,8 +128,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout PolyGnomeAudioProcessor::cre
 
             }
             layout.add(std::make_unique<juce::AudioParameterInt>(getSubdivisionsString(barNum, i), to_string(barNum) + "_Subdivisions " + to_string(i), 1, MAX_SUBDIVISIONS, DEFAULT_SUBDIVISIONS));
-            layout.add(std::make_unique<juce::AudioParameterInt>(getMidiValueString(barNum, i), to_string(barNum) + "_Midi Value " + to_string(i), 0, 127, DEFAULT_MIDI_VALUE + i));
-            layout.add(std::make_unique<juce::AudioParameterInt>(getVelocityString(barNum, i), to_string(barNum) + "_Velocity " + to_string(i), 0, 127, DEFAULT_VELOCITY));
+            layout.add(std::make_unique<juce::AudioParameterInt>(getMidiValueString(barNum, i), to_string(barNum) + "_Midi Value " + to_string(i), 0, MAX_MIDI_VALUE, DEFAULT_MIDI_VALUE + i));
+            layout.add(std::make_unique<juce::AudioParameterInt>(getVelocityString(barNum, i), to_string(barNum) + "_Velocity " + to_string(i), 0, MAX_MIDI_VALUE, DEFAULT_VELOCITY));
             layout.add(std::make_unique<juce::AudioParameterFloat>(getSustainString(barNum, i), to_string(barNum) + "_Sustain " + to_string(i), 0, 100.0, DEFAULT_SUSTAIN));
             layout.add(std::make_unique<juce::AudioParameterBool>(getTrackEnableString(barNum, i), to_string(barNum) + "_Track " + to_string(i) + " Enable", true));
             }

@@ -58,6 +58,7 @@ private:
     double samplesPerBar = 0; //= 4 * (60.0 / bpm) * sampleRate;
     double bpm = 120;
     int barCounter = 0;
+
     //apvts of caller that created this instance of polyRhythmMachine
     juce::AudioProcessorValueTreeState* apvts;
 

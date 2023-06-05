@@ -69,6 +69,7 @@ public:
 
     PolyRhythmMachine polyRhythmMachine{ &apvts };
 
+    bool midiNeedsClearing = false;
 
 
 private:

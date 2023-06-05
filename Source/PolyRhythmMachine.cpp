@@ -40,11 +40,11 @@ void PolyRhythmMachine::prepareToPlay(double _sampleRate, int samplesPerBlock)
 void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiBuffer)
 {
     resetParams(midiBuffer); //checks if apvts params have changed and updates class variables accordingly
+    
+    
     auto bufferSize = buffer.getNumSamples(); //usually 16, 32, 64... 1024...
     totalSamples = (int)apvts->getRawParameterValue("SAMPLES_ELAPSED")->load() % (int)samplesPerBar;
-    
 
-    
     //TODO: old test case, possibly no longer relevant, double check
     /*
     for (int i = 0; i < MAX_TRACKS; i++) {
@@ -66,10 +66,9 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
         //turn any previously played notes off 
         float samplesAfterBeat = (((tracks[i].beatCounter - 1) * tracks[i].samplesPerInterval) + ((tracks[i].sustain / 100) * tracks[i].samplesPerInterval)); // the amount of samples for all intervals that have happened + the amount of samples after the latest interval
         if (tracks[i].samplesProcessed > samplesAfterBeat && tracks[i].noteOffQueued == true) {
-            auto messageOff = juce::MidiMessage::noteOff(1, tracks[i].midiValue);
+            auto messageOff = juce::MidiMessage::noteOff(MIDI_CHANNEL, tracks[i].midiValue + TEMP_MIDI_BUGFIX_NUM);
             midiBuffer.addEvent(messageOff, totalSamples - samplesAfterBeat);
             tracks[i].noteOffQueued = false;
-            DBG("noteoff");
         }
 
         //reset the beat counters if it's been looped
@@ -151,7 +150,7 @@ void PolyRhythmMachine::handleBarChange() {
 
 void PolyRhythmMachine::handleNoteTrigger(juce::MidiBuffer& midiBuffer, int noteNumber, int velocity, int bufferPosition)
 {
-    auto message = juce::MidiMessage::noteOn(1, noteNumber, (juce::uint8)velocity);
+    auto message = juce::MidiMessage::noteOn(MIDI_CHANNEL, noteNumber + TEMP_MIDI_BUGFIX_NUM, (juce::uint8)velocity);
     if (!midiBuffer.addEvent(message, bufferPosition))
     {
        DBG("error adding messages to midiBuffer");
@@ -185,7 +184,7 @@ void PolyRhythmMachine::resetParams(juce::MidiBuffer& midiBuffer)
         int tempMidiValue = apvts->getRawParameterValue(getMidiValueString(barNum, i))->load();
         if (tracks[i].midiValue != tempMidiValue)
         {
-            auto messageOff = juce::MidiMessage::noteOff(1, tracks[i].midiValue);
+            auto messageOff = juce::MidiMessage::noteOff(MIDI_CHANNEL, tracks[i].midiValue + TEMP_MIDI_BUGFIX_NUM);
             midiBuffer.addEvent(messageOff, 0);
             tracks[i].midiValue = tempMidiValue;
         }
