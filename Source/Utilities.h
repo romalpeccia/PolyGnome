@@ -16,7 +16,7 @@ using namespace std;
 
 const int MAX_TRACK_LENGTH = 16;
 const int MAX_MIDI_CHANNELS = 12;
-const int MAX_RACKS = 8;
+const int MAX_BARS = 8;
 
 const float MAX_BPM = 480;
 const int DEFAULT_VELOCITY = 100;
@@ -50,12 +50,12 @@ const string RACK_BUTTON_REMINDER = "select a bar of the loop";
 string midiIntToString(int midiValue);
 int midiStringToInt(string midiValue);
 
-juce::String getBeatToggleString(int i, int j);
-juce::String getSubdivisionsString(int i);
-juce::String getVelocityString(int i);
-juce::String getMidiValueString(int i);
-juce::String getSustainString(int i);
-juce::String getTrackEnableString(int i);
+juce::String getBeatToggleString(int barNum, int trackNum, int beatNum);
+juce::String getSubdivisionsString(int trackNum);
+juce::String getVelocityString(int trackNum);
+juce::String getMidiValueString(int trackNum);
+juce::String getSustainString(int trackNum);
+juce::String getTrackEnableString(int trackNum);
 
 /*
 class CustomComponent : public virtual juce::Component {

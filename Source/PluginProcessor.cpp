@@ -47,7 +47,8 @@ void PolyGnomeAudioProcessor::releaseResources()
 
 void PolyGnomeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-
+    int barNum = apvts.getRawParameterValue("SELECTED_BAR")->load();
+    DBG(barNum);
 
     auto positionInfo = getPlayHead()->getPosition();
     if (positionInfo) {
@@ -69,10 +70,10 @@ void PolyGnomeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
         }
 
     }
-    
-   
+
+
     midiMessages.clear(); //clear any noise in the midiBuffer
-if (apvts.getRawParameterValue("ON/OFF")->load() == true)
+    if (apvts.getRawParameterValue("ON/OFF")->load() == true)
     {
         polyRhythmMachine.getNextAudioBlock(buffer, midiMessages);
     }
@@ -88,28 +89,33 @@ juce::AudioProcessorValueTreeState::ParameterLayout PolyGnomeAudioProcessor::cre
     layout.add(std::make_unique<juce::AudioParameterBool>("ON/OFF", "On/Off", false));
     layout.add(std::make_unique<juce::AudioParameterBool>("DAW_CONNECTED", "DAW Connected", false));
     layout.add(std::make_unique<juce::AudioParameterInt>("SAMPLES_ELAPSED", "samples elapsed", 0, 2147483647, 0));
-    layout.add(std::make_unique<juce::AudioParameterInt>("NUM_RACKS", "num racks", 1, MAX_RACKS, 1));
-    layout.add(std::make_unique<juce::AudioParameterInt>("SELECTED_RACK", "selected rack", 1, MAX_RACKS, 1));
+    layout.add(std::make_unique<juce::AudioParameterInt>("NUM_BARS", "num bars", 1, MAX_BARS, 1));
+    layout.add(std::make_unique<juce::AudioParameterInt>("SELECTED_BAR", "selected bar", 0, MAX_BARS - 1, 0));
     layout.add(std::make_unique<juce::AudioParameterFloat>("BPM", "bpm", juce::NormalisableRange<float>(1.f, 480.f, 0.1f, 0.25f), 120.f));
 
 
-    for (int i = 0; i < MAX_MIDI_CHANNELS; i++)
-    {
-        //Parameters for Polytrack Machine 
-        //BEAT_<0-MAX_MIDI_CHANNELS>.<0-MAX_TRACK_LENGTH>_TOGGLE
-        //SUBDIVISIONS_<0-MAX_MIDI_CHANNELS>
-        //MIDI_VALUE__<0-MAX_MIDI_CHANNELS>
-        //TRACK_<0-MAX_MIDI_CHANNELS>_ENABLE
-        for (int j = 0; j < MAX_TRACK_LENGTH; j++)
+        for (int i = 0; i < MAX_MIDI_CHANNELS; i++)
         {
-            layout.add(std::make_unique<juce::AudioParameterBool>(getBeatToggleString(i, j), "Beat" + to_string(i) + "." + to_string(j) + "Toggle", false));
+            //Parameters for Polytrack Machine 
+            //BEAT_<0-MAX_MIDI_CHANNELS>.<0-MAX_TRACK_LENGTH>_TOGGLE
+            //SUBDIVISIONS_<0-MAX_MIDI_CHANNELS>
+            //MIDI_VALUE__<0-MAX_MIDI_CHANNELS>
+            //TRACK_<0-MAX_MIDI_CHANNELS>_ENABLE
+            for (int j = 0; j < MAX_TRACK_LENGTH; j++)
+            {
+                for (int barNum = 0; barNum < MAX_BARS; barNum++) {
+                    layout.add(std::make_unique<juce::AudioParameterBool>(getBeatToggleString(barNum, i, j), "Beat" + to_string(i) + "." + to_string(j) + "Toggle", false));
+                }
+            }
+            layout.add(std::make_unique<juce::AudioParameterInt>(getSubdivisionsString(i), "Subdivisions " + to_string(i), 1, MAX_TRACK_LENGTH, DEFAULT_SUBDIVISIONS));
+            layout.add(std::make_unique<juce::AudioParameterInt>(getMidiValueString(i), "Midi Value " + to_string(i), 0, 127, DEFAULT_MIDI_VALUE + i));
+            layout.add(std::make_unique<juce::AudioParameterInt>(getVelocityString(i), "Velocity " + to_string(i), 0, 127, DEFAULT_VELOCITY));
+            layout.add(std::make_unique<juce::AudioParameterFloat>(getSustainString(i), "Sustain " + to_string(i), 0, 100.0, DEFAULT_SUSTAIN));
+            layout.add(std::make_unique<juce::AudioParameterBool>(getTrackEnableString(i), "Track " + to_string(i) + " Enable", true));
         }
-        layout.add(std::make_unique<juce::AudioParameterInt>(getSubdivisionsString(i), "Subdivisions " + to_string(i), 1, MAX_TRACK_LENGTH, DEFAULT_SUBDIVISIONS));
-        layout.add(std::make_unique<juce::AudioParameterInt>(getMidiValueString(i), "Midi Value " + to_string(i), 0, 127, DEFAULT_MIDI_VALUE + i));
-        layout.add(std::make_unique<juce::AudioParameterInt>(getVelocityString(i), "Velocity " + to_string(i), 0, 127, DEFAULT_VELOCITY));
-        layout.add(std::make_unique<juce::AudioParameterFloat>(getSustainString(i), "Sustain " + to_string(i), 0, 100.0, DEFAULT_SUSTAIN));
-        layout.add(std::make_unique<juce::AudioParameterBool>(getTrackEnableString(i), "Track " + to_string(i) + " Enable", true));
-    }
+
+ 
+
 
     return layout;
 

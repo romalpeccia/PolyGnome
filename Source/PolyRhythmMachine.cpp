@@ -34,15 +34,8 @@ PolyRhythmMachine::~PolyRhythmMachine()
 void PolyRhythmMachine::prepareToPlay(double _sampleRate, int samplesPerBlock)
 {
     //preparetoplay should call every time we start (right before)
-
+    sampleRate = _sampleRate;
     resetParams();
-
-    if (sampleRate != _sampleRate)
-    {
-        sampleRate = _sampleRate;
-        //TODO: rare edge case (the user changes their sample rate mid session): change any logic that depends on sampleRate here
-    }
-
 }
 void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiBuffer)
 {
@@ -85,9 +78,13 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
         }
 
         float samplesCounted = tracks[i].samplesPerInterval * (tracks[i].beatCounter);
+
+
+        int barNum = apvts->getRawParameterValue("SELECTED_BAR")->load();
+
         if (tracks[i].samplesProcessed >= samplesCounted) {
             if (tracks[i].beatCounter < MAX_TRACK_LENGTH) {
-                if (apvts->getRawParameterValue(getBeatToggleString(i, tracks[i].beatCounter))->load() == true ) {
+                if (apvts->getRawParameterValue(getBeatToggleString(barNum, i, tracks[i].beatCounter))->load() == true ) {
                     
                     //TODO: sort out this bufferPosition calculation error. possibly related to GUI error?. possibly completely irrelevant variable
                     int bufferPosition = totalSamples - samplesCounted; //TODO: maybe this should be samplesProcessed instead of totalSamples

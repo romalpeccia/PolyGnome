@@ -50,7 +50,7 @@ private:
     std::vector<juce::Component*> getVisibleComps();
     std::vector<juce::Component*> getHiddenComps();
     std::vector<juce::Component*> getAllComps();
-    std::vector<juce::Component*> getTrackComps(int index);
+    std::vector<juce::Component*> getTrackComps(int barIndex, int trackIndex);
 
     void loadPreset();
     void savePreset();
@@ -64,7 +64,7 @@ private:
     CustomTextEditor reminderTextEditor;
 
     //MIDDLE COMPONENTS
-    CustomTextButton beatButtons[MAX_MIDI_CHANNELS][MAX_TRACK_LENGTH];
+    CustomTextButton beatButtons[MAX_BARS][MAX_MIDI_CHANNELS][MAX_TRACK_LENGTH];
 
     //RIGHT COMPONENTS
     CustomSlider subdivisionSliders[MAX_MIDI_CHANNELS];
@@ -77,17 +77,17 @@ private:
     CustomSlider sustainSliders[MAX_MIDI_CHANNELS];
 
     //BOTTOM COMPONENTS
-    CustomTextButton rackButtons[MAX_RACKS];
-    CustomSlider rackSlider;
+    CustomTextButton barButtons[MAX_BARS];
+    CustomSlider barSlider;
 
     //ATTACHMENTS
     std::unique_ptr <juce::AudioProcessorValueTreeState::ButtonAttachment> muteButtonAttachments[MAX_MIDI_CHANNELS];
-    std::unique_ptr <juce::AudioProcessorValueTreeState::ButtonAttachment> beatButtonAttachments[MAX_MIDI_CHANNELS][MAX_TRACK_LENGTH];
+    std::unique_ptr <juce::AudioProcessorValueTreeState::ButtonAttachment> beatButtonAttachments[MAX_BARS][MAX_MIDI_CHANNELS][MAX_TRACK_LENGTH];
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> subdivisionSliderAttachments[MAX_MIDI_CHANNELS];
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> midiSliderAttachments[MAX_MIDI_CHANNELS];
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> velocitySliderAttachments[MAX_MIDI_CHANNELS];
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> sustainSliderAttachments[MAX_MIDI_CHANNELS];
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> rackSliderAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> barSliderAttachment;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PolyGnomeAudioProcessorEditor)
 };
 

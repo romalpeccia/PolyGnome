@@ -38,123 +38,133 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
     savePresetButton.setButtonText("Save Preset");
     savePresetButton.setHelpText(SAVE_PRESET_BUTTON_REMINDER);
 
-    //initialize the rack options
-    rackSlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
-    colorSlider(rackSlider, MAIN_COLOUR, MAIN_COLOUR, SECONDARY_COLOUR, MAIN_COLOUR, true);
-    rackSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "NUM_RACKS", rackSlider);
-    rackSlider.setHelpText(RACK_SLIDER_REMINDER);
+    //initialize the bar options
+    barSlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
+    colorSlider(barSlider, MAIN_COLOUR, MAIN_COLOUR, SECONDARY_COLOUR, MAIN_COLOUR, true);
+    barSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "NUM_BARS", barSlider);
+    barSlider.setHelpText(RACK_SLIDER_REMINDER);
 
-    for (int i = 0; i < MAX_RACKS; i++)
-    { //initialize the track buttons
-        juce::String name = "SELECTED_RACK";
-        rackButtons[i].onClick = [this, name, i]() {
+    for (int i = 0; i < MAX_BARS; i++)
+    { //initialize the bar buttons
+        juce::String name = "SELECTED_BAR";
+        barButtons[i].onClick = [this, name, i]() {
             audioProcessor.apvts.getRawParameterValue(name)->store(i);
-            for (int j = 0; j < MAX_RACKS; j++) {
-                rackButtons[j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR);
+            for (int j = 0; j < MAX_BARS; j++) {
+                barButtons[j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR);
             }
-            rackButtons[i].setColour(juce::TextButton::ColourIds::buttonColourId, MAIN_COLOUR);
+            for (int j = 0; j < MAX_MIDI_CHANNELS; j++) {
+                for (int k = 0; k < MAX_TRACK_LENGTH; k++) {
+                    beatButtons[i][j][k].toFront(false);
+                }
+            }
+
+            barButtons[i].setColour(juce::TextButton::ColourIds::buttonColourId, MAIN_COLOUR);
         };
-        rackButtons[i].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR);
-        rackButtons[i].setHelpText(RACK_BUTTON_REMINDER);
+        barButtons[i].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR);
+        barButtons[i].setHelpText(RACK_BUTTON_REMINDER);
     }
+    barButtons[0].setColour(juce::TextButton::ColourIds::buttonColourId, MAIN_COLOUR);
 
 
     //initialize the polytrack Machine buttons and sliders
-    for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
-        for (int j = 0; j < MAX_TRACK_LENGTH; j++)
-        { //initialize the track buttons
-            juce::String name = getBeatToggleString(i, j);
-            beatButtons[i][j].onClick = [this, name, i, j]() {
-                if (audioProcessor.apvts.getRawParameterValue(name)->load() == true) {
-                    beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR);
+    for (int k = 0; k < MAX_BARS; k++) {
+        for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
+            for (int j = 0; j < MAX_TRACK_LENGTH; j++)
+            { //initialize the track buttons
+                juce::String name = getBeatToggleString(k, i, j);
+                beatButtons[k][i][j].onClick = [this, name, k, i , j]() {
+                    if (audioProcessor.apvts.getRawParameterValue(name)->load() == true) {
+                        beatButtons[k][i][j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR);
+                    }
+                    else {
+                        beatButtons[k][i][j].setColour(juce::TextButton::ColourIds::buttonOnColourId, MAIN_COLOUR);
+                    }
+                };
+
+                beatButtons[k][i][j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR);
+                beatButtons[k][i][j].setClickingTogglesState(true); //what does this do?
+                beatButtonAttachments[k][i][j] = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.apvts, name, beatButtons[k][i][j]);
+                beatButtons[k][i][j].setHelpText(BEAT_BUTTON_REMINDER);
+            }
+
+            //initialize the mute buttons
+            muteButtons[i].setClickingTogglesState(true);
+            muteButtonAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.apvts, getTrackEnableString(i), muteButtons[i]);
+            muteButtons[i].setHelpText(MUTE_BUTTON_REMINDER);
+
+            //initialize the subdivision sliders
+            subdivisionSliders[i].setSliderStyle(juce::Slider::SliderStyle::Rotary);
+            colorSlider(subdivisionSliders[i], ACCENT_COLOUR, ACCENT_COLOUR, SECONDARY_COLOUR, ACCENT_COLOUR, true);
+            subdivisionSliderAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, getSubdivisionsString(i), subdivisionSliders[i]);
+            subdivisionSliders[i].setHelpText(SUBDIVISION_SLIDER_REMINDER);
+
+            //initialize the velocity sliders
+            velocitySliders[i].setSliderStyle(juce::Slider::SliderStyle::Rotary);
+            colorSlider(velocitySliders[i], ACCENT_COLOUR, ACCENT_COLOUR, SECONDARY_COLOUR, ACCENT_COLOUR, true);
+            velocitySliderAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, getVelocityString(i), velocitySliders[i]);
+            velocitySliders[i].setHelpText(VELOCITY_SLIDER_REMINDER);
+
+            //initialize the sustain sliders
+            colorSlider(sustainSliders[i], ACCENT_COLOUR, ACCENT_COLOUR, SECONDARY_COLOUR, ACCENT_COLOUR, true);
+            sustainSliderAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, getSustainString(i), sustainSliders[i]);
+            sustainSliders[i].setHelpText(SUSTAIN_SLIDER_REMINDER);
+
+
+            //initialize the MIDI control slider    
+            midiSliders[i].setSliderStyle(juce::Slider::SliderStyle::Rotary);
+            midiSliderAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, getMidiValueString(i), midiSliders[i]);
+            midiSliders[i].setHelpText(MIDI_SLIDER_REMINDER);
+
+            //initialize the text entry logic and UI for MIDI Values
+            int currentIntValue = audioProcessor.apvts.getRawParameterValue(getMidiValueString(i))->load();
+            midiTextEditors[i].setText(midiIntToString(currentIntValue) + " / " + to_string(currentIntValue));
+            midiTextEditors[i].setReadOnly(false);
+            colorTextEditor(midiTextEditors[i], ACCENT_COLOUR, ACCENT_COLOUR, ACCENT_COLOUR, MAIN_COLOUR, true);
+            midiTextEditors[i].setHelpText(MIDI_TEXTEDITOR_REMINDER);
+
+
+            midiTextEditors[i].onReturnKey = [this, i]() {
+                juce::String input = midiTextEditors[i].getText();
+                string inputString = input.toStdString();
+                int inputInt;
+                string convertedString;
+                int currentIntValue = audioProcessor.apvts.getRawParameterValue(getMidiValueString(i))->load();
+                if (sscanf(inputString.c_str(), "%d", &inputInt) == 1)
+                {   //if the user inputted an int
+                    convertedString = midiIntToString(inputInt);
+                    if (convertedString != "") {
+                        midiTextEditors[i].setText(convertedString + " / " + to_string(inputInt));
+                        audioProcessor.apvts.getRawParameterValue(getMidiValueString(i))->store(inputInt);
+                        //add control of MIDI slider to textbox
+                        midiSliders[i].setValue(inputInt);
+                    }
+                    else {
+                        midiTextEditors[i].setText(midiIntToString(currentIntValue) + " / " + to_string(currentIntValue));
+                    }
                 }
-                else {
-                    beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonOnColourId, MAIN_COLOUR);
+                else
+                { //user inputted a string
+                    int convertedInt = midiStringToInt(inputString);
+                    if (convertedInt != -1) {
+                        midiTextEditors[i].setText(inputString + " / " + to_string(convertedInt));
+                        audioProcessor.apvts.getRawParameterValue(getMidiValueString(i))->store(convertedInt);
+                        //add control of MIDI slider to textbox
+                        midiSliders[i].setValue(convertedInt);
+                    }
+                    else {
+                        midiTextEditors[i].setText(midiIntToString(currentIntValue) + " / " + to_string(currentIntValue));
+                    }
                 }
             };
-            beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR);
-            beatButtons[i][j].setClickingTogglesState(true); //what does this do?
-            beatButtonAttachments[i][j] = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.apvts, name,beatButtons[i][j]);
-            beatButtons[i][j].setHelpText(BEAT_BUTTON_REMINDER);
+
+            //add control of textbox to MIDI slider
+            midiSliders[i].onValueChange = [this, i]() {
+                int sliderInt = midiSliders[i].getValue();
+                midiTextEditors[i].setText(midiIntToString(sliderInt) + " / " + to_string(sliderInt));
+            };
+
+
         }
-
-        //initialize the mute buttons
-        muteButtons[i].setClickingTogglesState(true);
-        muteButtonAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.apvts, getTrackEnableString(i), muteButtons[i]);
-        muteButtons[i].setHelpText(MUTE_BUTTON_REMINDER);
-
-        //initialize the subdivision sliders
-        subdivisionSliders[i].setSliderStyle(juce::Slider::SliderStyle::Rotary);
-        colorSlider(subdivisionSliders[i], ACCENT_COLOUR, ACCENT_COLOUR, SECONDARY_COLOUR, ACCENT_COLOUR, true);
-        subdivisionSliderAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, getSubdivisionsString(i), subdivisionSliders[i]);
-        subdivisionSliders[i].setHelpText(SUBDIVISION_SLIDER_REMINDER);
-
-        //initialize the velocity sliders
-        velocitySliders[i].setSliderStyle(juce::Slider::SliderStyle::Rotary);
-        colorSlider(velocitySliders[i], ACCENT_COLOUR, ACCENT_COLOUR, SECONDARY_COLOUR, ACCENT_COLOUR, true);
-        velocitySliderAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, getVelocityString(i), velocitySliders[i]);
-        velocitySliders[i].setHelpText(VELOCITY_SLIDER_REMINDER);
-
-        //initialize the sustain sliders
-        colorSlider(sustainSliders[i], ACCENT_COLOUR, ACCENT_COLOUR, SECONDARY_COLOUR, ACCENT_COLOUR, true);
-        sustainSliderAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, getSustainString(i),sustainSliders[i]);
-        sustainSliders[i].setHelpText(SUSTAIN_SLIDER_REMINDER);
-
-
-        //initialize the MIDI control slider    
-        midiSliders[i].setSliderStyle(juce::Slider::SliderStyle::Rotary);
-        midiSliderAttachments[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, getMidiValueString(i), midiSliders[i]);
-        midiSliders[i].setHelpText(MIDI_SLIDER_REMINDER);
-
-        //initialize the text entry logic and UI for MIDI Values
-        int currentIntValue = audioProcessor.apvts.getRawParameterValue(getMidiValueString(i))->load();
-        midiTextEditors[i].setText(midiIntToString(currentIntValue) + " / " + to_string(currentIntValue));
-        midiTextEditors[i].setReadOnly(false);
-        colorTextEditor(midiTextEditors[i], ACCENT_COLOUR, ACCENT_COLOUR, ACCENT_COLOUR, MAIN_COLOUR, true);
-        midiTextEditors[i].setHelpText(MIDI_TEXTEDITOR_REMINDER);
-
-
-        midiTextEditors[i].onReturnKey = [this, i]() {
-            juce::String input = midiTextEditors[i].getText();
-            string inputString = input.toStdString();
-            int inputInt;
-            string convertedString;
-            int currentIntValue = audioProcessor.apvts.getRawParameterValue(getMidiValueString(i))->load();
-            if (sscanf(inputString.c_str(), "%d", &inputInt) == 1)
-            {   //if the user inputted an int
-                convertedString = midiIntToString(inputInt);
-                if (convertedString != "") {
-                    midiTextEditors[i].setText(convertedString + " / " + to_string(inputInt));
-                    audioProcessor.apvts.getRawParameterValue(getMidiValueString(i))->store(inputInt);
-                    //add control of MIDI slider to textbox
-                    midiSliders[i].setValue(inputInt);
-                }
-                else {
-                    midiTextEditors[i].setText(midiIntToString(currentIntValue) + " / " + to_string(currentIntValue));
-                }
-            } 
-            else
-            { //user inputted a string
-                int convertedInt = midiStringToInt(inputString);
-                if (convertedInt != -1) {
-                    midiTextEditors[i].setText(inputString + " / " + to_string(convertedInt));
-                    audioProcessor.apvts.getRawParameterValue(getMidiValueString(i))->store(convertedInt);
-                    //add control of MIDI slider to textbox
-                    midiSliders[i].setValue(convertedInt);
-                }
-                else {
-                    midiTextEditors[i].setText(midiIntToString(currentIntValue) + " / " + to_string(currentIntValue));
-                }
-            }   
-        };
-
-        //add control of textbox to MIDI slider
-        midiSliders[i].onValueChange = [this, i]() {
-            int sliderInt = midiSliders[i].getValue();
-            midiTextEditors[i].setText(midiIntToString(sliderInt) + " / " + to_string(sliderInt));
-        };
-
-
     }
 
 
@@ -190,9 +200,9 @@ void PolyGnomeAudioProcessorEditor::resized()
     flexBox.items.add(juce::FlexItem(100, 25, loadPresetButton));
     flexBox.items.add(juce::FlexItem(100, 25, savePresetButton));
     flexBox.items.add(juce::FlexItem(100, 200, reminderTextEditor));
-    flexBox.items.add(juce::FlexItem(100, 200, rackSlider));
-    for (int i = 0; i < MAX_RACKS; i++) {
-        flexBox.items.add(juce::FlexItem(25, 25, rackButtons[i]));
+    flexBox.items.add(juce::FlexItem(100, 200, barSlider));
+    for (int i = 0; i < MAX_BARS; i++) {
+        flexBox.items.add(juce::FlexItem(25, 25, barButtons[i]));
     }
     flexBox.performLayout(menuBounds);
   
@@ -216,13 +226,13 @@ juce::String PolyGnomeAudioProcessorEditor::getCurrentMouseOverText() {
     else  if (savePresetButton.isHoveredOver == true) {
         reminderText = savePresetButton.getHelpText();
     }
-    else if (rackSlider.isHoveredOver == true) {
-        reminderText = rackSlider.getHelpText();
+    else if (barSlider.isHoveredOver == true) {
+        reminderText = barSlider.getHelpText();
     }
     else {
-        for (int i = 0; i < MAX_RACKS; i++) {
-            if (rackButtons[i].isHoveredOver == true) {
-                reminderText = rackButtons[i].getHelpText();
+        for (int i = 0; i < MAX_BARS; i++) {
+            if (barButtons[i].isHoveredOver == true) {
+                reminderText = barButtons[i].getHelpText();
                 break;
             }
         }
@@ -253,10 +263,13 @@ juce::String PolyGnomeAudioProcessorEditor::getCurrentMouseOverText() {
             }
             else {
                 for (int j = 0; j < MAX_TRACK_LENGTH; j++) {
-                    if (beatButtons[i][j].isHoveredOver == true) {
-                        reminderText = beatButtons[i][j].getHelpText();
-                        break;
+                    for (int k = 0; k < MAX_BARS; k++) {
+                        if (beatButtons[k][i][j].isHoveredOver == true) {
+                            reminderText = beatButtons[k][i][j].getHelpText();
+                            break;
+                        }
                     }
+
                 }
             }
         }
@@ -271,12 +284,12 @@ void PolyGnomeAudioProcessorEditor::paint(juce::Graphics& g)
     g.drawImageAt(logo, 0, 0);
 
 
-    int numRacks = audioProcessor.apvts.getRawParameterValue("NUM_RACKS")->load();
-    for (int j = 0; j < numRacks; j++) {
-        rackButtons[j].setVisible(true);
+    int numBars = audioProcessor.apvts.getRawParameterValue("NUM_BARS")->load();
+    for (int j = 0; j < numBars; j++) {
+        barButtons[j].setVisible(true);
     }
-    for (int j = numRacks; j < MAX_RACKS; j++) {
-        rackButtons[j].setVisible(false);
+    for (int j = numBars; j < MAX_BARS; j++) {
+        barButtons[j].setVisible(false);
     }
 
     
@@ -335,63 +348,70 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
         trackLine.addLineSegment(juce::Line<float>(X, Y + spacing * i, X + width, Y + spacing * i), 1.f);
         g.setColour(SECONDARY_COLOUR);
         g.strokePath(trackLine, juce::PathStrokeType(2.0f));
-        bool isTrackEnabled = audioProcessor.apvts.getRawParameterValue(getTrackEnableString(i))->load();
 
-        //draw the buttons for each note of the track
+        int barNum = audioProcessor.apvts.getRawParameterValue("SELECTED_BAR")->load();
+        bool isTrackEnabled = audioProcessor.apvts.getRawParameterValue(getTrackEnableString(i))->load();
         int subdivisions = audioProcessor.apvts.getRawParameterValue(getSubdivisionsString(i))->load();
+        //draw the buttons for each note of the track
         for (int j = 0; j < subdivisions; j++) {
 
             float distanceOnPath = (width / subdivisions) * j;
             juce::Rectangle<int> pointBounds(X + distanceOnPath, Y + spacing * i - 10, 22, 22);
-            beatButtons[i][j].setBounds(pointBounds);
-            beatButtons[i][j].setVisible(true);
+            beatButtons[barNum][i][j].setBounds(pointBounds);
+            beatButtons[barNum][i][j].setVisible(true);
 
 
             //TODO : clean this?
-            if (audioProcessor.apvts.getRawParameterValue(getBeatToggleString(i, j))->load() == true) {
+            if (audioProcessor.apvts.getRawParameterValue(getBeatToggleString(barNum, i, j))->load() == true) {
                 if (j == audioProcessor.polyRhythmMachine.tracks[i].beatCounter - 1) {
                     if (isTrackEnabled == true) {
-                        beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonOnColourId, ENABLED_COLOUR);
+                        beatButtons[barNum][i][j].setColour(juce::TextButton::ColourIds::buttonOnColourId, ENABLED_COLOUR);
                     }
                     else {
-                        beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonOnColourId, ENABLED_COLOUR.brighter(0.9));
+                        beatButtons[barNum][i][j].setColour(juce::TextButton::ColourIds::buttonOnColourId, ENABLED_COLOUR.brighter(0.9));
                     }
 
                 }
                 else {
                     if (isTrackEnabled == true){
-                        beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonOnColourId, MAIN_COLOUR);
+                        beatButtons[barNum][i][j].setColour(juce::TextButton::ColourIds::buttonOnColourId, MAIN_COLOUR);
                     }
                     else {
-                        beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonOnColourId, MAIN_COLOUR.brighter(0.9));
+                        beatButtons[barNum][i][j].setColour(juce::TextButton::ColourIds::buttonOnColourId, MAIN_COLOUR.brighter(0.9));
                     }
                 }
             }
             else {
                 if (j == audioProcessor.polyRhythmMachine.tracks[i].beatCounter - 1 && audioProcessor.polyRhythmMachine.tracks[i].subdivisions != 1) {
                     if (isTrackEnabled == true) {
-                        beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_DARK_COLOUR);
+                        beatButtons[barNum][i][j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_DARK_COLOUR);
                     }
                     else {
-                        beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_DARK_COLOUR.brighter(0.9));
+                        beatButtons[barNum][i][j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_DARK_COLOUR.brighter(0.9));
                     }
                     
                 }
                 else {
                     if (isTrackEnabled == true) {
-                        beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR);
+                        beatButtons[barNum][i][j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR);
                     }
                     else {
-                        beatButtons[i][j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR.brighter(0.9));
+                        beatButtons[barNum][i][j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR.brighter(0.9));
                     }
                     
                 }
             }
         }
+        
         //hide any hidden buttons
-        for (int k = subdivisions; k < MAX_TRACK_LENGTH; k++) {
-            beatButtons[i][k].setVisible(false);
+        for (int k = 0; k < MAX_TRACK_LENGTH; k++) {
+            for (int j = 0; j < MAX_BARS; j++) {
+                if (j != barNum || k >= subdivisions) {
+                    beatButtons[j][i][k].setVisible(false);
+                }
+            }
         }
+
 
         //draw the components to the right of the tracks
         juce::Rectangle<int> subdivisionSliderBounds(X + width + 10, Y + spacing * (i - 1), 75, 75);
@@ -444,17 +464,17 @@ void PolyGnomeAudioProcessorEditor::togglePlayStateOn() {
 }
 
 
-std::vector<juce::Component*> PolyGnomeAudioProcessorEditor::getTrackComps(int index) {
+std::vector<juce::Component*> PolyGnomeAudioProcessorEditor::getTrackComps(int barIndex, int trackIndex) {
     //returns components for track[i]
     std::vector<juce::Component*> comps;
-    comps.push_back(&subdivisionSliders[index]);
-    comps.push_back(&velocitySliders[index]);
-    comps.push_back(&midiSliders[index]);
-    comps.push_back(&midiTextEditors[index]);
-    comps.push_back(&muteButtons[index]);
-    comps.push_back(&sustainSliders[index]);
+    comps.push_back(&subdivisionSliders[trackIndex]);
+    comps.push_back(&velocitySliders[trackIndex]);
+    comps.push_back(&midiSliders[trackIndex]);
+    comps.push_back(&midiTextEditors[trackIndex]);
+    comps.push_back(&muteButtons[trackIndex]);
+    comps.push_back(&sustainSliders[trackIndex]);
     for (int j = 0; j < MAX_TRACK_LENGTH; j++) {
-        comps.push_back(&beatButtons[index][j]);
+        comps.push_back(&beatButtons[barIndex][trackIndex][j]);
     }
     return{ comps };
 }
@@ -467,7 +487,7 @@ std::vector<juce::Component*> PolyGnomeAudioProcessorEditor::getVisibleComps() {
     comps.push_back(&loadPresetButton);
     comps.push_back(&savePresetButton);
     comps.push_back(&reminderTextEditor);
-    comps.push_back(&rackSlider);
+    comps.push_back(&barSlider);
     for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
         comps.push_back(&subdivisionSliders[i]);
         comps.push_back(&velocitySliders[i]);
@@ -484,13 +504,15 @@ std::vector<juce::Component*> PolyGnomeAudioProcessorEditor::getHiddenComps() {
     //returns components that sometimes have their state changed to hidden
 
     std::vector<juce::Component*> comps;
-    for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
-        for (int j = 0; j < MAX_TRACK_LENGTH; j++) {
-            comps.push_back(&beatButtons[i][j]);
+    for (int k = 0; k < MAX_BARS; k++){
+        for (int i = 0; i < MAX_MIDI_CHANNELS; i++) {
+            for (int j = 0; j < MAX_TRACK_LENGTH; j++) {
+                comps.push_back(&beatButtons[k][i][j]);
+            }
         }
     }
-    for (int i = 0; i < MAX_RACKS; i++) {
-        comps.push_back(&rackButtons[i]);
+    for (int i = 0; i < MAX_BARS; i++) {
+        comps.push_back(&barButtons[i]);
     }
 
     return{ comps };

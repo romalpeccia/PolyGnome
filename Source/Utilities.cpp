@@ -12,8 +12,8 @@
 #include <JuceHeader.h>
 
 
-juce::String getBeatToggleString(int i, int j) {
-    return "BEAT_" + to_string(i) + "_" + to_string(j) + "_TOGGLE";
+juce::String getBeatToggleString(int barNum, int i, int j) {
+    return to_string(barNum)+ "_BEAT_" + to_string(i) + "_" + to_string(j) + "_TOGGLE";
 }
 
 juce::String getSubdivisionsString(int i) {
