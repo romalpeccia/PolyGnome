@@ -93,25 +93,28 @@ juce::AudioProcessorValueTreeState::ParameterLayout PolyGnomeAudioProcessor::cre
     layout.add(std::make_unique<juce::AudioParameterInt>("SELECTED_BAR", "selected bar", 0, MAX_BARS - 1, 0));
     layout.add(std::make_unique<juce::AudioParameterFloat>("BPM", "bpm", juce::NormalisableRange<float>(1.f, 480.f, 0.1f, 0.25f), 120.f));
 
-
-        for (int i = 0; i < MAX_MIDI_CHANNELS; i++)
+    //Parameters for Polytrack Machine 
+    //<0-MAX_BARS>_BEAT_<0-MAX_TRACKS>.<0-MAX_SUBDIVISIONS>_TOGGLE
+    //<0-MAX_BARS>_SUBDIVISIONS_<0-MAX_TRACKS>
+    //<0-MAX_BARS>_MIDI_VALUE_<0-MAX_TRACKS>
+    //<0-MAX_BARS>_SUSTAIN_<0-MAX_TRACKS>
+    //<0-MAX_BARS>_TRACK_<0-MAX_TRACKS>_ENABLE
+    for (int barNum = 0; barNum < MAX_BARS; barNum++) {
+        for (int i = 0; i < MAX_TRACKS; i++)
         {
-            //Parameters for Polytrack Machine 
-            //BEAT_<0-MAX_MIDI_CHANNELS>.<0-MAX_TRACK_LENGTH>_TOGGLE
-            //SUBDIVISIONS_<0-MAX_MIDI_CHANNELS>
-            //MIDI_VALUE__<0-MAX_MIDI_CHANNELS>
-            //TRACK_<0-MAX_MIDI_CHANNELS>_ENABLE
-            for (int j = 0; j < MAX_TRACK_LENGTH; j++)
+            for (int j = 0; j < MAX_SUBDIVISIONS; j++)
             {
-                for (int barNum = 0; barNum < MAX_BARS; barNum++) {
-                    layout.add(std::make_unique<juce::AudioParameterBool>(getBeatToggleString(barNum, i, j), "Beat" + to_string(i) + "." + to_string(j) + "Toggle", false));
-                }
+
+                    layout.add(std::make_unique<juce::AudioParameterBool>(getBeatToggleString(barNum, i, j), to_string(barNum) + "_Beat" + to_string(i) + "." + to_string(j) + "Toggle", false));
+
             }
-            layout.add(std::make_unique<juce::AudioParameterInt>(getSubdivisionsString(i), "Subdivisions " + to_string(i), 1, MAX_TRACK_LENGTH, DEFAULT_SUBDIVISIONS));
-            layout.add(std::make_unique<juce::AudioParameterInt>(getMidiValueString(i), "Midi Value " + to_string(i), 0, 127, DEFAULT_MIDI_VALUE + i));
-            layout.add(std::make_unique<juce::AudioParameterInt>(getVelocityString(i), "Velocity " + to_string(i), 0, 127, DEFAULT_VELOCITY));
-            layout.add(std::make_unique<juce::AudioParameterFloat>(getSustainString(i), "Sustain " + to_string(i), 0, 100.0, DEFAULT_SUSTAIN));
-            layout.add(std::make_unique<juce::AudioParameterBool>(getTrackEnableString(i), "Track " + to_string(i) + " Enable", true));
+            layout.add(std::make_unique<juce::AudioParameterInt>(getSubdivisionsString(barNum, i), to_string(barNum) + "_Subdivisions " + to_string(i), 1, MAX_SUBDIVISIONS, DEFAULT_SUBDIVISIONS));
+            layout.add(std::make_unique<juce::AudioParameterInt>(getMidiValueString(barNum, i), to_string(barNum) + "_Midi Value " + to_string(i), 0, 127, DEFAULT_MIDI_VALUE + i));
+            layout.add(std::make_unique<juce::AudioParameterInt>(getVelocityString(barNum, i), to_string(barNum) + "_Velocity " + to_string(i), 0, 127, DEFAULT_VELOCITY));
+            layout.add(std::make_unique<juce::AudioParameterFloat>(getSustainString(barNum, i), to_string(barNum) + "_Sustain " + to_string(i), 0, 100.0, DEFAULT_SUSTAIN));
+            layout.add(std::make_unique<juce::AudioParameterBool>(getTrackEnableString(barNum, i), to_string(barNum) + "_Track " + to_string(i) + " Enable", true));
+            }
+
         }
 
  

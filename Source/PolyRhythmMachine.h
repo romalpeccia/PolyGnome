@@ -45,7 +45,7 @@ public:
     void resetParams(juce::MidiBuffer& midiBuffer); 
     int getTotalSamples() { return totalSamples; }
 
-    Track tracks[MAX_MIDI_CHANNELS];
+    Track tracks[MAX_TRACKS];
 
 private:
 

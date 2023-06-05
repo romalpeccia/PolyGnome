@@ -12,24 +12,24 @@
 #include <JuceHeader.h>
 
 
-juce::String getBeatToggleString(int barNum, int i, int j) {
-    return to_string(barNum)+ "_BEAT_" + to_string(i) + "_" + to_string(j) + "_TOGGLE";
+juce::String getBeatToggleString(int barNum, int trackNum, int beatNum) {
+    return to_string(barNum)+ "_BEAT_" + to_string(trackNum) + "_" + to_string(beatNum) + "_TOGGLE";
 }
 
-juce::String getSubdivisionsString(int i) {
-    return "SUBDIVISIONS_" + to_string(i);
+juce::String getSubdivisionsString(int barNum, int trackNum) {
+    return to_string(barNum) + "_SUBDIVISIONS_" + to_string(trackNum);
 }
-juce::String getVelocityString(int i) {
-    return "VELOCITY_" + to_string(i);
+juce::String getVelocityString(int barNum, int trackNum) {
+    return to_string(barNum) + "_VELOCITY_" + to_string(trackNum);
 }
-juce::String getMidiValueString(int i) {
-    return "MIDI_VALUE" + to_string(i);
+juce::String getMidiValueString(int barNum, int trackNum) {
+    return to_string(barNum) + "_MIDI_VALUE" + to_string(trackNum);
 }
-juce::String getSustainString(int i) {
-    return "SUSTAIN_" + to_string(i);
+juce::String getSustainString(int barNum, int trackNum) {
+    return to_string(barNum) + "_SUSTAIN_" + to_string(trackNum);
 }
-juce::String getTrackEnableString(int i) {
-    return "TRACK_" + to_string(i) + "_ENABLE";
+juce::String getTrackEnableString(int barNum, int trackNum) {
+    return to_string(barNum) + "_TRACK_" + to_string(trackNum) + "_ENABLE";
 }
 
 

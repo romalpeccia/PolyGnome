@@ -14,14 +14,14 @@
 using namespace std;
 
 
-const int MAX_TRACK_LENGTH = 16;
-const int MAX_MIDI_CHANNELS = 12;
+const int MAX_SUBDIVISIONS = 16;
+const int MAX_TRACKS = 12;
 const int MAX_BARS = 8;
 
 const float MAX_BPM = 480;
 const int DEFAULT_VELOCITY = 100;
-const int DEFAULT_MIDI_VALUE = 36; //0 - (128 - MAX_MIDI_CHANNELS)
-const int DEFAULT_SUBDIVISIONS = 4; //1 -  MAX_TRACK_LENGTH
+const int DEFAULT_MIDI_VALUE = 36; //0 - (128 - MAX_TRACKS)
+const int DEFAULT_SUBDIVISIONS = 4; //1 -  MAX_SUBDIVISIONS
 const int DEFAULT_SUSTAIN = 50.00; // 0 - 100
 
 const juce::Colour BACKGROUND_COLOUR = juce::Colours::black;
@@ -51,11 +51,11 @@ string midiIntToString(int midiValue);
 int midiStringToInt(string midiValue);
 
 juce::String getBeatToggleString(int barNum, int trackNum, int beatNum);
-juce::String getSubdivisionsString(int trackNum);
-juce::String getVelocityString(int trackNum);
-juce::String getMidiValueString(int trackNum);
-juce::String getSustainString(int trackNum);
-juce::String getTrackEnableString(int trackNum);
+juce::String getSubdivisionsString(int barNum, int trackNum);
+juce::String getVelocityString(int barNum, int trackNum);
+juce::String getMidiValueString(int barNum, int trackNum);
+juce::String getSustainString(int barNum, int trackNum);
+juce::String getTrackEnableString(int barNum, int trackNum);
 
 /*
 class CustomComponent : public virtual juce::Component {

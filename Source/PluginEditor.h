@@ -13,6 +13,38 @@
 #include "Utilities.h"
 
 
+class TrackComponent {
+public:
+    //MIDDLE COMPONENTS
+    CustomTextButton beatButtons[MAX_SUBDIVISIONS];
+
+    //RIGHT COMPONENTS
+    CustomSlider subdivisionSlider;
+    CustomSlider midiSlider;
+    CustomTextEditor midiTextEditor;
+
+    //LEFT COMPONENTS
+    CustomToggleButton muteButton;
+    CustomSlider velocitySlider;
+    CustomSlider sustainSlider;
+
+    //ATTACHMENTS
+    std::unique_ptr <juce::AudioProcessorValueTreeState::ButtonAttachment> muteButtonAttachment;
+    std::unique_ptr <juce::AudioProcessorValueTreeState::ButtonAttachment> beatButtonAttachments[MAX_SUBDIVISIONS];
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> subdivisionSliderAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> midiSliderAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> velocitySliderAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> sustainSliderAttachment;
+
+};
+
+
+class BarComponent {
+public:
+    TrackComponent tracks[MAX_TRACKS];
+
+};
+
 
 //==============================================================================
 /**
@@ -44,6 +76,11 @@ public:
     void colorSlider(juce::Slider &slider, juce::Colour thumbColour, juce::Colour textBoxTextColour, juce::Colour textBoxBackgroundColour, juce::Colour textBoxOutlineColour, bool trackEnabled);
     void colorTextEditor(juce::TextEditor &textEditor, juce::Colour textColour, juce::Colour focusedOutlineColour, juce::Colour outlineColour, juce::Colour backgroundColour, bool trackEnabled);
     //void colorTextButton(juce::TextButton& textButton, juce::Colour buttonColour, bool buttonEnabled, bool trackEnabled);
+
+
+
+
+
 private:
     PolyGnomeAudioProcessor& audioProcessor;
 
@@ -56,39 +93,25 @@ private:
     void savePreset();
     std::unique_ptr<juce::FileChooser> fileChooser;
 
+
+
+
     // TOP LEFT Components
     juce::Image logo;
     CustomTextButton playButton;
     CustomTextButton loadPresetButton;
     CustomTextButton savePresetButton;
     CustomTextEditor reminderTextEditor;
-
-    //MIDDLE COMPONENTS
-    CustomTextButton beatButtons[MAX_BARS][MAX_MIDI_CHANNELS][MAX_TRACK_LENGTH];
-
-    //RIGHT COMPONENTS
-    CustomSlider subdivisionSliders[MAX_MIDI_CHANNELS];
-    CustomSlider midiSliders[MAX_MIDI_CHANNELS];
-    CustomTextEditor midiTextEditors[MAX_MIDI_CHANNELS];
-
-    //LEFT COMPONENTS
-    CustomToggleButton muteButtons[MAX_MIDI_CHANNELS];
-    CustomSlider velocitySliders[MAX_MIDI_CHANNELS];
-    CustomSlider sustainSliders[MAX_MIDI_CHANNELS];
-
-    //BOTTOM COMPONENTS
-    CustomTextButton barButtons[MAX_BARS];
+    CustomTextButton barSelectButtons[MAX_BARS];
     CustomSlider barSlider;
-
-    //ATTACHMENTS
-    std::unique_ptr <juce::AudioProcessorValueTreeState::ButtonAttachment> muteButtonAttachments[MAX_MIDI_CHANNELS];
-    std::unique_ptr <juce::AudioProcessorValueTreeState::ButtonAttachment> beatButtonAttachments[MAX_BARS][MAX_MIDI_CHANNELS][MAX_TRACK_LENGTH];
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> subdivisionSliderAttachments[MAX_MIDI_CHANNELS];
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> midiSliderAttachments[MAX_MIDI_CHANNELS];
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> velocitySliderAttachments[MAX_MIDI_CHANNELS];
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> sustainSliderAttachments[MAX_MIDI_CHANNELS];
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> barSliderAttachment;
+
+    BarComponent bars[MAX_BARS];
+
+
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PolyGnomeAudioProcessorEditor)
 };
+
 
 
