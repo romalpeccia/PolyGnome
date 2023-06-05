@@ -79,7 +79,7 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
                 int midiValue = audioProcessor.apvts.getRawParameterValue(getMidiValueString(currentBar, i))->load();
                 audioProcessor.apvts.getRawParameterValue(getMidiValueString(targetBar, i))->store(midiValue);
                 bars[targetBar].tracks[i].midiSlider.setValue(midiValue);
-                bars[targetBar].tracks[i].midiTextEditor.setText(midiIntToString(midiValue) + " / " + to_string(midiValue));
+                bars[targetBar].tracks[i].midiTextEditor.setText(midiIntToString(midiValue) + " | " + to_string(midiValue));
 
                 int velocity = audioProcessor.apvts.getRawParameterValue(getVelocityString(currentBar, i))->load();
                 audioProcessor.apvts.getRawParameterValue(getVelocityString(targetBar, i))->store(velocity);
@@ -160,7 +160,7 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
 
             //initialize the text entry logic and UI for MIDI Values
             int currentIntValue = audioProcessor.apvts.getRawParameterValue(getMidiValueString(k, i))->load();
-            bars[k].tracks[i].midiTextEditor.setText(midiIntToString(currentIntValue) + " / " + to_string(currentIntValue));
+            bars[k].tracks[i].midiTextEditor.setText(midiIntToString(currentIntValue) + " | " + to_string(currentIntValue));
             bars[k].tracks[i].midiTextEditor.setReadOnly(false);
             colorTextEditor(bars[k].tracks[i].midiTextEditor, ACCENT_COLOUR, ACCENT_COLOUR, ACCENT_COLOUR, MAIN_COLOUR, true);
             bars[k].tracks[i].midiTextEditor.setHelpText(MIDI_TEXTEDITOR_REMINDER);
@@ -176,26 +176,26 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
                 {   //if the user inputted an int
                     convertedString = midiIntToString(inputInt);
                     if (convertedString != "") {
-                        bars[k].tracks[i].midiTextEditor.setText(convertedString + " / " + to_string(inputInt));
+                        bars[k].tracks[i].midiTextEditor.setText(convertedString + " | " + to_string(inputInt));
                         audioProcessor.apvts.getRawParameterValue(getMidiValueString(k, i))->store(inputInt);
                         //add control of MIDI slider to textbox
                         bars[k].tracks[i].midiSlider.setValue(inputInt);
                     }
                     else {
-                        bars[k].tracks[i].midiTextEditor.setText(midiIntToString(currentIntValue) + " / " + to_string(currentIntValue));
+                        bars[k].tracks[i].midiTextEditor.setText(midiIntToString(currentIntValue) + " | " + to_string(currentIntValue));
                     }
                 }
                 else
                 { //user inputted a string
                     int convertedInt = midiStringToInt(inputString);
                     if (convertedInt != -1) {
-                        bars[k].tracks[i].midiTextEditor.setText(inputString + " / " + to_string(convertedInt));
+                        bars[k].tracks[i].midiTextEditor.setText(inputString + " | " + to_string(convertedInt));
                         audioProcessor.apvts.getRawParameterValue(getMidiValueString(k, i))->store(convertedInt);
                         //add control of MIDI slider to textbox
                         bars[k].tracks[i].midiSlider.setValue(convertedInt);
                     }
                     else {
-                        bars[k].tracks[i].midiTextEditor.setText(midiIntToString(currentIntValue) + " / " + to_string(currentIntValue));
+                        bars[k].tracks[i].midiTextEditor.setText(midiIntToString(currentIntValue) + " | " + to_string(currentIntValue));
                     }
                 }
             };
@@ -339,6 +339,8 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
     int numBars = audioProcessor.apvts.getRawParameterValue("NUM_BARS")->load();
     int activeBar = audioProcessor.apvts.getRawParameterValue("ACTIVE_BAR")->load();
     int selectedBar = audioProcessor.apvts.getRawParameterValue("SELECTED_BAR")->load();
+
+    //possibly unecessary
     bool isBarLoopEnabled = audioProcessor.apvts.getRawParameterValue("AUTO_LOOP")->load();
     if (isBarLoopEnabled) {
         selectedBar = activeBar;
@@ -455,8 +457,7 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
         colorSlider(bars[selectedBar].tracks[i].sustainSlider, ACCENT_COLOUR, ACCENT_COLOUR, SECONDARY_COLOUR, ACCENT_COLOUR, isTrackEnabled);
         colorTextEditor(bars[selectedBar].tracks[i].midiTextEditor, ACCENT_COLOUR, ACCENT_COLOUR, ACCENT_COLOUR, MAIN_COLOUR, isTrackEnabled);
 
-        bars[selectedBar].tracks[i].midiTextEditor.toFront(false);
-        //hide any hidden track components TODO: possibly unecessary after changes
+        //hide any hidden track components 
         for (int k = 0; k < MAX_SUBDIVISIONS; k++) {
             if (k >= subdivisions) {
                 bars[selectedBar].tracks[i].beatButtons[k].setVisible(false);

@@ -50,6 +50,10 @@ void PolyGnomeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
     int selectedBar = apvts.getRawParameterValue("SELECTED_BAR")->load();
     int activeBar = apvts.getRawParameterValue("ACTIVE_BAR")->load();
     int isAutoLoopEnabled = apvts.getRawParameterValue("AUTO_LOOP")->load();
+
+
+
+
     if (selectedBar != activeBar && isAutoLoopEnabled) {
         apvts.getRawParameterValue("SELECTED_BAR")->store(activeBar);
     }

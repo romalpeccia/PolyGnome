@@ -27,7 +27,8 @@ struct Track {
     int midiValue = DEFAULT_MIDI_VALUE; 
     int velocity = DEFAULT_VELOCITY;
     float sustain = DEFAULT_SUSTAIN; //noteOffInterval = sustain * samplesPerInterval - 1
-    bool noteOffFlag = false;
+    bool noteOffQueued = false;
+    bool barComplete = false;
 };        
 
 
@@ -44,6 +45,7 @@ public:
     void resetParams();
     void resetParams(juce::MidiBuffer& midiBuffer); 
     int getTotalSamples() { return totalSamples; }
+    void handleBarChange();
 
     Track tracks[MAX_TRACKS];
 
@@ -56,7 +58,6 @@ private:
     double samplesPerBar = 0; //= 4 * (60.0 / bpm) * sampleRate;
     double bpm = 120;
     int barCounter = 0;
-
     //apvts of caller that created this instance of polyRhythmMachine
     juce::AudioProcessorValueTreeState* apvts;
 
