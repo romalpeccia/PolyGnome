@@ -50,6 +50,9 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
             barCounter = 0;
         }
         apvts->getRawParameterValue("ACTIVE_BAR")->store(barCounter);
+        if (apvts->getRawParameterValue("AUTO_LOOP")->load() == true) {
+            apvts->getRawParameterValue("SELECTED_BAR")->store(barCounter);
+        }
 
     }
     

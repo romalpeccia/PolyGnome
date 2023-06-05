@@ -54,6 +54,7 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
     };
     autoLoopButton.setHelpText(AUTO_LOOP_REMINDER);
     autoLoopButton.setButtonText("Auto-Loop");
+
     for (int i = 0; i < MAX_BARS; i++)
     { //initialize the bar buttons
         barSelectButtons[i].onClick = [this, i]() {
@@ -302,10 +303,10 @@ void PolyGnomeAudioProcessorEditor::paint(juce::Graphics& g)
                 barSelectButtons[j].setColour(juce::TextButton::ColourIds::buttonColourId, ENABLED_COLOUR);
             }
             else if (j == selectedBar) {
-                barSelectButtons[j].setColour(juce::TextButton::ColourIds::buttonColourId, SECONDARY_COLOUR);
+                barSelectButtons[j].setColour(juce::TextButton::ColourIds::buttonColourId, MAIN_COLOUR);
             }
             else if (j == activeBar) {
-                barSelectButtons[j].setColour(juce::TextButton::ColourIds::buttonColourId, MAIN_COLOUR);
+                barSelectButtons[j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_DARK_COLOUR);
             }
             else {
                 barSelectButtons[j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR);
@@ -314,16 +315,6 @@ void PolyGnomeAudioProcessorEditor::paint(juce::Graphics& g)
     }
     
     paintPolyRhythmMachine(g);
-}
-
-juce::Rectangle<int> PolyGnomeAudioProcessorEditor::getVisualArea()
-{
-    auto bounds = getLocalBounds();
-    //visual area consists of middle third of top third of area 
-    auto visualArea = bounds.removeFromTop(bounds.getHeight() * 0.66);
-    visualArea.removeFromLeft(visualArea.getWidth() * 0.33);
-    visualArea.removeFromRight(visualArea.getWidth() * 0.5);
-    return visualArea;
 }
 
 void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
@@ -343,14 +334,7 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
     int spacing = height / MAX_TRACKS;
     Y = Y + spacing;
 
-    //hide any hidden buttons
-    for (int j = 0; j < MAX_BARS; j++){
-        for (int i = 0; i < MAX_TRACKS; i++) {
-            for (auto* comp : getTrackComps(j, i)) {
-                comp->setVisible(false);
-            }
-        }
-    }
+
 
     int numBars = audioProcessor.apvts.getRawParameterValue("NUM_BARS")->load();
     int activeBar = audioProcessor.apvts.getRawParameterValue("ACTIVE_BAR")->load();
@@ -359,9 +343,18 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
     if (isBarLoopEnabled) {
         selectedBar = activeBar;
     }
+
+    //hide any hidden components
+    for (int j = 0; j < MAX_BARS; j++) {
+        if (j != selectedBar){
+            for (int i = 0; i < MAX_TRACKS; i++) {
+                for (auto* comp : getTrackComps(j, i)) {
+                    comp->setVisible(false);
+                }
+            }
+        }
+    }
     //main loop to draw the tracks and all of its components
-
-
     for (int i = 0; i < MAX_TRACKS; i++) {
 
         //draw the components to the left of the tracks
@@ -462,6 +455,7 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
         colorSlider(bars[selectedBar].tracks[i].sustainSlider, ACCENT_COLOUR, ACCENT_COLOUR, SECONDARY_COLOUR, ACCENT_COLOUR, isTrackEnabled);
         colorTextEditor(bars[selectedBar].tracks[i].midiTextEditor, ACCENT_COLOUR, ACCENT_COLOUR, ACCENT_COLOUR, MAIN_COLOUR, isTrackEnabled);
 
+        bars[selectedBar].tracks[i].midiTextEditor.toFront(false);
         //hide any hidden track components TODO: possibly unecessary after changes
         for (int k = 0; k < MAX_SUBDIVISIONS; k++) {
             if (k >= subdivisions) {
@@ -471,7 +465,15 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
     }
 }
 
-
+juce::Rectangle<int> PolyGnomeAudioProcessorEditor::getVisualArea()
+{
+    auto bounds = getLocalBounds();
+    //visual area consists of middle third of top third of area 
+    auto visualArea = bounds.removeFromTop(bounds.getHeight() * 0.66);
+    visualArea.removeFromLeft(visualArea.getWidth() * 0.33);
+    visualArea.removeFromRight(visualArea.getWidth() * 0.5);
+    return visualArea;
+}
 
 
 void PolyGnomeAudioProcessorEditor::toggleAudioProcessorChildrenStates()

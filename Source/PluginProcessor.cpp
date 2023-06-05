@@ -47,8 +47,12 @@ void PolyGnomeAudioProcessor::releaseResources()
 
 void PolyGnomeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-    int barNum = apvts.getRawParameterValue("SELECTED_BAR")->load();
-    DBG(barNum);
+    int selectedBar = apvts.getRawParameterValue("SELECTED_BAR")->load();
+    int activeBar = apvts.getRawParameterValue("ACTIVE_BAR")->load();
+    int isAutoLoopEnabled = apvts.getRawParameterValue("AUTO_LOOP")->load();
+    if (selectedBar != activeBar && isAutoLoopEnabled) {
+        apvts.getRawParameterValue("SELECTED_BAR")->store(activeBar);
+    }
 
     auto positionInfo = getPlayHead()->getPosition();
     if (positionInfo) {
