@@ -58,7 +58,6 @@ public:
     //==============================================================================
     void paint(juce::Graphics&) override;
     void paintPolyRhythmMachine(juce::Graphics& g);
-    void changeOptionsButtonColors(juce::TextButton *buttonOn);
 
     juce::Rectangle<int> getVisualArea();
 
@@ -103,12 +102,13 @@ private:
     CustomTextButton savePresetButton;
     CustomTextEditor reminderTextEditor;
     CustomTextButton barSelectButtons[MAX_BARS];
+    CustomTextButton barCopyButtons[MAX_BARS];
     CustomSlider barSlider;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> barSliderAttachment;
 
     BarComponent bars[MAX_BARS];
 
-
+    CustomTextButton autoLoopButton;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PolyGnomeAudioProcessorEditor)
 };

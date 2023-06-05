@@ -33,6 +33,7 @@ const juce::Colour DISABLED_COLOUR = juce::Colours::grey;
 const juce::Colour DISABLED_DARK_COLOUR = juce::Colours::darkgrey; 
 const juce::Colour ENABLED_COLOUR = juce::Colours::green; //default green
 
+//TODO turn these into functions and make them dynamic strings
 const string BEAT_BUTTON_REMINDER = "Toggle Beat";
 const string MUTE_BUTTON_REMINDER = "mute all beats for this track";
 const string SUBDIVISION_SLIDER_REMINDER = "change the number of subdivisions per bar for this track";
@@ -45,7 +46,9 @@ const string LOAD_PRESET_BUTTON_REMINDER = "load a .pgnome file";
 const string SAVE_PRESET_BUTTON_REMINDER = "save a .pgnome file";
 const string BPM_SLIDER_REMINDER = "change bpm";
 const string RACK_SLIDER_REMINDER = "adjust how many bars per loop";
-const string RACK_BUTTON_REMINDER = "select a bar of the loop";
+const string BAR_SELECT_BUTTON_REMINDER = "select a bar of the loop";
+const string AUTO_LOOP_REMINDER = "automatically switch to page cooresponding to currently playing bar";
+const string BAR_COPY_BUTTON_REMINDER = "copy currently selected page to different bar";
 
 string midiIntToString(int midiValue);
 int midiStringToInt(string midiValue);

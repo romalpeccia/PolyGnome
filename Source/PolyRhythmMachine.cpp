@@ -42,7 +42,17 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
     resetParams(midiBuffer); //checks if user params have changed and updates class variables accordingly
     auto bufferSize = buffer.getNumSamples(); //usually 16, 32, 64... 1024...
     totalSamples += bufferSize; 
+    
+    if (totalSamples > samplesPerBar) {
+        int numBars = apvts->getRawParameterValue("NUM_BARS")->load();
+        barCounter += 1;
+        if (barCounter >= numBars){
+            barCounter = 0;
+        }
+        apvts->getRawParameterValue("ACTIVE_BAR")->store(barCounter);
 
+    }
+    
     //TODO: old test case, possibly no longer relevant, double check
     /*
     for (int i = 0; i < MAX_TRACKS; i++) {
@@ -78,13 +88,9 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
         }
 
         float samplesCounted = tracks[i].samplesPerInterval * (tracks[i].beatCounter);
-
-
-        int barNum = apvts->getRawParameterValue("SELECTED_BAR")->load();
-
         if (tracks[i].samplesProcessed >= samplesCounted) {
             if (tracks[i].beatCounter < MAX_SUBDIVISIONS) {
-                if (apvts->getRawParameterValue(getBeatToggleString(barNum, i, tracks[i].beatCounter))->load() == true ) {
+                if (apvts->getRawParameterValue(getBeatToggleString(barCounter, i, tracks[i].beatCounter))->load() == true ) {
                     
                     //TODO: sort out this bufferPosition calculation error. possibly related to GUI error?. possibly completely irrelevant variable
                     int bufferPosition = totalSamples - samplesCounted; //TODO: maybe this should be samplesProcessed instead of totalSamples
@@ -99,7 +105,7 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
                         */
                         ;
                     }
-                    if (apvts->getRawParameterValue(getTrackEnableString(barNum, i))->load() == true) {
+                    if (apvts->getRawParameterValue(getTrackEnableString(barCounter, i))->load() == true) {
                         handleNoteTrigger(midiBuffer, tracks[i].midiValue, tracks[i].velocity, bufferPosition);
                         tracks[i].noteOffFlag = true;
                     }
@@ -164,19 +170,19 @@ void PolyRhythmMachine::resetParams()
     bpm = apvts->getRawParameterValue("BPM")->load();
     int barNum = apvts->getRawParameterValue("SELECTED_BAR")->load();
     for (int i = 0; i < MAX_TRACKS; i++) {
-        int tempRhythmValue = apvts->getRawParameterValue(getSubdivisionsString(barNum, i))->load();;
-        if (tracks[i].subdivisions != tempRhythmValue)
+        int tempSubdivisionValue = apvts->getRawParameterValue(getSubdivisionsString(barNum, i))->load();;
+        if (tracks[i].subdivisions != tempSubdivisionValue)
         {
 
             auto oldRatio = (double)(tracks[i].beatCounter + 1.0) / (double)(tracks[i].subdivisions);
             /*
             DBG("i:" << i);
-            DBG("tempRhythmValue" << tempRhythmValue);
+            DBG("tempSubdivisionValue" << tempSubdivisionValue);
             DBG("oldsubd: " << tracks[i].subdivisions);
             DBG("oldcounter: " <<  tracks[i].beatCounter);
             DBG("oldRatio:" << oldRatio);
             */
-            tracks[i].subdivisions = tempRhythmValue;
+            tracks[i].subdivisions = tempSubdivisionValue;
             //solve for new tracks[i].beatCounter
 
             tracks[i].beatCounter = (int)(oldRatio * tracks[i].subdivisions);

@@ -85,14 +85,14 @@ juce::AudioProcessorValueTreeState::ParameterLayout PolyGnomeAudioProcessor::cre
 
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
 
-    //TODO: maybe use of format strings would make accessing these strings cleaner
     layout.add(std::make_unique<juce::AudioParameterBool>("ON/OFF", "On/Off", false));
+    layout.add(std::make_unique<juce::AudioParameterBool>("AUTO_LOOP", "auto loop", false));
     layout.add(std::make_unique<juce::AudioParameterBool>("DAW_CONNECTED", "DAW Connected", false));
-    layout.add(std::make_unique<juce::AudioParameterInt>("SAMPLES_ELAPSED", "samples elapsed", 0, 2147483647, 0));
     layout.add(std::make_unique<juce::AudioParameterInt>("NUM_BARS", "num bars", 1, MAX_BARS, 1));
     layout.add(std::make_unique<juce::AudioParameterInt>("SELECTED_BAR", "selected bar", 0, MAX_BARS - 1, 0));
+    layout.add(std::make_unique<juce::AudioParameterInt>("ACTIVE_BAR", "active bar", 0, MAX_BARS - 1, 0));
     layout.add(std::make_unique<juce::AudioParameterFloat>("BPM", "bpm", juce::NormalisableRange<float>(1.f, 480.f, 0.1f, 0.25f), 120.f));
-
+    layout.add(std::make_unique<juce::AudioParameterInt>("SAMPLES_ELAPSED", "samples elapsed", 0, 2147483647, 0));
     //Parameters for Polytrack Machine 
     //<0-MAX_BARS>_BEAT_<0-MAX_TRACKS>.<0-MAX_SUBDIVISIONS>_TOGGLE
     //<0-MAX_BARS>_SUBDIVISIONS_<0-MAX_TRACKS>
