@@ -104,11 +104,6 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
 
             }
             tracks[i].beatCounter += 1;
-            /*
-            if (totalSamples > samplesPerBar) {
-                tracks[i].beatCounter ==0;
-            }
-            */
         }
     }
 
@@ -134,6 +129,20 @@ void PolyRhythmMachine::handleBarChange() {
     for (int i = 0; i < MAX_TRACKS; i++) {
         tracks[i].beatCounter = 0;
         //tracks[i].samplesProcessed -= samplesPerBar;
+        int tempSubdivisionValue = apvts->getRawParameterValue(getSubdivisionsString(barCounter, i))->load();
+        if (tracks[i].subdivisions != tempSubdivisionValue)
+        {
+            tracks[i].subdivisions = tempSubdivisionValue;
+        }
+        int tempVelocity = apvts->getRawParameterValue(getVelocityString(barCounter, i))->load();
+        if (tracks[i].velocity != tempVelocity) {
+            tracks[i].velocity = tempVelocity;
+        }
+
+        int tempSustain = apvts->getRawParameterValue(getSustainString(barCounter, i))->load();
+        if (tracks[i].sustain != tempSustain) {
+            tracks[i].sustain = tempSustain;
+        }
         
     }
     resetParams();
@@ -159,6 +168,8 @@ void PolyRhythmMachine::resetAll()
     for (int i = 0; i < MAX_TRACKS; i++) {
         tracks[i].beatCounter = 0;
         tracks[i].samplesProcessed = 0;
+
+
     }
 }
 
@@ -169,7 +180,7 @@ void PolyRhythmMachine::resetParams(juce::MidiBuffer& midiBuffer)
   
 
     resetParams();
-    int barNum = apvts->getRawParameterValue("SELECTED_BAR")->load();
+    int barNum = apvts->getRawParameterValue("ACTIVE_BAR")->load();
     for (int i = 0; i < MAX_TRACKS; i++) {
         int tempMidiValue = apvts->getRawParameterValue(getMidiValueString(barNum, i))->load();
         if (tracks[i].midiValue != tempMidiValue)
@@ -186,7 +197,9 @@ void PolyRhythmMachine::resetParams()
    //the variables keeping track of time should be reset to reflect the new track
 
     bpm = apvts->getRawParameterValue("BPM")->load();
-    int barNum = apvts->getRawParameterValue("SELECTED_BAR")->load();
+    int barNum = apvts->getRawParameterValue("ACTIVE_BAR")->load();
+    samplesPerBar = 4 * (60.0 / bpm) * sampleRate;
+
     for (int i = 0; i < MAX_TRACKS; i++) {
         int tempSubdivisionValue = apvts->getRawParameterValue(getSubdivisionsString(barNum, i))->load();;
         if (tracks[i].subdivisions != tempSubdivisionValue)
@@ -210,9 +223,6 @@ void PolyRhythmMachine::resetParams()
             */
 
         }
-
-
-
         int tempVelocity = apvts->getRawParameterValue(getVelocityString(barNum, i))->load();
         if (tracks[i].velocity != tempVelocity) {
             tracks[i].velocity = tempVelocity;
@@ -222,9 +232,7 @@ void PolyRhythmMachine::resetParams()
         if (tracks[i].sustain != tempSustain) {
             tracks[i].sustain = tempSustain;
         }
-
-
-        samplesPerBar = 4 * (60.0 / bpm) * sampleRate;
         tracks[i].samplesPerInterval = samplesPerBar / tracks[i].subdivisions;
-    }
+    }        
+
 }
