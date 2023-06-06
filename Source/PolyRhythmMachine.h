@@ -47,7 +47,7 @@ public:
     void resetParams();
     void resetParams(juce::MidiBuffer& midiBuffer); 
     int getTotalSamples() { return totalSamples; }
-    void handleBarChange();
+    void handleBarChange(juce::MidiBuffer& midiBuffer);
 
     Bar bars[MAX_BARS]; 
 

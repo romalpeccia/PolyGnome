@@ -53,7 +53,7 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
         }
     }
     */
-
+    
     for (int j = 0; j < MAX_BARS; j++) {
         for (int i = 0; i < MAX_TRACKS; i++) {
 
@@ -67,11 +67,14 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
 
             //turn any previously played notes off 
             float samplesAfterBeat = (((bars[j].tracks[i].beatCounter - 1) * bars[j].tracks[i].samplesPerInterval) + ((bars[j].tracks[i].sustain / 100) * bars[j].tracks[i].samplesPerInterval)); // the amount of samples for all intervals that have happened + the amount of samples after the latest interval
-            if (bars[j].tracks[i].samplesProcessed > samplesAfterBeat && bars[j].tracks[i].noteOffQueued == true) {
-                auto messageOff = juce::MidiMessage::noteOff(MIDI_CHANNEL, bars[j].tracks[i].midiValue + TEMP_MIDI_BUGFIX_NUM);
-                midiBuffer.addEvent(messageOff, totalSamples - samplesAfterBeat);
-                bars[j].tracks[i].noteOffQueued = false;
+            if (j == barCounter) {
+                if (bars[j].tracks[i].samplesProcessed > samplesAfterBeat && bars[j].tracks[i].noteOffQueued == true) {
+                    auto messageOff = juce::MidiMessage::noteOff(MIDI_CHANNEL, bars[j].tracks[i].midiValue + TEMP_MIDI_BUGFIX_NUM);
+                    midiBuffer.addEvent(messageOff, totalSamples - samplesAfterBeat);
+                    bars[j].tracks[i].noteOffQueued = false;
+                }
             }
+
 
             //reset the beat counters if it's been looped
             if (bars[j].tracks[i].beatCounter > bars[j].tracks[i].subdivisions) {
@@ -81,51 +84,52 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
 
             float samplesCounted = bars[j].tracks[i].samplesPerInterval * (bars[j].tracks[i].beatCounter);
             if (bars[j].tracks[i].samplesProcessed >= samplesCounted) {
-                if (bars[j].tracks[i].beatCounter < MAX_SUBDIVISIONS) {
-                    if (apvts->getRawParameterValue(getBeatToggleString(barCounter, i, bars[j].tracks[i].beatCounter))->load() == true) {
 
-                        //TODO: sort out this bufferPosition calculation error. possibly related to GUI error?. possibly completely irrelevant variable
-                        int bufferPosition = totalSamples - samplesCounted; //TODO: maybe this should be samplesProcessed instead of totalSamples
-                        //bufferPosition = 0; //for debugging
-                        if (bufferPosition > bufferSize)
-                        {
-                            /*
-                            DBG("midi buffer calculation error");
-                            DBG(tracks[i].samplesPerInterval);
-                            DBG(totalSamples);
-                            DBG(samplesCounted);
-                            */
-                            ;
-                        }
-                        if (apvts->getRawParameterValue(getTrackEnableString(barCounter, i))->load() == true) {
-                            handleNoteTrigger(midiBuffer, bars[j].tracks[i].midiValue, bars[j].tracks[i].velocity, bufferPosition);
-                            bars[j].tracks[i].noteOffQueued = true;
+                if (j == barCounter) {
+                    if (bars[j].tracks[i].beatCounter < MAX_SUBDIVISIONS) {
+                        if (apvts->getRawParameterValue(getBeatToggleString(barCounter, i, bars[j].tracks[i].beatCounter))->load() == true) {
+
+                            //TODO: sort out this bufferPosition calculation error. possibly related to GUI error?. possibly completely irrelevant variable
+                            int bufferPosition = totalSamples - samplesCounted; //TODO: maybe this should be samplesProcessed instead of totalSamples
+                            //bufferPosition = 0; //for debugging
+                            if (bufferPosition > bufferSize)
+                            {
+                                /*
+                                DBG("midi buffer calculation error");
+                                DBG(tracks[i].samplesPerInterval);
+                                DBG(totalSamples);
+                                DBG(samplesCounted);
+                                */
+                                ;
+                            }
+                            if (apvts->getRawParameterValue(getTrackEnableString(barCounter, i))->load() == true) {
+                                handleNoteTrigger(midiBuffer, bars[j].tracks[i].midiValue, bars[j].tracks[i].velocity, bufferPosition);
+                                bars[j].tracks[i].noteOffQueued = true;
+                            }
                         }
                     }
-
                 }
                 bars[j].tracks[i].beatCounter += 1;
             }
         }
-
     }
 
 
     if (totalSamples + bufferSize > samplesPerBar) {
         totalSamples -= samplesPerBar;
-            handleBarChange();
+            handleBarChange(midiBuffer);
     }
 
 }
 
-void PolyRhythmMachine::handleBarChange() {
+void PolyRhythmMachine::handleBarChange(juce::MidiBuffer& midiBuffer) {
     int numBars = apvts->getRawParameterValue("NUM_BARS")->load();
     barCounter += 1;
     if (barCounter >= numBars) {
         barCounter = 0;
     }
 
-   
+    resetParams(midiBuffer);
     apvts->getRawParameterValue("ACTIVE_BAR")->store(barCounter);
     if (apvts->getRawParameterValue("AUTO_LOOP")->load() == true) {
         apvts->getRawParameterValue("SELECTED_BAR")->store(barCounter);
@@ -135,6 +139,7 @@ void PolyRhythmMachine::handleBarChange() {
         for (int i = 0; i < MAX_TRACKS; i++) {
             bars[j].tracks[i].beatCounter = 0;
             //tracks[i].samplesProcessed -= samplesPerBar;
+            /*
             int tempSubdivisionValue = apvts->getRawParameterValue(getSubdivisionsString(j, i))->load();
             if (bars[j].tracks[i].subdivisions != tempSubdivisionValue)
             {
@@ -149,12 +154,12 @@ void PolyRhythmMachine::handleBarChange() {
             if (bars[j].tracks[i].sustain != tempSustain) {
                 bars[j].tracks[i].sustain = tempSustain;
             }
-
+            */
         }
 
     }
 
-    resetParams();
+
 }
 
 
@@ -188,18 +193,16 @@ void PolyRhythmMachine::resetParams(juce::MidiBuffer& midiBuffer)
   
 
     resetParams();
-    //int barNum = apvts->getRawParameterValue("ACTIVE_BAR")->load();
-    for (int j = 0; j < MAX_BARS; j++) {
-        for (int i = 0; i < MAX_TRACKS; i++) {
-            int tempMidiValue = apvts->getRawParameterValue(getMidiValueString(j, i))->load();
-            if (bars[j].tracks[i].midiValue != tempMidiValue)
-            {
-                auto messageOff = juce::MidiMessage::noteOff(MIDI_CHANNEL, bars[j].tracks[i].midiValue + TEMP_MIDI_BUGFIX_NUM);
-                midiBuffer.addEvent(messageOff, 0);
-                bars[j].tracks[i].midiValue = tempMidiValue;
-            }
+    for (int i = 0; i < MAX_TRACKS; i++) {
+        int tempMidiValue = apvts->getRawParameterValue(getMidiValueString(barCounter, i))->load();
+        if (bars[barCounter].tracks[i].midiValue != tempMidiValue)
+        {
+            auto messageOff = juce::MidiMessage::noteOff(MIDI_CHANNEL, bars[barCounter].tracks[i].midiValue + TEMP_MIDI_BUGFIX_NUM);
+            midiBuffer.addEvent(messageOff, 0);
+            bars[barCounter].tracks[i].midiValue = tempMidiValue;
         }
     }
+    
 
 }
 
