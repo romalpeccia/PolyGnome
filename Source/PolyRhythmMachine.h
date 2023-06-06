@@ -19,7 +19,7 @@ using namespace std;
 
 struct Track {
     int samplesPerInterval = 0; //samples per subdivided beat, updated when user changes a param. samplesPerInterval =  4 * ((60.0 / bpm) * sampleRate) / tracks[i].subdivisions;
-    int samplesProcessed = 0; //TODO remove this, make it a single class variable
+    
     int beatCounter = 0; // counts by 1 after each subdivided beat has been played (from 0 to num subdivisions) then resets to 0. 
 
     //user adjustable values
@@ -46,7 +46,7 @@ public:
     void resetAll();
     void resetParams();
     void resetParams(juce::MidiBuffer& midiBuffer); 
-    int getTotalSamples() { return totalSamples; }
+    int getTotalSamples() { return samplesProcessed; }
     void handleBarChange(juce::MidiBuffer& midiBuffer);
 
     Bar bars[MAX_BARS]; 
@@ -54,8 +54,7 @@ public:
 private:
 
     void PolyRhythmMachine::handleNoteTrigger(juce::MidiBuffer&, int noteNumber, int velocity, int bufferPosition);
-
-    int totalSamples = 0; //total samples since start time
+    int samplesProcessed = 0; //total samples since start time
     double sampleRate = 0; //sampleRate from DAW, usually 44100 samples/beat
     double samplesPerBar = 0; //= 4 * (60.0 / bpm) * sampleRate;
     double bpm = 120;
