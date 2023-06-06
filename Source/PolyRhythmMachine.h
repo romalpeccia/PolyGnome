@@ -30,7 +30,9 @@ struct Track {
     bool noteOffQueued = false;
     bool barComplete = false;
 };        
-
+struct Bar {
+    Track tracks[MAX_TRACKS];
+};
 
 class PolyRhythmMachine : public juce::Component
 {
@@ -40,14 +42,14 @@ public:
     ~PolyRhythmMachine() override;
 
     void prepareToPlay(double _sampleRate, int samplesPerBlock);
-    void getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiBuffer);// override; //no override?
+    void getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiBuffer);
     void resetAll();
     void resetParams();
     void resetParams(juce::MidiBuffer& midiBuffer); 
     int getTotalSamples() { return totalSamples; }
     void handleBarChange();
 
-    Track tracks[MAX_TRACKS];
+    Bar bars[MAX_BARS]; 
 
 private:
 

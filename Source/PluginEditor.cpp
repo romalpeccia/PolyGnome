@@ -392,7 +392,7 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
 
             //TODO : clean this?
             if (audioProcessor.apvts.getRawParameterValue(getBeatToggleString(selectedBar, i, j))->load() == true) {
-                if (j == audioProcessor.polyRhythmMachine.tracks[i].beatCounter - 1) {
+                if (j == audioProcessor.polyRhythmMachine.bars[selectedBar].tracks[i].beatCounter - 1) {
                     if (isBeatEnabled) {
                         bars[selectedBar].tracks[i].beatButtons[j].setColour(juce::TextButton::ColourIds::buttonOnColourId, ENABLED_COLOUR);
                     }
@@ -411,7 +411,7 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
                 }
             }
             else {
-                if (j == audioProcessor.polyRhythmMachine.tracks[i].beatCounter - 1 && audioProcessor.polyRhythmMachine.tracks[i].subdivisions != 1) {
+                if (j == audioProcessor.polyRhythmMachine.bars[selectedBar].tracks[i].beatCounter - 1 && audioProcessor.polyRhythmMachine.bars[selectedBar].tracks[i].subdivisions != 1) {
                     if (isBeatEnabled) {
                         bars[selectedBar].tracks[i].beatButtons[j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_DARK_COLOUR);
                     }
