@@ -48,6 +48,7 @@ void PolyGnomeAudioProcessor::releaseResources()
 
 void PolyGnomeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
+    //get internal Bar state info
     int selectedBar = apvts.getRawParameterValue("SELECTED_BAR")->load();
     int activeBar = apvts.getRawParameterValue("ACTIVE_BAR")->load();
     int isAutoLoopEnabled = apvts.getRawParameterValue("AUTO_LOOP")->load();
@@ -55,11 +56,11 @@ void PolyGnomeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
     if (selectedBar >= numBars) {
         apvts.getRawParameterValue("SELECTED_BAR")->store(numBars - 1);
     }
-
     if (selectedBar != activeBar && isAutoLoopEnabled) {
         apvts.getRawParameterValue("SELECTED_BAR")->store(activeBar);
     }
 
+    //get DAW INFO
     auto positionInfo = getPlayHead()->getPosition();
     if (positionInfo) {
         auto bpmInfo = (*positionInfo).getBpm();
@@ -81,6 +82,19 @@ void PolyGnomeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
 
     }
 
+    //process incoming notes for active miditexteditor
+    int selectedMidi = apvts.getRawParameterValue("SELECTED_MIDI")->load();
+    if (selectedMidi != -1){
+        juce::MidiBuffer::Iterator iterator(midiMessages);
+        juce::MidiMessage currentMessage;
+        int samplePos;
+        if (iterator.getNextEvent(currentMessage, samplePos)) {
+            if (currentMessage.isNoteOn()) {
+                DBG(currentMessage.getDescription());
+                apvts.getRawParameterValue(getMidiValueString(selectedBar, selectedMidi))->store(currentMessage.getNoteNumber());
+            }
+        }
+    }
 
     midiMessages.clear(); //clear any noise in the midiBuffer
     if (apvts.getRawParameterValue("ON/OFF")->load() == true)
@@ -97,6 +111,8 @@ void PolyGnomeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
             midiNeedsClearing = false;
         }
     }
+
+
     keyboardState.processNextMidiBuffer(midiMessages, 0, buffer.getNumSamples(), false);
 
 
@@ -116,6 +132,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PolyGnomeAudioProcessor::cre
     layout.add(std::make_unique<juce::AudioParameterInt>("ACTIVE_BAR", "active bar", 0, MAX_BARS - 1, 0));
     layout.add(std::make_unique<juce::AudioParameterFloat>("BPM", "bpm", juce::NormalisableRange<float>(1.f, 480.f, 0.1f, 0.25f), 120.f));
     layout.add(std::make_unique<juce::AudioParameterInt>("SAMPLES_ELAPSED", "samples elapsed", 0, 2147483647, 0));
+    layout.add(std::make_unique<juce::AudioParameterInt>("SELECTED_MIDI", "selected midi", -1, MAX_TRACKS, -1));
     //Parameters for Polytrack Machine 
     //<0-MAX_BARS>_BEAT_<0-MAX_TRACKS>.<0-MAX_SUBDIVISIONS>_TOGGLE
     //<0-MAX_BARS>_SUBDIVISIONS_<0-MAX_TRACKS>
@@ -133,7 +150,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PolyGnomeAudioProcessor::cre
             }
             layout.add(std::make_unique<juce::AudioParameterInt>(getSubdivisionsString(barNum, i), to_string(barNum) + "_Subdivisions " + to_string(i), 1, MAX_SUBDIVISIONS, DEFAULT_SUBDIVISIONS));
             layout.add(std::make_unique<juce::AudioParameterInt>(getMidiValueString(barNum, i), to_string(barNum) + "_Midi Value " + to_string(i), 0, MAX_MIDI_VALUE, DEFAULT_MIDI_VALUE + i));
-            layout.add(std::make_unique<juce::AudioParameterInt>(getVelocityString(barNum, i), to_string(barNum) + "_Velocity " + to_string(i), 0, MAX_MIDI_VALUE, DEFAULT_VELOCITY));
+            layout.add(std::make_unique<juce::AudioParameterInt>(getVelocityString(barNum, i), to_string(barNum) + "_Velocity " + to_string(i), 0, MAX_VELOCITY, DEFAULT_VELOCITY));
             layout.add(std::make_unique<juce::AudioParameterFloat>(getSustainString(barNum, i), to_string(barNum) + "_Sustain " + to_string(i), 0, 100.0, DEFAULT_SUSTAIN));
             layout.add(std::make_unique<juce::AudioParameterBool>(getTrackEnableString(barNum, i), to_string(barNum) + "_Track " + to_string(i) + " Enable", true));
             }

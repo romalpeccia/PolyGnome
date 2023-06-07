@@ -168,6 +168,7 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
 
 
             bars[k].tracks[i].midiTextEditor.onReturnKey = [this, k, i]() {
+                bars[k].tracks[i].midiTextEditor.giveAwayKeyboardFocus();
                 juce::String input = bars[k].tracks[i].midiTextEditor.getText();
                 string inputString = input.toStdString();
                 int inputInt;
@@ -204,7 +205,7 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
             //add control of textbox to MIDI slider
             bars[k].tracks[i].midiSlider.onValueChange = [this, k , i]() {
                 int sliderInt = bars[k].tracks[i].midiSlider.getValue();
-                bars[k].tracks[i].midiTextEditor.setText(midiIntToString(sliderInt) + " / " + to_string(sliderInt));
+                bars[k].tracks[i].midiTextEditor.setText(midiIntToString(sliderInt) + " | " + to_string(sliderInt));
             };
 
 
@@ -274,17 +275,6 @@ void PolyGnomeAudioProcessorEditor::paint(juce::Graphics& g)
     g.fillAll(BACKGROUND_COLOUR);
     g.drawImageAt(logo, 0, 0);
 
-    
-    for (int i = 0; i < MAX_MIDI_VALUE; i++) {
-
-        if (audioProcessor.keyboardState.isNoteOnForChannels(0xffff, i)) {
-            keyboard.keyboardState .noteOn(MIDI_CHANNEL, i, 1.f);
-        }
-        else {
-            keyboard.keyboardState.noteOff(MIDI_CHANNEL, i, 1.f);
-        }
-    }
-    
 
     if (audioProcessor.apvts.getRawParameterValue("ON/OFF")->load() == true) {
         playButton.setColour(juce::TextButton::ColourIds::buttonColourId, MAIN_COLOUR);
@@ -292,6 +282,7 @@ void PolyGnomeAudioProcessorEditor::paint(juce::Graphics& g)
     else {
         playButton.setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR);
     }
+
     if (audioProcessor.apvts.getRawParameterValue("AUTO_LOOP")->load() == true) {
         autoLoopButton.setColour(juce::TextButton::ColourIds::buttonColourId, MAIN_COLOUR);
     }
@@ -299,13 +290,48 @@ void PolyGnomeAudioProcessorEditor::paint(juce::Graphics& g)
         autoLoopButton.setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR);
     }
 
-
     reminderTextEditor.setText(getCurrentMouseOverText());
 
 
     int numBars = audioProcessor.apvts.getRawParameterValue("NUM_BARS")->load();
     int activeBar = audioProcessor.apvts.getRawParameterValue("ACTIVE_BAR")->load();
     int selectedBar = audioProcessor.apvts.getRawParameterValue("SELECTED_BAR")->load();
+
+    //handle the notes being output by the machine
+    if (audioProcessor.apvts.getRawParameterValue("SELECTED_MIDI")->load() == -1) {
+        for (int i = 0; i < MAX_MIDI_VALUE; i++) {
+
+            if (audioProcessor.keyboardState.isNoteOnForChannels(0xffff, i)) {
+                keyboard.keyboardState.noteOn(MIDI_CHANNEL, i - TEMP_MIDI_BUGFIX_NUM, 1.f);
+            }
+            else {
+                keyboard.keyboardState.noteOff(MIDI_CHANNEL, i, 1.f);
+            }
+        }
+    }
+    
+    //handle notes being input by user
+    int isMidiSelected = false;
+    for (int i = 0; i < MAX_TRACKS; i++) {
+        if (bars[selectedBar].tracks[i].midiTextEditor.isFocussed) {
+            audioProcessor.apvts.getRawParameterValue("SELECTED_MIDI")->store(i);
+            isMidiSelected = true;
+            break;
+        }
+    }
+    if (isMidiSelected == false) {
+        audioProcessor.apvts.getRawParameterValue("SELECTED_MIDI")->store(-1);
+    }
+    //TODO: bandaid for when user inputs a key to the miditexteditor
+    for (int i = 0; i < MAX_TRACKS; i++) {
+        int midiValue = audioProcessor.apvts.getRawParameterValue(getMidiValueString(selectedBar, i))->load();
+        bars[selectedBar].tracks[i].midiTextEditor.setText(midiIntToString(midiValue) + " | " + to_string(midiValue));
+        bars[selectedBar].tracks[i].midiSlider.setValue(midiValue);
+    }
+
+
+
+    //draw all the buttons related to bar selection/copying
     for (int j = 0; j < MAX_BARS; j++) {
         if (j >= numBars) {
             barSelectButtons[j].setVisible(false);
@@ -375,13 +401,13 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
 
         //draw the components to the left of the tracks
         juce::Rectangle<int> muteButtonBounds(X - 50, Y + spacing * (i - 1) + 13, 50, 50);
-            bars[selectedBar].tracks[i].muteButton.setBounds(muteButtonBounds);
-            bars[selectedBar].tracks[i].muteButton.setVisible(true);
+        bars[selectedBar].tracks[i].muteButton.setBounds(muteButtonBounds);
+        bars[selectedBar].tracks[i].muteButton.setVisible(true);
 
-            juce::Rectangle<int> velocitySliderBounds(X - 125, Y + spacing * (i - 1), 75, 75);
-            bars[selectedBar].tracks[i].velocitySlider.setBounds(velocitySliderBounds);
-            bars[selectedBar].tracks[i].velocitySlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxLeft, false, 35, spacing / 2);
-            bars[selectedBar].tracks[i].velocitySlider.setVisible(true);
+        juce::Rectangle<int> velocitySliderBounds(X - 125, Y + spacing * (i - 1), 75, 75);
+        bars[selectedBar].tracks[i].velocitySlider.setBounds(velocitySliderBounds);
+        bars[selectedBar].tracks[i].velocitySlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxLeft, false, 35, spacing / 2);
+        bars[selectedBar].tracks[i].velocitySlider.setVisible(true);
 
         juce::Rectangle<int> sustainSliderBounds(X - 200, Y + spacing * (i - 1) + 13, 50, 50);
         bars[selectedBar].tracks[i].sustainSlider.setBounds(sustainSliderBounds);

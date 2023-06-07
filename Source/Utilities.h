@@ -14,15 +14,19 @@
 using namespace std;
 
 //TODO: figure out why ableton is lowering all my notes by an octave
-
-
 const int TEMP_MIDI_BUGFIX_NUM = 12;
+const int MIN_MIDI_VALUE = 12;
+const int MAX_MIDI_VALUE = 127 - TEMP_MIDI_BUGFIX_NUM;
 
-const int MAX_SUBDIVISIONS = 16;
+
+
 const int MAX_TRACKS = 12;
 const int MAX_BARS = 8;
 const float MAX_BPM = 480;
-const int MAX_MIDI_VALUE = 127 - TEMP_MIDI_BUGFIX_NUM;
+
+
+const int MAX_SUBDIVISIONS = 16;
+const int MAX_VELOCITY = 128;
 const int DEFAULT_VELOCITY = 100;
 const int DEFAULT_MIDI_VALUE = 24; //0 - (128 - MAX_TRACKS)
 const int DEFAULT_SUBDIVISIONS = 4; //1 -  MAX_SUBDIVISIONS
@@ -105,6 +109,14 @@ class CustomTextEditor : public  juce::TextEditor {
         void mouseExit(const juce::MouseEvent& event) override {
             isHoveredOver = false;
         }
+        void focusGained(FocusChangeType cause) override {
+            isFocussed = true;
+        }
+        void focusLost(FocusChangeType cause) override {
+            isFocussed = false;
+        }
+
+        bool isFocussed = false;
         bool isHoveredOver = false;
     private:
 };
