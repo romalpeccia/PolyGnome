@@ -55,8 +55,9 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
     autoLoopButton.setHelpText(AUTO_LOOP_REMINDER);
     autoLoopButton.setButtonText("Auto-Loop");
 
+    //initialize the bar buttons
     for (int i = 0; i < MAX_BARS; i++)
-    { //initialize the bar buttons
+    { 
         barSelectButtons[i].onClick = [this, i]() {
             audioProcessor.apvts.getRawParameterValue("SELECTED_BAR")->store(i);
             audioProcessor.apvts.getRawParameterValue("AUTO_LOOP")->store(false);
@@ -65,8 +66,9 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
         barSelectButtons[i].setButtonText(to_string(i+1));
     }
 
+    //initialize the copy bar to other bar buttons
     for (int k = 0; k < MAX_BARS; k++)
-    { //initialize the copy bar to other bar buttons
+    {
         barCopyButtons[k].onClick = [this, k]() {
             int targetBar = k;
             int currentBar = audioProcessor.apvts.getRawParameterValue("SELECTED_BAR")->load();
@@ -94,13 +96,14 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
                 audioProcessor.apvts.getRawParameterValue(getTrackEnableString(targetBar, i))->store(trackEnabled);
                 bars[targetBar].tracks[i].muteButton.setToggleState(trackEnabled, juce::NotificationType::sendNotification);
 
-                /* //TODO: (maybe) copy these as well depending on user feedback
-                for (int j = 0; j < MAX_SUBDIVISIONS; j++)
+                 //TODO: (maybe) copy these as well depending on user feedback
+                for (int j = 0; j < subdivisions; j++)
                 {
                     bool beatEnabled = audioProcessor.apvts.getRawParameterValue(getBeatToggleString(currentBar, i, j))->load();
                     audioProcessor.apvts.getRawParameterValue(getBeatToggleString(targetBar, i, j))->store(beatEnabled);
+                    bars[targetBar].tracks[i].beatButtons[j].setToggleState(beatEnabled, juce::NotificationType::sendNotification);
                 }
-                */
+                
             }
 
 
@@ -116,6 +119,7 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
             for (int j = 0; j < MAX_SUBDIVISIONS; j++)
             { //initialize the track buttons
                 juce::String name = getBeatToggleString(k, i, j);
+                /*
                 bars[k].tracks[i].beatButtons[j].onClick = [this, name, k, i , j]() {
                     if (audioProcessor.apvts.getRawParameterValue(name)->load() == true) {
                         bars[k].tracks[i].beatButtons[j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR);
@@ -125,8 +129,10 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
                     }
                 };
 
-                bars[k].tracks[i].beatButtons[j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR);
+                //bars[k].tracks[i].beatButtons[j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR);
+                */
                 bars[k].tracks[i].beatButtons[j].setClickingTogglesState(true); 
+                
                 bars[k].tracks[i].beatButtonAttachments[j] = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.apvts, name, bars[k].tracks[i].beatButtons[j]);
                 bars[k].tracks[i].beatButtons[j].setHelpText(BEAT_BUTTON_REMINDER);
             }
@@ -167,6 +173,7 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
             bars[k].tracks[i].midiTextEditor.setHelpText(MIDI_TEXTEDITOR_REMINDER);
 
 
+            //initialize the MIDITextEditor's text entry function
             bars[k].tracks[i].midiTextEditor.onReturnKey = [this, k, i]() {
                 bars[k].tracks[i].midiTextEditor.giveAwayKeyboardFocus();
                 juce::String input = bars[k].tracks[i].midiTextEditor.getText();
@@ -302,7 +309,7 @@ void PolyGnomeAudioProcessorEditor::paint(juce::Graphics& g)
         for (int i = 0; i < MAX_MIDI_VALUE; i++) {
 
             if (audioProcessor.keyboardState.isNoteOnForChannels(0xffff, i)) {
-                keyboard.keyboardState.noteOn(MIDI_CHANNEL, i - TEMP_MIDI_BUGFIX_NUM, 1.f);
+                keyboard.keyboardState.noteOn(MIDI_CHANNEL, i, 1.f);
             }
             else {
                 keyboard.keyboardState.noteOff(MIDI_CHANNEL, i, 1.f);
