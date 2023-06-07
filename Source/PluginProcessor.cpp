@@ -26,6 +26,7 @@ PolyGnomeAudioProcessor::PolyGnomeAudioProcessor()
 {
 }
 
+
 PolyGnomeAudioProcessor::~PolyGnomeAudioProcessor()
 {
 }
@@ -50,9 +51,10 @@ void PolyGnomeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
     int selectedBar = apvts.getRawParameterValue("SELECTED_BAR")->load();
     int activeBar = apvts.getRawParameterValue("ACTIVE_BAR")->load();
     int isAutoLoopEnabled = apvts.getRawParameterValue("AUTO_LOOP")->load();
-
-
-
+    int numBars = apvts.getRawParameterValue("NUM_BARS")->load();
+    if (selectedBar >= numBars) {
+        apvts.getRawParameterValue("SELECTED_BAR")->store(numBars - 1);
+    }
 
     if (selectedBar != activeBar && isAutoLoopEnabled) {
         apvts.getRawParameterValue("SELECTED_BAR")->store(activeBar);
@@ -95,6 +97,8 @@ void PolyGnomeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
             midiNeedsClearing = false;
         }
     }
+    keyboardState.processNextMidiBuffer(midiMessages, 0, buffer.getNumSamples(), false);
+
 
 }
 

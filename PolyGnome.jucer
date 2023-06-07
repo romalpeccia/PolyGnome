@@ -2,9 +2,14 @@
 
 <JUCERPROJECT id="J7GAry" name="PolyGnome" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
-              pluginCharacteristicsValue="pluginProducesMidiOut" companyName="Romal">
+              pluginCharacteristicsValue="pluginProducesMidiOut,pluginWantsMidiIn"
+              companyName="Romal">
   <MAINGROUP id="PkQ1Xo" name="PolyGnome">
     <GROUP id="{C6B4A32D-9EBD-62FC-20B1-EDF06920B470}" name="Source">
+      <FILE id="DhsYi5" name="CustomKeyboardComponent.cpp" compile="1" resource="0"
+            file="Source/CustomKeyboardComponent.cpp"/>
+      <FILE id="TUxePa" name="CustomKeyboardComponent.h" compile="0" resource="0"
+            file="Source/CustomKeyboardComponent.h"/>
       <FILE id="fnmiPc" name="Utilities.cpp" compile="1" resource="0" file="Source/Utilities.cpp"/>
       <FILE id="n45m6i" name="Utilities.h" compile="0" resource="0" file="Source/Utilities.h"/>
       <FILE id="znq21E" name="PolyRhythmMachine.cpp" compile="1" resource="0"

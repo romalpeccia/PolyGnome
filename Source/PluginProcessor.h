@@ -70,7 +70,7 @@ public:
     PolyRhythmMachine polyRhythmMachine{ &apvts };
 
     bool midiNeedsClearing = false;
-
+    juce::MidiKeyboardState keyboardState;
 
 private:
 

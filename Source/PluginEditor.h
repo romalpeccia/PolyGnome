@@ -11,7 +11,7 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 #include "Utilities.h"
-
+#include "CustomKeyboardComponent.h"
 
 class TrackComponent {
 public:
@@ -35,7 +35,6 @@ public:
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> midiSliderAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> velocitySliderAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> sustainSliderAttachment;
-
 };
 
 
@@ -109,6 +108,7 @@ private:
     BarComponent bars[MAX_BARS];
 
     CustomTextButton autoLoopButton;
+    CustomKeyboardComponent keyboard;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PolyGnomeAudioProcessorEditor)
 };

@@ -227,7 +227,7 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
 
 
     startTimerHz(144);
-    setSize(1000, 700);
+    setSize(PLUGIN_WIDTH, PLUGIN_HEIGHT);
 }
 
 PolyGnomeAudioProcessorEditor::~PolyGnomeAudioProcessorEditor()
@@ -237,27 +237,33 @@ PolyGnomeAudioProcessorEditor::~PolyGnomeAudioProcessorEditor()
 void PolyGnomeAudioProcessorEditor::resized()
 {
     //TODO: change how all of this is laid out
-
-    juce::Rectangle<int> menuBounds(100, 100);
+    
+    juce::Rectangle<int> menuBounds(MENU_WIDTH, MENU_WIDTH);
     menuBounds.removeFromTop(50);
-
+    
     juce::FlexBox flexBox;
     flexBox.flexWrap = juce::FlexBox::Wrap::wrap;
-    flexBox.items.add(juce::FlexItem(100, 50, playButton));
-    flexBox.items.add(juce::FlexItem(100, 25, loadPresetButton));
-    flexBox.items.add(juce::FlexItem(100, 25, savePresetButton));
-    flexBox.items.add(juce::FlexItem(100, 200, reminderTextEditor));
-    flexBox.items.add(juce::FlexItem(100, 25, autoLoopButton));
-    flexBox.items.add(juce::FlexItem(100, 50, barSlider));
+    flexBox.items.add(juce::FlexItem(MENU_WIDTH, 50, playButton));
+    flexBox.items.add(juce::FlexItem(MENU_WIDTH, 25, loadPresetButton));
+    flexBox.items.add(juce::FlexItem(MENU_WIDTH, 25, savePresetButton));
+    flexBox.items.add(juce::FlexItem(MENU_WIDTH, 200, reminderTextEditor));
+    flexBox.items.add(juce::FlexItem(MENU_WIDTH, 25, autoLoopButton));
+    flexBox.items.add(juce::FlexItem(MENU_WIDTH, 50, barSlider));
     for (int i = 0; i < MAX_BARS; i++) {
         flexBox.items.add(juce::FlexItem(25, 25, barSelectButtons[i]));
     }
-    flexBox.items.add(juce::FlexItem(100, 175));
+    flexBox.items.add(juce::FlexItem(MENU_WIDTH, 175));
     for (int i = 0; i < MAX_BARS; i++) {
         flexBox.items.add(juce::FlexItem(25, 25, barCopyButtons[i]));
     }
     flexBox.performLayout(menuBounds);
-  
+    
+    juce::FlexBox flexBox2;
+    juce::Rectangle<int> keyboardBounds(PLUGIN_WIDTH, PLUGIN_HEIGHT);
+    flexBox2.items.add(juce::FlexItem(PLUGIN_WIDTH - MENU_WIDTH, 200, keyboard));
+    keyboardBounds.removeFromTop(PLUGIN_HEIGHT - BOTTOM_HEIGHT);
+    keyboardBounds.removeFromLeft(MENU_WIDTH);
+    flexBox2.performLayout(keyboardBounds);
 }
 
 //==============================================================================
@@ -267,6 +273,18 @@ void PolyGnomeAudioProcessorEditor::paint(juce::Graphics& g)
 {
     g.fillAll(BACKGROUND_COLOUR);
     g.drawImageAt(logo, 0, 0);
+
+    
+    for (int i = 0; i < MAX_MIDI_VALUE; i++) {
+
+        if (audioProcessor.keyboardState.isNoteOnForChannels(0xffff, i)) {
+            keyboard.keyboardState .noteOn(MIDI_CHANNEL, i, 1.f);
+        }
+        else {
+            keyboard.keyboardState.noteOff(MIDI_CHANNEL, i, 1.f);
+        }
+    }
+    
 
     if (audioProcessor.apvts.getRawParameterValue("ON/OFF")->load() == true) {
         playButton.setColour(juce::TextButton::ColourIds::buttonColourId, MAIN_COLOUR);
@@ -283,6 +301,7 @@ void PolyGnomeAudioProcessorEditor::paint(juce::Graphics& g)
 
 
     reminderTextEditor.setText(getCurrentMouseOverText());
+
 
     int numBars = audioProcessor.apvts.getRawParameterValue("NUM_BARS")->load();
     int activeBar = audioProcessor.apvts.getRawParameterValue("ACTIVE_BAR")->load();
@@ -459,6 +478,10 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
             }
         }
     }
+
+
+
+
 }
 
 juce::Rectangle<int> PolyGnomeAudioProcessorEditor::getVisualArea()
@@ -520,6 +543,7 @@ std::vector<juce::Component*> PolyGnomeAudioProcessorEditor::getVisibleComps() {
     comps.push_back(&reminderTextEditor);
     comps.push_back(&barSlider);
     comps.push_back(&autoLoopButton);
+    comps.push_back(&keyboard);
     for (int i = 0; i < MAX_TRACKS; i++) {
 
     }

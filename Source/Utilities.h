@@ -14,19 +14,27 @@
 using namespace std;
 
 //TODO: figure out why ableton is lowering all my notes by an octave
+
+
 const int TEMP_MIDI_BUGFIX_NUM = 12;
 
 const int MAX_SUBDIVISIONS = 16;
 const int MAX_TRACKS = 12;
 const int MAX_BARS = 8;
-
 const float MAX_BPM = 480;
 const int MAX_MIDI_VALUE = 127 - TEMP_MIDI_BUGFIX_NUM;
 const int DEFAULT_VELOCITY = 100;
 const int DEFAULT_MIDI_VALUE = 24; //0 - (128 - MAX_TRACKS)
 const int DEFAULT_SUBDIVISIONS = 4; //1 -  MAX_SUBDIVISIONS
 const int DEFAULT_SUSTAIN = 50.00; // 0 - 100
+
 const int MIDI_CHANNEL = 1;
+
+const int PLUGIN_WIDTH = 1000;
+const int PLUGIN_HEIGHT = 700;
+const int MENU_WIDTH = 100;
+const int BOTTOM_HEIGHT = 200;
+
 
 const juce::Colour BACKGROUND_COLOUR = juce::Colours::black;
 const juce::Colour REMINDER_COLOUR = juce::Colours::white;

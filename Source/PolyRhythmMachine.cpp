@@ -114,7 +114,7 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
     }
 
 
-    if (samplesProcessed  > samplesPerBar) {
+    if (samplesProcessed  >= samplesPerBar) {
         samplesProcessed -= samplesPerBar;
             handleBarChange(midiBuffer);
     }
