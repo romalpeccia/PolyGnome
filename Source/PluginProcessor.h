@@ -69,9 +69,17 @@ public:
 
     PolyRhythmMachine polyRhythmMachine{ &apvts };
 
-    int storedMidiFromKeyboard = -1;
+
+
+
+    //midiNeedsClearing = true when the machine is turned on, which then triggers all midi notes to be cleared once the machine is turned off, then midiNeedsClearing = false
     bool midiNeedsClearing = false;
+
+    //this keyboardState holds all the notes being played by the machine, which is then copied into the keyboardState of the keyboardComponent in the pluginEditor
     juce::MidiKeyboardState keyboardState;
+
+    //holds the last note pressed by the user 
+    int storedMidiFromKeyboard = -1;
 
 private:
 

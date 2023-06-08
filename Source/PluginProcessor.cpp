@@ -60,27 +60,24 @@ void PolyGnomeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
         apvts.getRawParameterValue("SELECTED_BAR")->store(activeBar);
     }
 
-    //get DAW INFO
+    //get DAW INFO: bpm, isPlaying, samplesSinceStartofPlayhead
     auto positionInfo = getPlayHead()->getPosition();
     if (positionInfo) {
         auto bpmInfo = (*positionInfo).getBpm();
         auto timeInfo = (*positionInfo).getTimeInSamples();
-        if (bpmInfo && timeInfo) {
+        auto isPlayingInfo = (*positionInfo).getIsPlaying();
+        if (bpmInfo && timeInfo && isPlayingInfo) {
+            apvts.getRawParameterValue("DAW_CONNECTED")->store(true);
             apvts.getRawParameterValue("BPM")->store(*bpmInfo);
             apvts.getRawParameterValue("SAMPLES_ELAPSED")->store(*timeInfo);
-            apvts.getRawParameterValue("DAW_CONNECTED")->store(true);
-
-            /*
-            if (auto playingInfo = (*positionInfo).getIsPlaying()) {
-                apvts.getRawParameterValue("ON/OFF")->store(true);
-            }
-            */
+            apvts.getRawParameterValue("DAW_PLAYING")->store(isPlayingInfo);
         }
         else {
             apvts.getRawParameterValue("DAW_CONNECTED")->store(false);
         }
 
     }
+
 
     //process incoming notes for active miditexteditor
     int selectedMidi = apvts.getRawParameterValue("SELECTED_MIDI")->load();
@@ -97,13 +94,16 @@ void PolyGnomeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
         }
     }
 
-    midiMessages.clear(); //clear any noise in the midiBuffer
+    midiMessages.clear(); //clear any noise or notes inputted by user in the midiBuffer
+
     if (apvts.getRawParameterValue("ON/OFF")->load() == true)
     {
+        //run the machine
         polyRhythmMachine.getNextAudioBlock(buffer, midiMessages);
         midiNeedsClearing = true;
     }
     else {
+        //the machine has been stopped, clear all MIDI notes
         if (midiNeedsClearing == true) {
             for (int i = 0; i < MAX_MIDI_VALUE; i++) {
                 auto messageOff = juce::MidiMessage::noteOff(MIDI_CHANNEL, i);
@@ -113,7 +113,7 @@ void PolyGnomeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
         }
     }
 
-
+    //process the MIDI added to the MIDIbuffer by polyRhythmMachine.getNextAudioBlock, add it to the keyboardState which later gets read by the keyBoardComponent
     keyboardState.processNextMidiBuffer(midiMessages, 0, buffer.getNumSamples(), false);
 
 
@@ -128,6 +128,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PolyGnomeAudioProcessor::cre
     layout.add(std::make_unique<juce::AudioParameterBool>("ON/OFF", "On/Off", false));
     layout.add(std::make_unique<juce::AudioParameterBool>("AUTO_LOOP", "auto loop", false));
     layout.add(std::make_unique<juce::AudioParameterBool>("DAW_CONNECTED", "DAW Connected", false));
+    layout.add(std::make_unique<juce::AudioParameterBool>("DAW_PLAYING", "DAW Playing", false)); 
     layout.add(std::make_unique<juce::AudioParameterInt>("NUM_BARS", "num bars", 1, MAX_BARS, 1));
     layout.add(std::make_unique<juce::AudioParameterInt>("SELECTED_BAR", "selected bar", 0, MAX_BARS - 1, 0));
     layout.add(std::make_unique<juce::AudioParameterInt>("ACTIVE_BAR", "active bar", 0, MAX_BARS - 1, 0));
