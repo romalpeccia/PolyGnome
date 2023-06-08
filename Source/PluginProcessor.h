@@ -69,6 +69,7 @@ public:
 
     PolyRhythmMachine polyRhythmMachine{ &apvts };
 
+    int storedMidiFromKeyboard = -1;
     bool midiNeedsClearing = false;
     juce::MidiKeyboardState keyboardState;
 

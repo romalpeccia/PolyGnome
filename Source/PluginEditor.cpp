@@ -329,14 +329,13 @@ void PolyGnomeAudioProcessorEditor::paint(juce::Graphics& g)
     if (isMidiSelected == false) {
         audioProcessor.apvts.getRawParameterValue("SELECTED_MIDI")->store(-1);
     }
-    //TODO: bandaid for when user inputs a key to the miditexteditor
-    for (int i = 0; i < MAX_TRACKS; i++) {
-        int midiValue = audioProcessor.apvts.getRawParameterValue(getMidiValueString(selectedBar, i))->load();
-        bars[selectedBar].tracks[i].midiTextEditor.setText(midiIntToString(midiValue) + " | " + to_string(midiValue));
-        bars[selectedBar].tracks[i].midiSlider.setValue(midiValue);
+    
+    int selectedMidi = audioProcessor.apvts.getRawParameterValue("SELECTED_MIDI")->load();
+    if (audioProcessor.storedMidiFromKeyboard != -1 && selectedMidi != -1) {
+        bars[selectedBar].tracks[selectedMidi].midiTextEditor.setText(midiIntToString(audioProcessor.storedMidiFromKeyboard) + " | " + to_string(audioProcessor.storedMidiFromKeyboard));
+        bars[selectedBar].tracks[selectedMidi].midiSlider.setValue(audioProcessor.storedMidiFromKeyboard);
+        audioProcessor.storedMidiFromKeyboard = -1;
     }
-
-
 
     //draw all the buttons related to bar selection/copying
     for (int j = 0; j < MAX_BARS; j++) {

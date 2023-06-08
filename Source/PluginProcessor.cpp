@@ -92,6 +92,7 @@ void PolyGnomeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
             if (currentMessage.isNoteOn()) {
                 DBG(currentMessage.getDescription());
                 apvts.getRawParameterValue(getMidiValueString(selectedBar, selectedMidi))->store(currentMessage.getNoteNumber());
+                storedMidiFromKeyboard = currentMessage.getNoteNumber();
             }
         }
     }

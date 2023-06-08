@@ -67,7 +67,7 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
             //turn any previously played notes off 
             float samplesAfterBeat = (((bars[j].tracks[i].beatCounter - 1) * bars[j].tracks[i].samplesPerInterval) + ((bars[j].tracks[i].sustain / 100) * bars[j].tracks[i].samplesPerInterval)); // the amount of samples for all intervals that have happened + the amount of samples after the latest interval
             if (j == barCounter) {
-                if (samplesProcessed > samplesAfterBeat && bars[j].tracks[i].noteOffQueued == true) {
+                if (samplesProcessed >= samplesAfterBeat && bars[j].tracks[i].noteOffQueued == true) {
                     auto messageOff = juce::MidiMessage::noteOff(MIDI_CHANNEL, bars[j].tracks[i].midiValue + TEMP_MIDI_BUGFIX_NUM);
                     midiBuffer.addEvent(messageOff, samplesProcessed - samplesAfterBeat);
                     bars[j].tracks[i].noteOffQueued = false;
@@ -89,7 +89,7 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
                         if (apvts->getRawParameterValue(getBeatToggleString(barCounter, i, bars[j].tracks[i].beatCounter))->load() == true) {
 
                             //TODO: sort out this bufferPosition calculation error. possibly related to GUI error?. possibly completely irrelevant variable
-                            int bufferPosition = samplesProcessed - samplesCounted; //TODO: maybe this should be samplesProcessed instead of samplesProcessed
+                            int bufferPosition = samplesProcessed - samplesCounted; 
                             //bufferPosition = 0; //for debugging
                             if (bufferPosition > bufferSize)
                             {
