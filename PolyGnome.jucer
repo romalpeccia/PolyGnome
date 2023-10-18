@@ -24,7 +24,12 @@
             file="Source/PluginEditor.cpp"/>
       <FILE id="HFRAP5" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
     </GROUP>
-    <FILE id="qnzgNY" name="OSRS_gnome.png" compile="0" resource="1" file="Samples/OSRS_gnome.png"/>
+    <FILE id="TrFJ06" name="enable.png" compile="0" resource="1" file="Samples/enable.png"/>
+    <FILE id="CvjRQG" name="keyboard.png" compile="0" resource="1" file="Samples/keyboard.png"/>
+    <FILE id="OHAUdM" name="OSRS_gnome.png" compile="0" resource="1" file="Samples/OSRS_gnome.png"/>
+    <FILE id="VOZkU5" name="sustain.png" compile="0" resource="1" file="Samples/sustain.png"/>
+    <FILE id="TNR4Go" name="track.png" compile="0" resource="1" file="Samples/track.png"/>
+    <FILE id="tN68l1" name="velocity.png" compile="0" resource="1" file="Samples/velocity.png"/>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>
   <EXPORTFORMATS>

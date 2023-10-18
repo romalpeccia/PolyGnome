@@ -95,7 +95,8 @@ private:
 
 
     // TOP LEFT Components
-    juce::Image logo;
+    juce::Image logo, keyboardIcon, trackIcon, enableIcon, sustainIcon, velocityIcon;
+
     CustomTextButton playButton;
     CustomTextButton loadPresetButton;
     CustomTextButton savePresetButton;

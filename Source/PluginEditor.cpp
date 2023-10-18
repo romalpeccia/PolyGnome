@@ -15,7 +15,11 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
 {
     //images are stored in binary using projucer
     logo = juce::ImageCache::getFromMemory(BinaryData::OSRS_gnome_png, BinaryData::OSRS_gnome_pngSize);
-
+    keyboardIcon = juce::ImageCache::getFromMemory(BinaryData::keyboard_png, BinaryData::keyboard_pngSize);
+    trackIcon = juce::ImageCache::getFromMemory(BinaryData::track_png, BinaryData::track_pngSize);
+    sustainIcon = juce::ImageCache::getFromMemory(BinaryData::sustain_png, BinaryData::sustain_pngSize);
+    velocityIcon = juce::ImageCache::getFromMemory(BinaryData::velocity_png, BinaryData::velocity_pngSize);
+    enableIcon = juce::ImageCache::getFromMemory(BinaryData::enable_png, BinaryData::enable_pngSize);
     //initialize the menu buttons
     playButton.onClick = [this]() { 
 
@@ -162,6 +166,7 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
 
             //initialize the MIDI control slider    
             bars[k].tracks[i].midiSlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
+            colorSlider(bars[k].tracks[i].midiSlider, MAIN_COLOUR, ACCENT_COLOUR, SECONDARY_COLOUR, ACCENT_COLOUR, true);
             bars[k].tracks[i].midiSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, getMidiValueString(k, i), bars[k].tracks[i].midiSlider);
             bars[k].tracks[i].midiSlider.setHelpText(MIDI_SLIDER_REMINDER);
 
@@ -271,7 +276,7 @@ void PolyGnomeAudioProcessorEditor::resized()
     juce::FlexBox flexBox2;
     juce::Rectangle<int> keyboardBounds(PLUGIN_WIDTH, PLUGIN_HEIGHT);
     flexBox2.items.add(juce::FlexItem(PLUGIN_WIDTH - MENU_WIDTH, 200, keyboard));
-    keyboardBounds.removeFromTop(PLUGIN_HEIGHT - BOTTOM_HEIGHT);
+    keyboardBounds.removeFromTop(PLUGIN_HEIGHT - 75);
     keyboardBounds.removeFromLeft(MENU_WIDTH);
     flexBox2.performLayout(keyboardBounds);
 }
@@ -282,8 +287,15 @@ void PolyGnomeAudioProcessorEditor::resized()
 void PolyGnomeAudioProcessorEditor::paint(juce::Graphics& g)
 {
     g.fillAll(BACKGROUND_COLOUR);
-    g.drawImageAt(logo, 0, 0);
 
+    g.drawImageAt(logo, 0, 0);
+    auto visualArea = getVisualArea();
+    g.drawImageAt(sustainIcon, visualArea.getX() - 190, 8);
+    g.drawImageAt(velocityIcon, visualArea.getX() - 105, 8);
+    g.drawImageAt(enableIcon, visualArea.getX() - 50, 8);
+
+    g.drawImageAt(trackIcon, visualArea.getX() + visualArea.getWidth() + 35, 5);
+    g.drawImageAt(keyboardIcon, visualArea.getX() + visualArea.getWidth() + 155, 5);
 
     if (audioProcessor.apvts.getRawParameterValue("ON/OFF")->load() == true) {
         playButton.setColour(juce::TextButton::ColourIds::buttonColourId, MAIN_COLOUR);
@@ -388,7 +400,7 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
     auto ON = audioProcessor.apvts.getRawParameterValue("ON/OFF")->load();
 
     int spacing = height / MAX_TRACKS;
-    Y = Y + spacing;
+    Y = Y + spacing + 15;
   
 
 
@@ -410,6 +422,7 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
     for (int i = 0; i < MAX_TRACKS; i++) {
 
         //draw the components to the left of the tracks
+            //TODO: make X-50, X-125, Y+spacing, etc all constants
         juce::Rectangle<int> muteButtonBounds(X - 50, Y + spacing * (i - 1) + 13, 50, 50);
         bars[selectedBar].tracks[i].muteButton.setBounds(muteButtonBounds);
         bars[selectedBar].tracks[i].muteButton.setVisible(true);
@@ -445,8 +458,6 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
             bars[selectedBar].tracks[i].beatButtons[j].setBounds(pointBounds);
             bars[selectedBar].tracks[i].beatButtons[j].setVisible(true);
 
-
-
             //TODO : clean this?
             //set the colors of the buttons based on their state
             if (audioProcessor.apvts.getRawParameterValue(getBeatToggleString(selectedBar, i, j))->load() == true) {
@@ -457,7 +468,6 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
                     else {
                         bars[selectedBar].tracks[i].beatButtons[j].setColour(juce::TextButton::ColourIds::buttonOnColourId, ENABLED_COLOUR.brighter(0.9));
                     }
-
                 }
                 else {
                     if (isBeatEnabled) {
@@ -490,6 +500,7 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
             }
         }
         //draw the components to the right of the tracks
+        //TODO: make X+10, X+95, X+170, Y+spacing into constants
         juce::Rectangle<int> subdivisionSliderBounds(X + width + 10, Y + spacing * (i - 1), 75, 75);
         bars[selectedBar].tracks[i].subdivisionSlider.setBounds(subdivisionSliderBounds);
         bars[selectedBar].tracks[i].subdivisionSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxRight, false, 25, spacing / 2);
