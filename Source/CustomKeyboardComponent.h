@@ -17,33 +17,6 @@
   ==============================================================================
 */
 
-/*******************************************************************************
- The block below describes the properties of this PIP. A PIP is a short snippet
- of code that can be read by the Projucer and used to generate a JUCE project.
-
- BEGIN_JUCE_PIP_METADATA
-
- name:             HandlingMidiEventsTutorial
- version:          1.0.0
- vendor:           JUCE
- website:          http://juce.com
- description:      Handles incoming midi events.
-
- dependencies:     juce_audio_basics, juce_audio_devices, juce_audio_formats,
-                   juce_audio_processors, juce_audio_utils, juce_core,
-                   juce_data_structures, juce_events, juce_graphics,
-                   juce_gui_basics, juce_gui_extra
- exporters:        xcode_mac, vs2019, linux_make
-
- type:             Component
- mainClass:        CustomKeyboardComponent
-
- useLocalCopy:     1
-
- END_JUCE_PIP_METADATA
-
-*******************************************************************************/
-
 
 #pragma once
 #include "Utilities.h"

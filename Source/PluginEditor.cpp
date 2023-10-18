@@ -386,7 +386,7 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
 
     int spacing = height / MAX_TRACKS;
     Y = Y + spacing;
-
+  
 
 
     int numBars = audioProcessor.apvts.getRawParameterValue("NUM_BARS")->load();
@@ -435,14 +435,17 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
         int subdivisions = audioProcessor.apvts.getRawParameterValue(getSubdivisionsString(selectedBar, i))->load();
         //draw the buttons for each note of the track
         for (int j = 0; j < subdivisions; j++) {
-
+ 
+    
             float distanceOnPath = (width / subdivisions) * j;
             juce::Rectangle<int> pointBounds(X + distanceOnPath, Y + spacing * i - 10, 22, 22);
             bars[selectedBar].tracks[i].beatButtons[j].setBounds(pointBounds);
             bars[selectedBar].tracks[i].beatButtons[j].setVisible(true);
 
 
+
             //TODO : clean this?
+            //set the colors of the buttons based on their state
             if (audioProcessor.apvts.getRawParameterValue(getBeatToggleString(selectedBar, i, j))->load() == true) {
                 if (j == audioProcessor.polyRhythmMachine.bars[selectedBar].tracks[i].beatCounter - 1) {
                     if (isBeatEnabled) {
@@ -526,6 +529,7 @@ juce::Rectangle<int> PolyGnomeAudioProcessorEditor::getVisualArea()
     auto visualArea = bounds.removeFromTop(bounds.getHeight() * 0.66);
     visualArea.removeFromLeft(visualArea.getWidth() * 0.33);
     visualArea.removeFromRight(visualArea.getWidth() * 0.5);
+    visualArea.setWidth(432); // common multiple of 9, 12, 16 
     return visualArea;
 }
 
