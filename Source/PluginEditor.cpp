@@ -173,6 +173,11 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
             bars[k].tracks[i].midiTextEditor.setHelpText(MIDI_TEXTEDITOR_REMINDER);
 
 
+            //add control of textbox to MIDI slider
+            bars[k].tracks[i].midiSlider.onValueChange = [this, k, i]() {
+                int sliderInt = bars[k].tracks[i].midiSlider.getValue();
+                bars[k].tracks[i].midiTextEditor.setText(midiIntToString(sliderInt) + " | " + to_string(sliderInt));
+            };
             //initialize the MIDITextEditor's text entry function
             bars[k].tracks[i].midiTextEditor.onReturnKey = [this, k, i]() {
                 bars[k].tracks[i].midiTextEditor.giveAwayKeyboardFocus();
@@ -209,11 +214,7 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
                 }
             };
 
-            //add control of textbox to MIDI slider
-            bars[k].tracks[i].midiSlider.onValueChange = [this, k , i]() {
-                int sliderInt = bars[k].tracks[i].midiSlider.getValue();
-                bars[k].tracks[i].midiTextEditor.setText(midiIntToString(sliderInt) + " | " + to_string(sliderInt));
-            };
+
 
 
         }
@@ -374,8 +375,10 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
 
     //TODO look into only calling redraws of specific elements if needed
     auto visualArea = getVisualArea();
-    g.setColour(juce::Colours::white);
-    g.drawRect(visualArea);
+
+    //for debugging purposes
+    //g.setColour(juce::Colours::white);
+    //g.drawRect(visualArea);
 
     int X = visualArea.getX(); //top left corner X
     int Y = visualArea.getY(); //top left corner  Y

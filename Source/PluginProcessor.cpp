@@ -80,7 +80,7 @@ void PolyGnomeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
     }
 
 
-    //process incoming notes for active miditexteditor
+    //process incoming notes from keyboard for active miditexteditor
     int selectedMidi = apvts.getRawParameterValue("SELECTED_MIDI")->load();
     if (selectedMidi != -1){
         juce::MidiBuffer::Iterator iterator(midiMessages);
