@@ -220,9 +220,10 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
     }
 
 
-
+    //setup the reminder text box
     colorTextEditor(reminderTextEditor, REMINDER_COLOUR, juce::Colours::white, juce::Colours::white, BACKGROUND_COLOUR, true);
     reminderTextEditor.setMultiLine(true);
+    //setup the keyboard
 
 
     for (auto* comp : getVisibleComps())
@@ -502,6 +503,8 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
         colorSlider(bars[selectedBar].tracks[i].velocitySlider, ACCENT_COLOUR, ACCENT_COLOUR, SECONDARY_COLOUR, ACCENT_COLOUR, isTrackEnabled);
         colorSlider(bars[selectedBar].tracks[i].sustainSlider, ACCENT_COLOUR, ACCENT_COLOUR, SECONDARY_COLOUR, ACCENT_COLOUR, isTrackEnabled);
         colorTextEditor(bars[selectedBar].tracks[i].midiTextEditor, ACCENT_COLOUR, ACCENT_COLOUR, ACCENT_COLOUR, MAIN_COLOUR, isTrackEnabled);
+
+
 
         //hide any hidden track components 
         for (int k = 0; k < MAX_SUBDIVISIONS; k++) {

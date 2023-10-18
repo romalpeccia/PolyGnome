@@ -45,19 +45,11 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
     
     auto bufferSize = buffer.getNumSamples(); //usually 16, 32, 64... 1024...
 
-    //TODO: old test case, possibly no longer relevant, double check
-    /*
-    for (int i = 0; i < MAX_TRACKS; i++) {
-        if (tracks[i].samplesPerInterval * tracks[i].subdivisions != samplesPerBar) {
-            DBG("track samplesPerInterval calculation error");
-        }
-    }
-    */
     if (!isDawConnected) {
         samplesProcessed += bufferSize;
     }
     else {
-        samplesProcessed = ((int)apvts->getRawParameterValue("SAMPLES_ELAPSED")->load() % (int)samplesPerBar) + (int)bufferSize;
+        samplesProcessed = ((int)apvts->getRawParameterValue("DAW_SAMPLES_ELAPSED")->load() % (int)samplesPerBar) + (int)bufferSize;
     }
     for (int j = 0; j < MAX_BARS; j++) {
         for (int i = 0; i < MAX_TRACKS; i++) {

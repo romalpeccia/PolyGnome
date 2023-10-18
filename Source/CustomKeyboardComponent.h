@@ -75,6 +75,10 @@ public:
         addAndMakeVisible(keyboardComponent);
         keyboardState.addListener(this);
 
+        //TODO: custom setting keyboard colors is not working as expected
+        setColour(juce::MidiKeyboardComponent::ColourIds::keySeparatorLineColourId, SECONDARY_COLOUR);
+        setColour(juce::MidiKeyboardComponent::ColourIds::keyDownOverlayColourId, MAIN_COLOUR);
+        setColour(juce::MidiKeyboardComponent::ColourIds::textLabelColourId, ACCENT_COLOUR);
         //setSize(600, 400);
     }
 

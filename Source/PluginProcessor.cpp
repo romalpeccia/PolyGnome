@@ -67,9 +67,10 @@ void PolyGnomeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
         auto timeInfo = (*positionInfo).getTimeInSamples();
         auto isPlayingInfo = (*positionInfo).getIsPlaying();
         if (bpmInfo && timeInfo && isPlayingInfo) {
+            //TODO: DAW_CONNECTED should not be set true if the DAW is connected but the DAW is not playing. 
             apvts.getRawParameterValue("DAW_CONNECTED")->store(true);
             apvts.getRawParameterValue("BPM")->store(*bpmInfo);
-            apvts.getRawParameterValue("SAMPLES_ELAPSED")->store(*timeInfo);
+            apvts.getRawParameterValue("DAW_SAMPLES_ELAPSED")->store(*timeInfo);
             apvts.getRawParameterValue("DAW_PLAYING")->store(isPlayingInfo);
         }
         else {
@@ -127,13 +128,16 @@ juce::AudioProcessorValueTreeState::ParameterLayout PolyGnomeAudioProcessor::cre
 
     layout.add(std::make_unique<juce::AudioParameterBool>("ON/OFF", "On/Off", false));
     layout.add(std::make_unique<juce::AudioParameterBool>("AUTO_LOOP", "auto loop", false));
+
     layout.add(std::make_unique<juce::AudioParameterBool>("DAW_CONNECTED", "DAW Connected", false));
     layout.add(std::make_unique<juce::AudioParameterBool>("DAW_PLAYING", "DAW Playing", false)); 
+    layout.add(std::make_unique<juce::AudioParameterFloat>("BPM", "bpm", juce::NormalisableRange<float>(1.f, 480.f, 0.1f, 0.25f), 120.f));
+    layout.add(std::make_unique<juce::AudioParameterInt>("DAW_SAMPLES_ELAPSED", "samples elapsed", 0, 2147483647, 0));
+
     layout.add(std::make_unique<juce::AudioParameterInt>("NUM_BARS", "num bars", 1, MAX_BARS, 1));
     layout.add(std::make_unique<juce::AudioParameterInt>("SELECTED_BAR", "selected bar", 0, MAX_BARS - 1, 0));
     layout.add(std::make_unique<juce::AudioParameterInt>("ACTIVE_BAR", "active bar", 0, MAX_BARS - 1, 0));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("BPM", "bpm", juce::NormalisableRange<float>(1.f, 480.f, 0.1f, 0.25f), 120.f));
-    layout.add(std::make_unique<juce::AudioParameterInt>("SAMPLES_ELAPSED", "samples elapsed", 0, 2147483647, 0));
+
     layout.add(std::make_unique<juce::AudioParameterInt>("SELECTED_MIDI", "selected midi", -1, MAX_TRACKS, -1));
     //Parameters for Polytrack Machine 
     //<0-MAX_BARS>_BEAT_<0-MAX_TRACKS>.<0-MAX_SUBDIVISIONS>_TOGGLE
@@ -146,9 +150,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PolyGnomeAudioProcessor::cre
         {
             for (int j = 0; j < MAX_SUBDIVISIONS; j++)
             {
-
                     layout.add(std::make_unique<juce::AudioParameterBool>(getBeatToggleString(barNum, i, j), to_string(barNum) + "_Beat" + to_string(i) + "." + to_string(j) + "Toggle", false));
-
             }
             layout.add(std::make_unique<juce::AudioParameterInt>(getSubdivisionsString(barNum, i), to_string(barNum) + "_Subdivisions " + to_string(i), 1, MAX_SUBDIVISIONS, DEFAULT_SUBDIVISIONS));
             layout.add(std::make_unique<juce::AudioParameterInt>(getMidiValueString(barNum, i), to_string(barNum) + "_Midi Value " + to_string(i), 0, MAX_MIDI_VALUE, DEFAULT_MIDI_VALUE + i));
@@ -158,12 +160,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PolyGnomeAudioProcessor::cre
             }
 
         }
-
- 
-
-
     return layout;
-
 }
 
 
