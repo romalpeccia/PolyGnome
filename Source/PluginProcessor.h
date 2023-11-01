@@ -70,7 +70,8 @@ public:
     PolyRhythmMachine polyRhythmMachine{ &apvts };
 
 
-
+    // set to false when the 
+    bool resetBarAfterPause = false;
 
     //midiNeedsClearing = true when the machine is turned on, which then triggers all midi notes to be cleared once the machine is turned off, then midiNeedsClearing = false
     bool midiNeedsClearing = false;
@@ -78,7 +79,7 @@ public:
     //this keyboardState holds all the notes being played by the machine, which is then copied into the keyboardState of the keyboardComponent in the pluginEditor
     juce::MidiKeyboardState keyboardState;
 
-    //holds the last note pressed by the user 
+    //holds the last note pressed by the user on their MIDI instrument. set to -1 when a MIDI textEditor isn't selected
     int storedMidiFromKeyboard = -1;
 
 private:

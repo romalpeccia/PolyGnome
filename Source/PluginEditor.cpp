@@ -80,31 +80,24 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
             {
 
                 int subdivisions = audioProcessor.apvts.getRawParameterValue(getSubdivisionsString(currentBar, i))->load();
-                audioProcessor.apvts.getRawParameterValue(getSubdivisionsString(targetBar, i))->store(subdivisions);
                 bars[targetBar].tracks[i].subdivisionSlider.setValue(subdivisions);
 
                 int midiValue = audioProcessor.apvts.getRawParameterValue(getMidiValueString(currentBar, i))->load();
-                audioProcessor.apvts.getRawParameterValue(getMidiValueString(targetBar, i))->store(midiValue);
                 bars[targetBar].tracks[i].midiSlider.setValue(midiValue);
                 bars[targetBar].tracks[i].midiTextEditor.setText(midiIntToString(midiValue) + " | " + to_string(midiValue));
 
                 int velocity = audioProcessor.apvts.getRawParameterValue(getVelocityString(currentBar, i))->load();
-                audioProcessor.apvts.getRawParameterValue(getVelocityString(targetBar, i))->store(velocity);
                 bars[targetBar].tracks[i].velocitySlider.setValue(velocity);
 
                 float sustain = audioProcessor.apvts.getRawParameterValue(getSustainString(currentBar, i))->load();
-                audioProcessor.apvts.getRawParameterValue(getSustainString(targetBar, i))->store(sustain);
                 bars[targetBar].tracks[i].sustainSlider.setValue(sustain);
 
                 bool trackEnabled = audioProcessor.apvts.getRawParameterValue(getTrackEnableString(currentBar, i))->load();
-                audioProcessor.apvts.getRawParameterValue(getTrackEnableString(targetBar, i))->store(trackEnabled);
                 bars[targetBar].tracks[i].muteButton.setToggleState(trackEnabled, juce::NotificationType::sendNotification);
 
-                 //TODO: (maybe) copy these as well depending on user feedback
                 for (int j = 0; j < subdivisions; j++)
                 {
                     bool beatEnabled = audioProcessor.apvts.getRawParameterValue(getBeatToggleString(currentBar, i, j))->load();
-                    audioProcessor.apvts.getRawParameterValue(getBeatToggleString(targetBar, i, j))->store(beatEnabled);
                     bars[targetBar].tracks[i].beatButtons[j].setToggleState(beatEnabled, juce::NotificationType::sendNotification);
                 }
                 
@@ -117,7 +110,7 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
         barSelectButtons[k].setColour(juce::TextButton::ColourIds::buttonColourId, SECONDARY_COLOUR);
     }
 
-    //initialize the polytrack Machine buttons and sliders
+    //initialize the polyMachine buttons and sliders
     for (int k = 0; k < MAX_BARS; k++) {
         for (int i = 0; i < MAX_TRACKS; i++) {
             for (int j = 0; j < MAX_SUBDIVISIONS; j++)
@@ -178,7 +171,7 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
             bars[k].tracks[i].midiTextEditor.setHelpText(MIDI_TEXTEDITOR_REMINDER);
 
 
-            //add control of textbox to MIDI slider
+            //add control of textbox value to MIDI slider
             bars[k].tracks[i].midiSlider.onValueChange = [this, k, i]() {
                 int sliderInt = bars[k].tracks[i].midiSlider.getValue();
                 bars[k].tracks[i].midiTextEditor.setText(midiIntToString(sliderInt) + " | " + to_string(sliderInt));
@@ -192,26 +185,24 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
                 string convertedString;
                 int currentIntValue = audioProcessor.apvts.getRawParameterValue(getMidiValueString(k, i))->load();
                 if (sscanf(inputString.c_str(), "%d", &inputInt) == 1)
-                {   //if the user inputted an int
+                {   //if user inputted an int
                     convertedString = midiIntToString(inputInt);
                     if (convertedString != "") {
                         bars[k].tracks[i].midiTextEditor.setText(convertedString + " | " + to_string(inputInt));
-                        audioProcessor.apvts.getRawParameterValue(getMidiValueString(k, i))->store(inputInt);
-                        //add control of MIDI slider to textbox
-                        bars[k].tracks[i].midiSlider.setValue(inputInt);
+                        //add control of MIDI slider value to textbox
+                        bars[k].tracks[i].midiSlider.setValue(inputInt, juce::NotificationType::sendNotification);
                     }
                     else {
                         bars[k].tracks[i].midiTextEditor.setText(midiIntToString(currentIntValue) + " | " + to_string(currentIntValue));
                     }
                 }
                 else
-                { //user inputted a string
+                { //if user inputted a string
                     int convertedInt = midiStringToInt(inputString);
                     if (convertedInt != -1) {
                         bars[k].tracks[i].midiTextEditor.setText(inputString + " | " + to_string(convertedInt));
-                        audioProcessor.apvts.getRawParameterValue(getMidiValueString(k, i))->store(convertedInt);
                         //add control of MIDI slider to textbox
-                        bars[k].tracks[i].midiSlider.setValue(convertedInt);
+                        bars[k].tracks[i].midiSlider.setValue(convertedInt, juce::NotificationType::sendNotification);
                     }
                     else {
                         bars[k].tracks[i].midiTextEditor.setText(midiIntToString(currentIntValue) + " | " + to_string(currentIntValue));
@@ -239,7 +230,6 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
     for (auto* comp : getHiddenComps()) {
         addChildComponent(comp);
     }
-
 
     startTimerHz(144);
     setSize(PLUGIN_WIDTH, PLUGIN_HEIGHT);
@@ -770,3 +760,4 @@ void PolyGnomeAudioProcessorEditor::loadPreset() {
             });
             
 }
+

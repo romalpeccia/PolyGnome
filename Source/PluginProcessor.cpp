@@ -9,8 +9,17 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 #include <string>
+#include "gtest/gtest.h"
+
+
+
 
 using namespace std;
+
+TEST_F(A, B)
+class MyPluginInstance : public juce::Test {
+
+}
 //==============================================================================
 PolyGnomeAudioProcessor::PolyGnomeAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -59,7 +68,7 @@ void PolyGnomeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
     if (selectedBar != activeBar && isAutoLoopEnabled) {
         apvts.getRawParameterValue("SELECTED_BAR")->store(activeBar);
     }
-
+    //DBG("TEST");
     //get DAW INFO: bpm, isPlaying, samplesSinceStartofPlayhead
     auto positionInfo = getPlayHead()->getPosition();
     if (positionInfo) {
@@ -67,17 +76,33 @@ void PolyGnomeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
         auto timeInfo = (*positionInfo).getTimeInSamples();
         auto isPlayingInfo = (*positionInfo).getIsPlaying();
         if (bpmInfo && timeInfo && isPlayingInfo) {
-            //TODO: DAW_CONNECTED should not be set true if the DAW is connected but the DAW is not playing. 
             apvts.getRawParameterValue("DAW_CONNECTED")->store(true);
             apvts.getRawParameterValue("BPM")->store(*bpmInfo);
             apvts.getRawParameterValue("DAW_SAMPLES_ELAPSED")->store(*timeInfo);
             apvts.getRawParameterValue("DAW_PLAYING")->store(isPlayingInfo);
+            if (isPlayingInfo == false) {
+                DBG("OFF");
+            }
+            else {
+                DBG("ON");
+            }
+            if (isPlayingInfo == false && resetBarAfterPause == true) {
+                polyRhythmMachine.resetAll();
+                resetBarAfterPause = false;
+                apvts.getRawParameterValue("ON/OFF")->store(false);
+            }
+            else if (isPlayingInfo == true && resetBarAfterPause == false) {
+                resetBarAfterPause = true;
+                apvts.getRawParameterValue("ON/OFF")->store(true);
+            }
         }
         else {
             apvts.getRawParameterValue("DAW_CONNECTED")->store(false);
         }
 
     }
+
+
 
 
     //process incoming notes from keyboard for active miditexteditor
@@ -180,7 +205,7 @@ void PolyGnomeAudioProcessor::getStateInformation(juce::MemoryBlock& destData)
     // as intermediaries to make it easy to save and load complex data.
 
     juce::MemoryOutputStream mos(destData, true);
-    apvts.state.writeToStream(mos);
+    apvts.copyState().writeToStream(mos);
 
 }
 void PolyGnomeAudioProcessor::setStateInformation(const void* data, int sizeInBytes)
@@ -188,10 +213,10 @@ void PolyGnomeAudioProcessor::setStateInformation(const void* data, int sizeInBy
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
 
-
+    
     auto tree = juce::ValueTree::readFromData(data, sizeInBytes);
     if (tree.isValid()) {
-        apvts.replaceState(tree);
+       apvts.replaceState(tree);
     }
     
 }
@@ -202,7 +227,7 @@ void PolyGnomeAudioProcessor::setStateInformation(const void* data, int sizeInBy
 /*
 ******************************************
 ******************************************
-Default unchanged JUCE library code
+Default JUCE library code
 ******************************************
 */
 

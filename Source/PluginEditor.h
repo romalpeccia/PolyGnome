@@ -78,7 +78,6 @@ public:
 
 
 
-
 private:
     PolyGnomeAudioProcessor& audioProcessor;
 
