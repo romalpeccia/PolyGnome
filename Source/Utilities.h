@@ -13,10 +13,10 @@
 
 using namespace std;
 
-//TODO: figure out why ableton is lowering all my notes by an octave
-const int TEMP_MIDI_BUGFIX_NUM = 12;
+//TODO: make MIDI_STANDARD_OFFSET customizable by user in case their DAW uses a different MIDI standard
+const int MIDI_STANDARD_OFFSET = 12;
 const int MIN_MIDI_VALUE = 12;
-const int MAX_MIDI_VALUE = 127 - TEMP_MIDI_BUGFIX_NUM;
+const int MAX_MIDI_VALUE = 127 - MIDI_STANDARD_OFFSET;
 
 
 

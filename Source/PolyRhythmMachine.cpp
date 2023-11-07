@@ -57,7 +57,7 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
             float samplesAfterBeat = (((bars[j].tracks[i].beatCounter - 1) * bars[j].tracks[i].samplesPerInterval) + ((bars[j].tracks[i].sustain / 100) * bars[j].tracks[i].samplesPerInterval)); // the amount of samples for all intervals that have happened + the amount of samples after the latest interval
             if (j == barCounter) {
                 if (samplesProcessed >= samplesAfterBeat && bars[j].tracks[i].noteOffQueued == true) {
-                    auto messageOff = juce::MidiMessage::noteOff(MIDI_CHANNEL, bars[j].tracks[i].midiValue + TEMP_MIDI_BUGFIX_NUM);
+                    auto messageOff = juce::MidiMessage::noteOff(MIDI_CHANNEL, bars[j].tracks[i].midiValue + MIDI_STANDARD_OFFSET);
                     midiBuffer.addEvent(messageOff, samplesProcessed - samplesAfterBeat);
                     bars[j].tracks[i].noteOffQueued = false;
                 }
@@ -148,7 +148,7 @@ void PolyRhythmMachine::handleBarChange(juce::MidiBuffer& midiBuffer) {
 
 void PolyRhythmMachine::handleNoteTrigger(juce::MidiBuffer& midiBuffer, int noteNumber, int velocity, int bufferPosition)
 {
-    auto message = juce::MidiMessage::noteOn(MIDI_CHANNEL, noteNumber + TEMP_MIDI_BUGFIX_NUM, (juce::uint8)velocity);
+    auto message = juce::MidiMessage::noteOn(MIDI_CHANNEL, noteNumber + MIDI_STANDARD_OFFSET, (juce::uint8)velocity);
     if (!midiBuffer.addEvent(message, bufferPosition))
     {
        DBG("error adding messages to midiBuffer");
@@ -180,7 +180,7 @@ void PolyRhythmMachine::resetParams(juce::MidiBuffer& midiBuffer)
         int tempMidiValue = apvts->getRawParameterValue(getMidiValueString(barCounter, i))->load();
         if (bars[barCounter].tracks[i].midiValue != tempMidiValue)
         {
-            auto messageOff = juce::MidiMessage::noteOff(MIDI_CHANNEL, bars[barCounter].tracks[i].midiValue + TEMP_MIDI_BUGFIX_NUM);
+            auto messageOff = juce::MidiMessage::noteOff(MIDI_CHANNEL, bars[barCounter].tracks[i].midiValue + MIDI_STANDARD_OFFSET);
             midiBuffer.addEvent(messageOff, 0);
             bars[barCounter].tracks[i].midiValue = tempMidiValue;
         }
@@ -188,7 +188,7 @@ void PolyRhythmMachine::resetParams(juce::MidiBuffer& midiBuffer)
         int selectedBar = apvts->getRawParameterValue("SELECTED_BAR")->load();
         int tempSubdivisionValue = apvts->getRawParameterValue(getSubdivisionsString(selectedBar, i))->load();
         if (tempSubdivisionValue != bars[selectedBar].tracks[i].subdivisions) {
-            auto messageOff = juce::MidiMessage::noteOff(MIDI_CHANNEL, bars[selectedBar].tracks[i].midiValue + TEMP_MIDI_BUGFIX_NUM);
+            auto messageOff = juce::MidiMessage::noteOff(MIDI_CHANNEL, bars[selectedBar].tracks[i].midiValue + MIDI_STANDARD_OFFSET);
             midiBuffer.addEvent(messageOff, 0);
         }
         

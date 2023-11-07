@@ -170,7 +170,6 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
             colorTextEditor(bars[k].tracks[i].midiTextEditor, ACCENT_COLOUR, ACCENT_COLOUR, ACCENT_COLOUR, MAIN_COLOUR, true);
             bars[k].tracks[i].midiTextEditor.setHelpText(MIDI_TEXTEDITOR_REMINDER);
 
-
             //add control of textbox value to MIDI slider
             bars[k].tracks[i].midiSlider.onValueChange = [this, k, i]() {
                 int sliderInt = bars[k].tracks[i].midiSlider.getValue();
@@ -339,6 +338,14 @@ void PolyGnomeAudioProcessorEditor::paint(juce::Graphics& g)
         bars[selectedBar].tracks[selectedMidi].midiTextEditor.setText(midiIntToString(audioProcessor.storedMidiFromKeyboard) + " | " + to_string(audioProcessor.storedMidiFromKeyboard));
         bars[selectedBar].tracks[selectedMidi].midiSlider.setValue(audioProcessor.storedMidiFromKeyboard);
         audioProcessor.storedMidiFromKeyboard = -1;
+        if (selectedMidi < MAX_TRACKS - 1) {
+            audioProcessor.apvts.getRawParameterValue("SELECTED_MIDI")->store(selectedMidi+1);
+            bars[selectedBar].tracks[selectedMidi + 1].midiTextEditor.grabKeyboardFocus();
+        }
+        else {
+            audioProcessor.apvts.getRawParameterValue("SELECTED_MIDI")->store(0);
+            bars[selectedBar].tracks[0].midiTextEditor.grabKeyboardFocus();
+        }
     }
 
     //draw all the buttons related to bar selection/copying
@@ -499,6 +506,7 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
         juce::Rectangle<int> midiTextEditorBounds(X + width + 10 + 85, Y + spacing * (i - 1) + 25, 75, 25);
         bars[selectedBar].tracks[i].midiTextEditor.setBounds(midiTextEditorBounds);
         bars[selectedBar].tracks[i].midiTextEditor.setVisible(true);
+        bars[selectedBar].tracks[i].midiTextEditor.setSelectAllWhenFocused(true);
 
         juce::Rectangle<int> midiSliderBounds(X + width + 10 + 170, Y + spacing * (i - 1) + 13, 50, 50);
         bars[selectedBar].tracks[i].midiSlider.setBounds(midiSliderBounds);
