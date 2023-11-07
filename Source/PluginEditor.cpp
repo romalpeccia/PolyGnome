@@ -248,7 +248,7 @@ void PolyGnomeAudioProcessorEditor::resized()
     
     juce::FlexBox flexBox;
     flexBox.flexWrap = juce::FlexBox::Wrap::wrap;
-    flexBox.items.add(juce::FlexItem(MENU_WIDTH, 50, playButton));
+    //flexBox.items.add(juce::FlexItem(MENU_WIDTH, 50, playButton));
     flexBox.items.add(juce::FlexItem(MENU_WIDTH, 25, loadPresetButton));
     flexBox.items.add(juce::FlexItem(MENU_WIDTH, 25, savePresetButton));
     flexBox.items.add(juce::FlexItem(MENU_WIDTH, 200, reminderTextEditor));

@@ -69,17 +69,17 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
                     if (bars[j].tracks[i].beatCounter < MAX_SUBDIVISIONS) {
                         if (apvts->getRawParameterValue(getBeatToggleString(barCounter, i, bars[j].tracks[i].beatCounter))->load() == true) {
 
-                            //TODO: sort out this bufferPosition calculation error
+                            //TODO: sort out this bufferPosition calculation
                             int bufferPosition = samplesProcessed - samplesCountedSinceBarStart; 
                             //bufferPosition = 0; //for debugging
                             if (bufferPosition > bufferSize)
                             {
-                                
+                                /*
                                 DBG("midi buffer calculation error");
                                 DBG(bars[j].tracks[i].samplesPerInterval);
                                 DBG(samplesProcessed);
                                 DBG(samplesCountedSinceBarStart);
-                                
+                                */
                                 
                             }
                             if (apvts->getRawParameterValue(getTrackEnableString(barCounter, i))->load() == true) {

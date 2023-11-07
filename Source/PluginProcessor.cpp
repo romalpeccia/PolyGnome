@@ -9,17 +9,7 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 #include <string>
-#include "gtest/gtest.h"
 
-
-
-
-using namespace std;
-
-TEST_F(A, B)
-class MyPluginInstance : public juce::Test {
-
-}
 //==============================================================================
 PolyGnomeAudioProcessor::PolyGnomeAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -68,37 +58,40 @@ void PolyGnomeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
     if (selectedBar != activeBar && isAutoLoopEnabled) {
         apvts.getRawParameterValue("SELECTED_BAR")->store(activeBar);
     }
-    //DBG("TEST");
-    //get DAW INFO: bpm, isPlaying, samplesSinceStartofPlayhead
+
     auto positionInfo = getPlayHead()->getPosition();
     if (positionInfo) {
+        apvts.getRawParameterValue("DAW_CONNECTED")->store(true);
         auto bpmInfo = (*positionInfo).getBpm();
         auto timeInfo = (*positionInfo).getTimeInSamples();
         auto isPlayingInfo = (*positionInfo).getIsPlaying();
-        if (bpmInfo && timeInfo && isPlayingInfo) {
-            apvts.getRawParameterValue("DAW_CONNECTED")->store(true);
+        if (bpmInfo) {
             apvts.getRawParameterValue("BPM")->store(*bpmInfo);
+        }
+        if (timeInfo){
             apvts.getRawParameterValue("DAW_SAMPLES_ELAPSED")->store(*timeInfo);
+            DBG("SAMPLES ELAPSED" + juce::String(*timeInfo));
+        }
+
+        if (isPlayingInfo != NULL) { //JUCE bug? isPlayingInfo is NULL instead of false when the DAW is not playing
             apvts.getRawParameterValue("DAW_PLAYING")->store(isPlayingInfo);
-            if (isPlayingInfo == false) {
-                DBG("OFF");
+             if ( resetBarAfterPause == false) {
+                resetBarAfterPause = true;
+                apvts.getRawParameterValue("ON/OFF")->store(true);
             }
-            else {
-                DBG("ON");
-            }
-            if (isPlayingInfo == false && resetBarAfterPause == true) {
+
+        }
+        else {
+            apvts.getRawParameterValue("DAW_PLAYING")->store(false);
+            if (resetBarAfterPause == true) {
                 polyRhythmMachine.resetAll();
                 resetBarAfterPause = false;
                 apvts.getRawParameterValue("ON/OFF")->store(false);
             }
-            else if (isPlayingInfo == true && resetBarAfterPause == false) {
-                resetBarAfterPause = true;
-                apvts.getRawParameterValue("ON/OFF")->store(true);
-            }
         }
-        else {
-            apvts.getRawParameterValue("DAW_CONNECTED")->store(false);
-        }
+            
+          
+
 
     }
 
