@@ -308,7 +308,7 @@ void PolyGnomeAudioProcessorEditor::paint(juce::Graphics& g)
     int selectedBar = audioProcessor.apvts.getRawParameterValue("SELECTED_BAR")->load();
 
     //handle the notes being output by the machine
-    if (audioProcessor.apvts.getRawParameterValue("SELECTED_MIDI")->load() == -1) {
+    if (audioProcessor.apvts.getRawParameterValue("SELECTED_MIDI_TRACK")->load() == -1) {
         for (int i = 0; i < MAX_MIDI_VALUE; i++) {
 
             if (audioProcessor.keyboardState.isNoteOnForChannels(0xffff, i)) {
@@ -324,26 +324,26 @@ void PolyGnomeAudioProcessorEditor::paint(juce::Graphics& g)
     int isMidiSelected = false;
     for (int i = 0; i < MAX_TRACKS; i++) {
         if (bars[selectedBar].tracks[i].midiTextEditor.isFocussed) {
-            audioProcessor.apvts.getRawParameterValue("SELECTED_MIDI")->store(i);
+            audioProcessor.apvts.getRawParameterValue("SELECTED_MIDI_TRACK")->store(i);
             isMidiSelected = true;
             break;
         }
     }
     if (isMidiSelected == false) {
-        audioProcessor.apvts.getRawParameterValue("SELECTED_MIDI")->store(-1);
+        audioProcessor.apvts.getRawParameterValue("SELECTED_MIDI_TRACK")->store(-1);
     }
     
-    int selectedMidi = audioProcessor.apvts.getRawParameterValue("SELECTED_MIDI")->load();
+    int selectedMidi = audioProcessor.apvts.getRawParameterValue("SELECTED_MIDI_TRACK")->load();
     if (audioProcessor.storedMidiFromKeyboard != -1 && selectedMidi != -1) {
         bars[selectedBar].tracks[selectedMidi].midiTextEditor.setText(midiIntToString(audioProcessor.storedMidiFromKeyboard) + " | " + to_string(audioProcessor.storedMidiFromKeyboard));
         bars[selectedBar].tracks[selectedMidi].midiSlider.setValue(audioProcessor.storedMidiFromKeyboard);
         audioProcessor.storedMidiFromKeyboard = -1;
         if (selectedMidi < MAX_TRACKS - 1) {
-            audioProcessor.apvts.getRawParameterValue("SELECTED_MIDI")->store(selectedMidi+1);
+            audioProcessor.apvts.getRawParameterValue("SELECTED_MIDI_TRACK")->store(selectedMidi+1);
             bars[selectedBar].tracks[selectedMidi + 1].midiTextEditor.grabKeyboardFocus();
         }
         else {
-            audioProcessor.apvts.getRawParameterValue("SELECTED_MIDI")->store(0);
+            audioProcessor.apvts.getRawParameterValue("SELECTED_MIDI_TRACK")->store(0);
             bars[selectedBar].tracks[0].midiTextEditor.grabKeyboardFocus();
         }
     }
