@@ -44,6 +44,22 @@ public:
 
 };
 
+class MenuComponent : public virtual juce::Component {
+public:
+
+    CustomTextButton playButton;
+    CustomTextButton loadPresetButton;
+    CustomTextButton savePresetButton;
+    CustomTextEditor reminderTextEditor;
+    CustomTextButton barSelectButtons[MAX_BARS];
+    CustomTextButton barCopyButtons[MAX_BARS];
+    CustomSlider barSlider;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> barSliderAttachment;
+    CustomTextButton autoLoopButton;
+
+};
+
+
 
 //==============================================================================
 /**
@@ -65,18 +81,27 @@ public:
         repaint();
     };
 
+
+
+
+
+    //play state functions TODO: (potentially obsolete in some cases, since menu.playButton was removed. keep it hidden for now in case it is helpful for standalone mode)
     void toggleAudioProcessorChildrenStates();
     void togglePlayState();
     void togglePlayStateOff();
     void togglePlayStateOn();
+
+
     juce::String getCurrentMouseOverText();
 
     void colorSlider(juce::Slider &slider, juce::Colour thumbColour, juce::Colour textBoxTextColour, juce::Colour textBoxBackgroundColour, juce::Colour textBoxOutlineColour, bool trackEnabled);
     void colorTextEditor(juce::TextEditor &textEditor, juce::Colour textColour, juce::Colour focusedOutlineColour, juce::Colour outlineColour, juce::Colour backgroundColour, bool trackEnabled);
     //void colorTextButton(juce::TextButton& textButton, juce::Colour buttonColour, bool buttonEnabled, bool trackEnabled);
 
-
-
+    //component initializations 
+    void initializeImages();
+    void initializeMenuComponents();
+    void initializeMachineComponents();
 
 private:
     PolyGnomeAudioProcessor& audioProcessor;
@@ -90,24 +115,12 @@ private:
     void savePreset();
     std::unique_ptr<juce::FileChooser> fileChooser;
 
-
-
-
-    // TOP LEFT Components
     juce::Image logo, keyboardIcon, trackIcon, enableIcon, sustainIcon, velocityIcon;
 
-    CustomTextButton playButton;
-    CustomTextButton loadPresetButton;
-    CustomTextButton savePresetButton;
-    CustomTextEditor reminderTextEditor;
-    CustomTextButton barSelectButtons[MAX_BARS];
-    CustomTextButton barCopyButtons[MAX_BARS];
-    CustomSlider barSlider;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> barSliderAttachment;
+    MenuComponent menu;
 
     BarComponent bars[MAX_BARS];
 
-    CustomTextButton autoLoopButton;
     CustomKeyboardComponent keyboard;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PolyGnomeAudioProcessorEditor)

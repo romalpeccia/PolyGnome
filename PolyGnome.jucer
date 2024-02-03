@@ -36,7 +36,7 @@
     <VS2022 targetFolder="Builds/VisualStudio2022">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug"/>
-        <CONFIGURATION name="Release" useRuntimeLibDLL="0" isDebug="0"/>
+        <CONFIGURATION name="Release" useRuntimeLibDLL="0" isDebug="1"/>
         <CONFIGURATION isDebug="1" name="Unit Test" defines="JUCE_UNIT_TESTS = 1"/>
       </CONFIGURATIONS>
       <MODULEPATHS>

@@ -129,7 +129,24 @@ class CustomTextButton : public  juce::TextButton {
         void mouseExit(const juce::MouseEvent& event) override {
             isHoveredOver = false;
         }
+
+        void mouseUp(const juce::MouseEvent& event) override
+        {
+ 
+            if (event.mods.isRightButtonDown()) {
+                DBG("TRUE");
+
+                return;
+            }
+            else if (event.mods.isLeftButtonDown()) {
+                triggerClick();
+            }
+
+            
+        }
+
         bool isHoveredOver = false;
+
     private:    
 };
 

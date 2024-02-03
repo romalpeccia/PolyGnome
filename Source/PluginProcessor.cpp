@@ -71,10 +71,9 @@ void PolyGnomeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
         }
         if (timeInfo){
             apvts.getRawParameterValue("DAW_SAMPLES_ELAPSED")->store(*timeInfo);
-            DBG("SAMPLES ELAPSED" + juce::String(*timeInfo));
         }
 
-        if (isPlayingInfo != NULL) { //JUCE bug? isPlayingInfo is NULL instead of false when the DAW is not playing
+        if (isPlayingInfo != NULL) { //isPlayingInfo is NULL instead of false when the DAW is not playing
             apvts.getRawParameterValue("DAW_PLAYING")->store(isPlayingInfo);
              if ( resetBarAfterPause == false) {
                 resetBarAfterPause = true;
@@ -154,7 +153,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout PolyGnomeAudioProcessor::cre
     layout.add(std::make_unique<juce::AudioParameterInt>("ACTIVE_BAR", "active bar", 0, MAX_BARS - 1, 0));
 
     layout.add(std::make_unique<juce::AudioParameterInt>("SELECTED_MIDI_TRACK", "selected midi", -1, MAX_TRACKS, -1));
-    layout.add(std::make_unique<juce::AudioParameterInt>("SELECTED_MIDI_VALUE", "selected midi", -1, MAX_MIDI_VALUE, -1));
     //Parameters for Polytrack Machine 
     //<0-MAX_BARS>_BEAT_<0-MAX_TRACKS>.<0-MAX_SUBDIVISIONS>_TOGGLE
     //<0-MAX_BARS>_SUBDIVISIONS_<0-MAX_TRACKS>

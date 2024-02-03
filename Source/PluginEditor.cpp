@@ -10,8 +10,30 @@
 #include "PluginEditor.h"
 using namespace std;
 //==============================================================================
+
+
 PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProcessor& p)
     : AudioProcessorEditor(&p), audioProcessor(p)
+{
+    initializeImages();
+    initializeMenuComponents();
+    initializeMachineComponents();
+
+    //add components to component tree 
+    for (auto* comp : getVisibleComps())
+    {
+        addAndMakeVisible(comp);
+    }
+    for (auto* comp : getHiddenComps()) {
+        addChildComponent(comp);
+    }
+
+    startTimerHz(144);
+    setSize(PLUGIN_WIDTH, PLUGIN_HEIGHT);
+}
+
+
+void PolyGnomeAudioProcessorEditor::initializeImages()
 {
     //images are stored in binary using projucer
     logo = juce::ImageCache::getFromMemory(BinaryData::OSRS_gnome_png, BinaryData::OSRS_gnome_pngSize);
@@ -20,65 +42,68 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
     sustainIcon = juce::ImageCache::getFromMemory(BinaryData::sustain_png, BinaryData::sustain_pngSize);
     velocityIcon = juce::ImageCache::getFromMemory(BinaryData::velocity_png, BinaryData::velocity_pngSize);
     enableIcon = juce::ImageCache::getFromMemory(BinaryData::enable_png, BinaryData::enable_pngSize);
-    //initialize the menu buttons
-    playButton.onClick = [this]() { 
+}
+
+void PolyGnomeAudioProcessorEditor::initializeMenuComponents() {
+    menu.playButton.onClick = [this]() {
 
         togglePlayState();
         toggleAudioProcessorChildrenStates();
-    };
-    playButton.setButtonText("Play");
-    playButton.setColour(juce::TextButton::ColourIds::buttonColourId, SECONDARY_COLOUR);
-    playButton.setHelpText(PLAY_BUTTON_REMINDER);
+        };
+    menu.playButton.setButtonText("Play");
+    menu.playButton.setColour(juce::TextButton::ColourIds::buttonColourId, SECONDARY_COLOUR);
+    menu.playButton.setHelpText(PLAY_BUTTON_REMINDER);
 
-    loadPresetButton.onClick = [this]() {
+    menu.loadPresetButton.onClick = [this]() {
         loadPreset();
-    };
-    loadPresetButton.setButtonText("Load Preset");
-    loadPresetButton.setHelpText(LOAD_PRESET_BUTTON_REMINDER);
+        };
+    menu.loadPresetButton.setButtonText("Load Preset");
+    menu.loadPresetButton.setHelpText(LOAD_PRESET_BUTTON_REMINDER);
 
-    savePresetButton.onClick = [this]() {
+    menu.savePresetButton.onClick = [this]() {
         savePreset();
-    };
-    savePresetButton.setButtonText("Save Preset");
-    savePresetButton.setHelpText(SAVE_PRESET_BUTTON_REMINDER);
+        };
+    menu.savePresetButton.setButtonText("Save Preset");
+    menu.savePresetButton.setHelpText(SAVE_PRESET_BUTTON_REMINDER);
 
-    //initialize the bar options
-    colorSlider(barSlider, MAIN_COLOUR, MAIN_COLOUR, SECONDARY_COLOUR, MAIN_COLOUR, true);
-    barSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "NUM_BARS", barSlider);
-    barSlider.setHelpText(RACK_SLIDER_REMINDER);
-    barSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxRight, false, 25, 25);
+    colorSlider(menu.barSlider, MAIN_COLOUR, MAIN_COLOUR, SECONDARY_COLOUR, MAIN_COLOUR, true);
+    menu.barSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "NUM_BARS", menu.barSlider);
+    menu.barSlider.setHelpText(RACK_SLIDER_REMINDER);
+    menu.barSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxRight, false, 25, 25);
 
-    autoLoopButton.onClick = [this]() {
+    colorTextEditor(menu.reminderTextEditor, REMINDER_COLOUR, juce::Colours::white, juce::Colours::white, BACKGROUND_COLOUR, true);
+    menu.reminderTextEditor.setMultiLine(true);
+
+    menu.autoLoopButton.onClick = [this]() {
         if (audioProcessor.apvts.getRawParameterValue("AUTO_LOOP")->load() == true) {
             audioProcessor.apvts.getRawParameterValue("AUTO_LOOP")->store(false);
         }
         else {
             audioProcessor.apvts.getRawParameterValue("AUTO_LOOP")->store(true);
         }
-    };
-    autoLoopButton.setHelpText(AUTO_LOOP_REMINDER);
-    autoLoopButton.setButtonText("Auto-Loop");
+        };
+    menu.autoLoopButton.setHelpText(AUTO_LOOP_REMINDER);
+    menu.autoLoopButton.setButtonText("Auto-Loop");
 
     //initialize the bar buttons
     for (int i = 0; i < MAX_BARS; i++)
-    { 
-        barSelectButtons[i].onClick = [this, i]() {
+    {
+        menu.barSelectButtons[i].onClick = [this, i]() {
             audioProcessor.apvts.getRawParameterValue("SELECTED_BAR")->store(i);
             audioProcessor.apvts.getRawParameterValue("AUTO_LOOP")->store(false);
-        };
-        barSelectButtons[i].setHelpText(BAR_SELECT_BUTTON_REMINDER);
-        barSelectButtons[i].setButtonText(to_string(i+1));
+            };
+        menu.barSelectButtons[i].setHelpText(BAR_SELECT_BUTTON_REMINDER);
+        menu.barSelectButtons[i].setButtonText(to_string(i + 1));
     }
 
     //initialize the copy bar to other bar buttons
     for (int k = 0; k < MAX_BARS; k++)
     {
-        barCopyButtons[k].onClick = [this, k]() {
+        menu.barCopyButtons[k].onClick = [this, k]() {
             int targetBar = k;
             int currentBar = audioProcessor.apvts.getRawParameterValue("SELECTED_BAR")->load();
             for (int i = 0; i < MAX_TRACKS; i++)
             {
-
                 int subdivisions = audioProcessor.apvts.getRawParameterValue(getSubdivisionsString(currentBar, i))->load();
                 bars[targetBar].tracks[i].subdivisionSlider.setValue(subdivisions);
 
@@ -100,17 +125,15 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
                     bool beatEnabled = audioProcessor.apvts.getRawParameterValue(getBeatToggleString(currentBar, i, j))->load();
                     bars[targetBar].tracks[i].beatButtons[j].setToggleState(beatEnabled, juce::NotificationType::sendNotification);
                 }
-                
             }
-
-
         };
-        barCopyButtons[k].setHelpText(BAR_COPY_BUTTON_REMINDER);
-        barCopyButtons[k].setButtonText(to_string(k + 1));
-        barSelectButtons[k].setColour(juce::TextButton::ColourIds::buttonColourId, SECONDARY_COLOUR);
+        menu.barCopyButtons[k].setHelpText(BAR_COPY_BUTTON_REMINDER);
+        menu.barCopyButtons[k].setButtonText(to_string(k + 1));
+        menu.barSelectButtons[k].setColour(juce::TextButton::ColourIds::buttonColourId, SECONDARY_COLOUR);
     }
+}
 
-    //initialize the polyMachine buttons and sliders
+void PolyGnomeAudioProcessorEditor::initializeMachineComponents() {
     for (int k = 0; k < MAX_BARS; k++) {
         for (int i = 0; i < MAX_TRACKS; i++) {
             for (int j = 0; j < MAX_SUBDIVISIONS; j++)
@@ -128,8 +151,10 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
 
                 //bars[k].tracks[i].beatButtons[j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR);
                 */
-                bars[k].tracks[i].beatButtons[j].setClickingTogglesState(true); 
-                
+                juce::Font buttonFont = juce::Font(8);
+                bars[k].tracks[i].beatButtons[j].setClickingTogglesState(true);
+                bars[k].tracks[i].beatButtons[j].setButtonText(juce::String(midiIntToString(24 + i)).retainCharacters("ABCDEFG#"));
+
                 bars[k].tracks[i].beatButtonAttachments[j] = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.apvts, name, bars[k].tracks[i].beatButtons[j]);
                 bars[k].tracks[i].beatButtons[j].setHelpText(BEAT_BUTTON_REMINDER);
             }
@@ -183,8 +208,8 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
                 int inputInt;
                 string convertedString;
                 int currentIntValue = audioProcessor.apvts.getRawParameterValue(getMidiValueString(k, i))->load();
-                if (sscanf(inputString.c_str(), "%d", &inputInt) == 1)
-                {   //if user inputted an int
+                if (sscanf(inputString.c_str(), "%d", &inputInt) == 1){   
+                    //if user inputted an int
                     convertedString = midiIntToString(inputInt);
                     if (convertedString != "") {
                         bars[k].tracks[i].midiTextEditor.setText(convertedString + " | " + to_string(inputInt));
@@ -195,8 +220,8 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
                         bars[k].tracks[i].midiTextEditor.setText(midiIntToString(currentIntValue) + " | " + to_string(currentIntValue));
                     }
                 }
-                else
-                { //if user inputted a string
+                else{ 
+                    //if user inputted a string
                     int convertedInt = midiStringToInt(inputString);
                     if (convertedInt != -1) {
                         bars[k].tracks[i].midiTextEditor.setText(inputString + " | " + to_string(convertedInt));
@@ -208,30 +233,8 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
                     }
                 }
             };
-
-
-
-
         }
     }
-
-
-    //setup the reminder text box
-    colorTextEditor(reminderTextEditor, REMINDER_COLOUR, juce::Colours::white, juce::Colours::white, BACKGROUND_COLOUR, true);
-    reminderTextEditor.setMultiLine(true);
-    //setup the keyboard
-
-
-    for (auto* comp : getVisibleComps())
-    {
-        addAndMakeVisible(comp);
-    }
-    for (auto* comp : getHiddenComps()) {
-        addChildComponent(comp);
-    }
-
-    startTimerHz(144);
-    setSize(PLUGIN_WIDTH, PLUGIN_HEIGHT);
 }
 
 PolyGnomeAudioProcessorEditor::~PolyGnomeAudioProcessorEditor()
@@ -240,25 +243,24 @@ PolyGnomeAudioProcessorEditor::~PolyGnomeAudioProcessorEditor()
 
 void PolyGnomeAudioProcessorEditor::resized()
 {
-    //TODO: change how all of this is laid out
     
     juce::Rectangle<int> menuBounds(MENU_WIDTH, MENU_WIDTH);
     menuBounds.removeFromTop(50);
     
     juce::FlexBox flexBox;
     flexBox.flexWrap = juce::FlexBox::Wrap::wrap;
-    //flexBox.items.add(juce::FlexItem(MENU_WIDTH, 50, playButton));
-    flexBox.items.add(juce::FlexItem(MENU_WIDTH, 25, loadPresetButton));
-    flexBox.items.add(juce::FlexItem(MENU_WIDTH, 25, savePresetButton));
-    flexBox.items.add(juce::FlexItem(MENU_WIDTH, 200, reminderTextEditor));
-    flexBox.items.add(juce::FlexItem(MENU_WIDTH, 25, autoLoopButton));
-    flexBox.items.add(juce::FlexItem(MENU_WIDTH, 50, barSlider));
+    //flexBox.items.add(juce::FlexItem(MENU_WIDTH, 50, menu.playButton));
+    flexBox.items.add(juce::FlexItem(MENU_WIDTH, 25, menu.loadPresetButton));
+    flexBox.items.add(juce::FlexItem(MENU_WIDTH, 25, menu.savePresetButton));
+    flexBox.items.add(juce::FlexItem(MENU_WIDTH, 200, menu.reminderTextEditor));
+    flexBox.items.add(juce::FlexItem(MENU_WIDTH, 25, menu.autoLoopButton));
+    flexBox.items.add(juce::FlexItem(MENU_WIDTH, 50, menu.barSlider));
     for (int i = 0; i < MAX_BARS; i++) {
-        flexBox.items.add(juce::FlexItem(25, 25, barSelectButtons[i]));
+        flexBox.items.add(juce::FlexItem(25, 25, menu.barSelectButtons[i]));
     }
     flexBox.items.add(juce::FlexItem(MENU_WIDTH, 175));
     for (int i = 0; i < MAX_BARS; i++) {
-        flexBox.items.add(juce::FlexItem(25, 25, barCopyButtons[i]));
+        flexBox.items.add(juce::FlexItem(25, 25, menu.barCopyButtons[i]));
     }
     flexBox.performLayout(menuBounds);
     
@@ -269,9 +271,6 @@ void PolyGnomeAudioProcessorEditor::resized()
     keyboardBounds.removeFromLeft(MENU_WIDTH);
     flexBox2.performLayout(keyboardBounds);
 }
-
-//==============================================================================
-
 
 void PolyGnomeAudioProcessorEditor::paint(juce::Graphics& g)
 {
@@ -287,20 +286,20 @@ void PolyGnomeAudioProcessorEditor::paint(juce::Graphics& g)
     g.drawImageAt(keyboardIcon, visualArea.getX() + visualArea.getWidth() + 155, 5);
 
     if (audioProcessor.apvts.getRawParameterValue("ON/OFF")->load() == true) {
-        playButton.setColour(juce::TextButton::ColourIds::buttonColourId, MAIN_COLOUR);
+        menu.playButton.setColour(juce::TextButton::ColourIds::buttonColourId, MAIN_COLOUR);
     }
     else {
-        playButton.setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR);
+        menu.playButton.setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR);
     }
 
     if (audioProcessor.apvts.getRawParameterValue("AUTO_LOOP")->load() == true) {
-        autoLoopButton.setColour(juce::TextButton::ColourIds::buttonColourId, MAIN_COLOUR);
+        menu.autoLoopButton.setColour(juce::TextButton::ColourIds::buttonColourId, MAIN_COLOUR);
     }
     else {
-        autoLoopButton.setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR);
+        menu.autoLoopButton.setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR);
     }
 
-    reminderTextEditor.setText(getCurrentMouseOverText());
+    menu.reminderTextEditor.setText(getCurrentMouseOverText());
 
 
     int numBars = audioProcessor.apvts.getRawParameterValue("NUM_BARS")->load();
@@ -351,28 +350,28 @@ void PolyGnomeAudioProcessorEditor::paint(juce::Graphics& g)
     //draw all the buttons related to bar selection/copying
     for (int j = 0; j < MAX_BARS; j++) {
         if (j >= numBars) {
-            barSelectButtons[j].setVisible(false);
-            barCopyButtons[j].setVisible(false);
+            menu.barSelectButtons[j].setVisible(false);
+            menu.barCopyButtons[j].setVisible(false);
         }
         else {
             if (j == selectedBar) {
-                barCopyButtons[j].setVisible(false);
+                menu.barCopyButtons[j].setVisible(false);
             }
             else {
-                barCopyButtons[j].setVisible(true);
+                menu.barCopyButtons[j].setVisible(true);
             }
-            barSelectButtons[j].setVisible(true);
+            menu.barSelectButtons[j].setVisible(true);
             if (j == activeBar && j == selectedBar) {
-                barSelectButtons[j].setColour(juce::TextButton::ColourIds::buttonColourId, ENABLED_COLOUR);
+                menu.barSelectButtons[j].setColour(juce::TextButton::ColourIds::buttonColourId, ENABLED_COLOUR);
             }
             else if (j == selectedBar) {
-                barSelectButtons[j].setColour(juce::TextButton::ColourIds::buttonColourId, MAIN_COLOUR);
+                menu.barSelectButtons[j].setColour(juce::TextButton::ColourIds::buttonColourId, MAIN_COLOUR);
             }
             else if (j == activeBar) {
-                barSelectButtons[j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_DARK_COLOUR);
+                menu.barSelectButtons[j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_DARK_COLOUR);
             }
             else {
-                barSelectButtons[j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR);
+                menu.barSelectButtons[j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR);
             }
         }
     }
@@ -588,12 +587,12 @@ std::vector<juce::Component*> PolyGnomeAudioProcessorEditor::getVisibleComps() {
     //returns components that do not need to be hidden
 
     std::vector<juce::Component*> comps;
-    comps.push_back(&playButton);
-    comps.push_back(&loadPresetButton);
-    comps.push_back(&savePresetButton);
-    comps.push_back(&reminderTextEditor);
-    comps.push_back(&barSlider);
-    comps.push_back(&autoLoopButton);
+    comps.push_back(&menu.playButton);
+    comps.push_back(&menu.loadPresetButton);
+    comps.push_back(&menu.savePresetButton);
+    comps.push_back(&menu.reminderTextEditor);
+    comps.push_back(&menu.barSlider);
+    comps.push_back(&menu.autoLoopButton);
     comps.push_back(&keyboard);
     for (int i = 0; i < MAX_TRACKS; i++) {
 
@@ -622,8 +621,8 @@ std::vector<juce::Component*> PolyGnomeAudioProcessorEditor::getHiddenComps() {
                 comps.push_back(&bars[k].tracks[i].beatButtons[j]);
             }
         }
-        comps.push_back(&barSelectButtons[k]);
-        comps.push_back(&barCopyButtons[k]);
+        comps.push_back(&menu.barSelectButtons[k]);
+        comps.push_back(&menu.barCopyButtons[k]);
     }
     return{ comps };
 }
@@ -637,6 +636,7 @@ std::vector<juce::Component*> PolyGnomeAudioProcessorEditor::getAllComps() {
 
 void PolyGnomeAudioProcessorEditor::colorSlider(juce::Slider& slider, juce::Colour thumbColour, juce::Colour textBoxTextColour, juce::Colour textBoxBackgroundColour, juce::Colour textBoxOutlineColour, bool trackEnabled) {
     //any further customization to slider colors should be added here
+    //TODO: make this a class function?
     if (trackEnabled == false) {
         thumbColour = thumbColour.brighter(0.9);
         textBoxTextColour = textBoxTextColour.brighter(0.9);
@@ -666,20 +666,20 @@ void PolyGnomeAudioProcessorEditor::colorTextEditor(juce::TextEditor& textEditor
 juce::String PolyGnomeAudioProcessorEditor::getCurrentMouseOverText() {
     juce::String   reminderText = "";
 
-    if (playButton.isHoveredOver == true) {
-        reminderText = playButton.getHelpText();
+    if (menu.playButton.isHoveredOver == true) {
+        reminderText = menu.playButton.getHelpText();
     }
-    else  if (loadPresetButton.isHoveredOver == true) {
-        reminderText = loadPresetButton.getHelpText();
+    else  if (menu.loadPresetButton.isHoveredOver == true) {
+        reminderText = menu.loadPresetButton.getHelpText();
     }
-    else  if (savePresetButton.isHoveredOver == true) {
-        reminderText = savePresetButton.getHelpText();
+    else  if (menu.savePresetButton.isHoveredOver == true) {
+        reminderText = menu.savePresetButton.getHelpText();
     }
-    else if (barSlider.isHoveredOver == true) {
-        reminderText = barSlider.getHelpText();
+    else if (menu.barSlider.isHoveredOver == true) {
+        reminderText = menu.barSlider.getHelpText();
     }
-    else if (autoLoopButton.isHoveredOver == true) {
-        reminderText = autoLoopButton.getHelpText();
+    else if (menu.autoLoopButton.isHoveredOver == true) {
+        reminderText = menu.autoLoopButton.getHelpText();
     }
     else {
         for (int j = 0; j < MAX_BARS; j++) {
@@ -717,12 +717,12 @@ juce::String PolyGnomeAudioProcessorEditor::getCurrentMouseOverText() {
                     }
                 }
             }
-            if (barSelectButtons[j].isHoveredOver == true) {
-                reminderText = barSelectButtons[j].getHelpText();
+            if (menu.barSelectButtons[j].isHoveredOver == true) {
+                reminderText = menu.barSelectButtons[j].getHelpText();
                 break;
             }
-            if (barCopyButtons[j].isHoveredOver == true) {
-                reminderText = barCopyButtons[j].getHelpText();
+            if (menu.barCopyButtons[j].isHoveredOver == true) {
+                reminderText = menu.barCopyButtons[j].getHelpText();
                 break;
             }
         }
