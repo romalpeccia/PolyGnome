@@ -1,11 +1,24 @@
-/*
+/*(
   ==============================================================================
 
-    Utilities.cpp
-    Created: 3 Mar 2023 3:15:33pm
-    Author:  romal
+    This file contains various utility functions which are used throughout
+    the PolyGnome.
 
   ==============================================================================
+    Copyright(C) 2024 Romal Peccia
+
+    This program is free software : you can redistribute it and /or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.If not, see < https://www.gnu.org/licenses/>.
 */
 
 #include "Utilities.h"
@@ -31,11 +44,6 @@ juce::String getSustainString(int barNum, int trackNum) {
 juce::String getTrackEnableString(int barNum, int trackNum) {
     return to_string(barNum) + "_TRACK_" + to_string(trackNum) + "_ENABLE";
 }
-
-
-
-
-
 
 
 string midiIntToString(int midiValue) {
@@ -130,7 +138,7 @@ string midiIntToString(int midiValue) {
 
 int midiStringToInt(string midiValue) {
     //takes an MIDI string and returns it's cooresponding MIDI integer value
-    //a value MIDI string can be some combination of (Note char)(optional sharp)(optional negative symbol)(note int), giving us 4 possible ways to parse a midi note
+    //a value MIDI string can be some combination of (Note char)(optional sharp)(optional negative symbol)(note int), giving us 4 possible ways to parse a midi string
 
     string noteName;
     string noteValue;
