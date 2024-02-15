@@ -45,7 +45,7 @@ const int MAX_VELOCITY = 128;
 const int DEFAULT_VELOCITY = 100;
 const int DEFAULT_MIDI_VALUE = 24; //0 - (128 - MAX_TRACKS)
 const int DEFAULT_SUBDIVISIONS = 4; //1 -  MAX_SUBDIVISIONS
-const int DEFAULT_SUSTAIN = 50.00; // 0 - 100
+const double DEFAULT_SUSTAIN = 50.00; // 0 - 100
 
 //UI size constants
 const int PLUGIN_WIDTH = 1000;
@@ -156,12 +156,8 @@ class CustomTextButton : public  juce::TextButton {
             else if (event.mods.isLeftButtonDown()) {
                 triggerClick();
             }
-
-            
         }
-
         bool isHoveredOver = false;
-
     private:    
 };
 

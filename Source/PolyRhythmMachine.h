@@ -65,7 +65,7 @@ public:
     int barCounter = 0;
 private:
 
-    void PolyRhythmMachine::handleNoteTrigger(juce::MidiBuffer&, int noteNumber, int velocity, int bufferPosition);
+    void handleNoteTrigger(juce::MidiBuffer&, int noteNumber, int velocity, int bufferPosition);
     int samplesProcessed = 0; //total samples since start time
     double sampleRate = 0; //sampleRate from DAW, usually 44100 samples/beat
     double samplesPerBar = 0; //= 4 * (60.0 / bpm) * sampleRate;

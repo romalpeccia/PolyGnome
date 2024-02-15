@@ -166,7 +166,7 @@ void PolyGnomeAudioProcessorEditor::initializeMachineComponents() {
                 */
                 juce::Font buttonFont = juce::Font(8);
                 bars[k].tracks[i].beatButtons[j].setClickingTogglesState(true);
-                bars[k].tracks[i].beatButtons[j].setButtonText(juce::String(midiIntToString(24 + i)).retainCharacters("ABCDEFG#"));
+
 
                 bars[k].tracks[i].beatButtonAttachments[j] = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.apvts, name, bars[k].tracks[i].beatButtons[j]);
                 bars[k].tracks[i].beatButtons[j].setHelpText(BEAT_BUTTON_REMINDER);
@@ -460,8 +460,9 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
         int subdivisions = audioProcessor.apvts.getRawParameterValue(getSubdivisionsString(selectedBar, i))->load();
         //draw the buttons for each note of the track
         for (int j = 0; j < subdivisions; j++) {
- 
-    
+            //TODO: make this text fit the button properly
+            bars[selectedBar].tracks[i].beatButtons[j].setButtonText(juce::String(midiIntToString((audioProcessor.apvts.getRawParameterValue(getMidiValueString(selectedBar, i))->load()))).retainCharacters("ABCDEFG#"));
+
             float distanceOnPath = (width / subdivisions) * j;
             juce::Rectangle<int> pointBounds(X + distanceOnPath, Y + spacing * i - 10, 22, 22);
             bars[selectedBar].tracks[i].beatButtons[j].setBounds(pointBounds);

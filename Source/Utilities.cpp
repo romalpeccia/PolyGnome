@@ -145,26 +145,20 @@ int midiStringToInt(string midiValue) {
     int noteMultiplier;
     int noteAddition;
 
-    if (midiValue[0] != NULL) {
+    if (midiValue[0] != '\0' && midiValue[1] != '\0') {
         noteName = midiValue[0];
-    }
-    else
-        return -1;
-    if (midiValue[1] != NULL) {
         if (midiValue[1] == '#') {
             noteName.append("#");
-            if (&midiValue[2] != NULL) {
+            if (midiValue[2] != '\0') {
                 noteValue.append(&midiValue[2]);
             }
-            else 
-                return -1;
+            else return -1;
         }
         else {
             noteValue.append(&midiValue[1]);
         }
     }
-    else
-        return -1;
+    else return -1;
 
 
     if (noteName == "C" || noteName == "c") {
