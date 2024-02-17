@@ -75,34 +75,25 @@ const string PLAY_BUTTON_REMINDER = "start/stop polygnome";
 const string LOAD_PRESET_BUTTON_REMINDER = "load a .pgnome file";
 const string SAVE_PRESET_BUTTON_REMINDER = "save a .pgnome file";
 const string BPM_SLIDER_REMINDER = "change bpm";
-const string RACK_SLIDER_REMINDER = "adjust how many bars per loop";
+const string BAR_SLIDER_REMINDER = "adjust how many bars per loop";
 const string BAR_SELECT_BUTTON_REMINDER = "select a bar of the loop";
 const string AUTO_LOOP_REMINDER = "automatically switch to page cooresponding to currently playing bar";
 const string BAR_COPY_BUTTON_REMINDER = "copy currently selected page to different bar";
 
-
+//conversion from MIDI strings like C#4 to integers like 37
 string midiIntToString(int midiValue);
 int midiStringToInt(string midiValue);
 
+//helper functions so I don't have to repeat giant strings in apvts.getRawParameterValue calls
 juce::String getBeatToggleString(int barNum, int trackNum, int beatNum);
+juce::String getBeatMidiString(int barNum, int trackNum, int beatNum);
 juce::String getSubdivisionsString(int barNum, int trackNum);
 juce::String getVelocityString(int barNum, int trackNum);
 juce::String getMidiValueString(int barNum, int trackNum);
 juce::String getSustainString(int barNum, int trackNum);
 juce::String getTrackEnableString(int barNum, int trackNum);
 
-/*
-class CustomComponent : public virtual juce::Component {
-public:
-    void mouseEnter(const juce::MouseEvent& event) override {
-        isHoveredOver = true;
-    }
-    void mouseExit(const juce::MouseEvent& event) override {
-        isHoveredOver = false;
-    }
-    bool isHoveredOver = false;
-};
-*/
+
 
 class CustomSlider : public  juce::Slider {
     public:
@@ -118,6 +109,8 @@ class CustomSlider : public  juce::Slider {
 
 class CustomTextEditor : public  juce::TextEditor {
     public:
+
+
         void mouseEnter(const juce::MouseEvent& event) override {
             isHoveredOver = true;
         }
@@ -145,21 +138,12 @@ class CustomTextButton : public  juce::TextButton {
             isHoveredOver = false;
         }
 
-        void mouseUp(const juce::MouseEvent& event) override
-        {
- 
-            if (event.mods.isRightButtonDown()) {
-                DBG("TRUE");
-
-                return;
-            }
-            else if (event.mods.isLeftButtonDown()) {
-                triggerClick();
-            }
-        }
         bool isHoveredOver = false;
+
     private:    
+ 
 };
+
 
 class CustomToggleButton : public juce::ToggleButton {
     public:
@@ -175,3 +159,94 @@ class CustomToggleButton : public juce::ToggleButton {
 
 
 
+
+
+class BeatMenu : public juce::Component {
+
+public:
+    BeatMenu() {
+        setSize(400, 400);
+        //beatMidiSlider.setValue(tempSliderValue);
+        addAndMakeVisible(beatMidiSlider);
+        addAndMakeVisible(arpButton);
+        flexBox.flexWrap = juce::FlexBox::Wrap::wrap;
+        flexBox.items.add(juce::FlexItem(300, 100, beatMidiSlider));
+        flexBox.items.add(juce::FlexItem(300, 100, arpButton));
+        flexBox.performLayout(getBounds());
+
+    }
+    ~BeatMenu() {
+
+    }
+
+    
+    CustomSlider beatMidiSlider;
+
+private:
+    /*
+    midi slider
+        Arp toggle
+        Num arps
+        Speed
+            Type
+        Root note
+        Major minor toggle
+    */
+
+    CustomTextButton arpButton;
+    juce::FlexBox flexBox;
+};
+
+
+class BeatButton : public  juce::TextButton {
+public:
+    //commented out code is for potential CallOutBox implementation: need a way to keep the components from getting deleted in memory when the calloutBox closes. 
+    BeatButton() {
+
+
+    }
+
+    void mouseEnter(const juce::MouseEvent& event) override {
+        isHoveredOver = true;
+    }
+    void mouseExit(const juce::MouseEvent& event) override {
+        isHoveredOver = false;
+    }
+
+    void mouseUp(const juce::MouseEvent& event) override
+    {
+
+        if (event.mods.isRightButtonDown()) {
+
+            /*
+            auto content = std::make_unique<BeatMenu>(tempSliderValue);
+            content->setSize(300, 300);
+            auto& myBox = juce::CallOutBox::launchAsynchronously(std::move(content),
+                getScreenBounds(),
+                nullptr);
+                */
+
+        }
+        else if (event.mods.isLeftButtonDown()) {
+            triggerClick();
+        }
+    }
+    bool isHoveredOver = false;
+
+private:
+    //int tempSliderValue = 0;
+
+};
+
+
+
+//notes on adding new components
+/*
+add helper text in utilities 
+component and attachment declaration in cooresponding parent class in editor
+add param to apvts in juce::AudioProcessorValueTreeState::ParameterLayout PolyGnomeAudioProcessor::createParameterLayout()
+set helptext/style in editor
+set helptext polling in getCurrentMouseOverText in pluginEditor.cpp
+add component to getHiddenComps or getVisibleComps in pluginEditor.cpp
+paint component in paint() in pluginEditor.cpp
+*/

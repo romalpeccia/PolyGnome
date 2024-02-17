@@ -180,6 +180,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PolyGnomeAudioProcessor::cre
             for (int j = 0; j < MAX_SUBDIVISIONS; j++)
             {
                     layout.add(std::make_unique<juce::AudioParameterBool>(getBeatToggleString(barNum, i, j), to_string(barNum) + "_Beat" + to_string(i) + "." + to_string(j) + "Toggle", false));
+                    layout.add(std::make_unique<juce::AudioParameterInt>(getBeatMidiString(barNum, i, j), to_string(barNum) + "_Beat" + to_string(i) + "." + to_string(j) + "Midi", 0, MAX_MIDI_VALUE, DEFAULT_MIDI_VALUE + i));
             }
             layout.add(std::make_unique<juce::AudioParameterInt>(getSubdivisionsString(barNum, i), to_string(barNum) + "_Subdivisions " + to_string(i), 1, MAX_SUBDIVISIONS, DEFAULT_SUBDIVISIONS));
             layout.add(std::make_unique<juce::AudioParameterInt>(getMidiValueString(barNum, i), to_string(barNum) + "_Midi Value " + to_string(i), 0, MAX_MIDI_VALUE, DEFAULT_MIDI_VALUE + i));

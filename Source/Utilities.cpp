@@ -29,18 +29,26 @@ juce::String getBeatToggleString(int barNum, int trackNum, int beatNum) {
     return to_string(barNum)+ "_BEAT_" + to_string(trackNum) + "_" + to_string(beatNum) + "_TOGGLE";
 }
 
+juce::String getBeatMidiString(int barNum, int trackNum, int beatNum) {
+    return to_string(barNum) + "_BEAT_" + to_string(trackNum) + "_" + to_string(beatNum) + "_MIDI";
+}
+
 juce::String getSubdivisionsString(int barNum, int trackNum) {
     return to_string(barNum) + "_SUBDIVISIONS_" + to_string(trackNum);
 }
+
 juce::String getVelocityString(int barNum, int trackNum) {
     return to_string(barNum) + "_VELOCITY_" + to_string(trackNum);
 }
+
 juce::String getMidiValueString(int barNum, int trackNum) {
     return to_string(barNum) + "_MIDI_VALUE" + to_string(trackNum);
 }
+
 juce::String getSustainString(int barNum, int trackNum) {
     return to_string(barNum) + "_SUSTAIN_" + to_string(trackNum);
 }
+
 juce::String getTrackEnableString(int barNum, int trackNum) {
     return to_string(barNum) + "_TRACK_" + to_string(trackNum) + "_ENABLE";
 }

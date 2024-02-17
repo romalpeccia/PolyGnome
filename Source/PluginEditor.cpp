@@ -45,6 +45,11 @@ PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProce
     setSize(PLUGIN_WIDTH, PLUGIN_HEIGHT);
 }
 
+PolyGnomeAudioProcessorEditor::~PolyGnomeAudioProcessorEditor()
+{
+
+}
+
 
 void PolyGnomeAudioProcessorEditor::initializeImages()
 {
@@ -57,9 +62,12 @@ void PolyGnomeAudioProcessorEditor::initializeImages()
     enableIcon = juce::ImageCache::getFromMemory(BinaryData::enable_png, BinaryData::enable_pngSize);
 }
 
-void PolyGnomeAudioProcessorEditor::initializeMenuComponents() {
-    menu.playButton.onClick = [this]() {
 
+
+void PolyGnomeAudioProcessorEditor::initializeMenuComponents() {
+
+    //initialize the playButton (currently defunct, may reintroduce it again for standalone mode)
+    menu.playButton.onClick = [this]() {
         togglePlayState();
         toggleAudioProcessorChildrenStates();
         };
@@ -67,26 +75,30 @@ void PolyGnomeAudioProcessorEditor::initializeMenuComponents() {
     menu.playButton.setColour(juce::TextButton::ColourIds::buttonColourId, SECONDARY_COLOUR);
     menu.playButton.setHelpText(PLAY_BUTTON_REMINDER);
 
+    //initialize the load/save preset buttons
     menu.loadPresetButton.onClick = [this]() {
         loadPreset();
         };
     menu.loadPresetButton.setButtonText("Load Preset");
     menu.loadPresetButton.setHelpText(LOAD_PRESET_BUTTON_REMINDER);
-
+    
     menu.savePresetButton.onClick = [this]() {
         savePreset();
         };
     menu.savePresetButton.setButtonText("Save Preset");
     menu.savePresetButton.setHelpText(SAVE_PRESET_BUTTON_REMINDER);
-
+    
+    //initialize  barSlider
     colorSlider(menu.barSlider, MAIN_COLOUR, MAIN_COLOUR, SECONDARY_COLOUR, MAIN_COLOUR, true);
     menu.barSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "NUM_BARS", menu.barSlider);
-    menu.barSlider.setHelpText(RACK_SLIDER_REMINDER);
+    menu.barSlider.setHelpText(BAR_SLIDER_REMINDER);
     menu.barSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxRight, false, 25, 25);
 
+    //initialize reminderTextEditor
     colorTextEditor(menu.reminderTextEditor, REMINDER_COLOUR, juce::Colours::white, juce::Colours::white, BACKGROUND_COLOUR, true);
     menu.reminderTextEditor.setMultiLine(true);
 
+    //initialize autoloop button
     menu.autoLoopButton.onClick = [this]() {
         if (audioProcessor.apvts.getRawParameterValue("AUTO_LOOP")->load() == true) {
             audioProcessor.apvts.getRawParameterValue("AUTO_LOOP")->store(false);
@@ -142,7 +154,6 @@ void PolyGnomeAudioProcessorEditor::initializeMenuComponents() {
         };
         menu.barCopyButtons[k].setHelpText(BAR_COPY_BUTTON_REMINDER);
         menu.barCopyButtons[k].setButtonText(to_string(k + 1));
-        menu.barSelectButtons[k].setColour(juce::TextButton::ColourIds::buttonColourId, SECONDARY_COLOUR);
     }
 }
 
@@ -151,25 +162,16 @@ void PolyGnomeAudioProcessorEditor::initializeMachineComponents() {
         for (int i = 0; i < MAX_TRACKS; i++) {
             for (int j = 0; j < MAX_SUBDIVISIONS; j++)
             { //initialize the track buttons
-                juce::String name = getBeatToggleString(k, i, j);
-                /*
-                bars[k].tracks[i].beatButtons[j].onClick = [this, name, k, i , j]() {
-                    if (audioProcessor.apvts.getRawParameterValue(name)->load() == true) {
-                        bars[k].tracks[i].beatButtons[j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR);
-                    }
-                    else {
-                        bars[k].tracks[i].beatButtons[j].setColour(juce::TextButton::ColourIds::buttonOnColourId, MAIN_COLOUR);
-                    }
-                };
-
-                //bars[k].tracks[i].beatButtons[j].setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR);
-                */
                 juce::Font buttonFont = juce::Font(8);
                 bars[k].tracks[i].beatButtons[j].setClickingTogglesState(true);
-
-
-                bars[k].tracks[i].beatButtonAttachments[j] = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.apvts, name, bars[k].tracks[i].beatButtons[j]);
+                bars[k].tracks[i].beatButtonAttachments[j] = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.apvts, getBeatToggleString(k, i, j) , bars[k].tracks[i].beatButtons[j]);
                 bars[k].tracks[i].beatButtons[j].setHelpText(BEAT_BUTTON_REMINDER);
+
+                //initialize their submenus
+                bars[k].tracks[i].beatMidiSliderAttachments[j] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, getBeatMidiString(k, i, j), bars[k].tracks[i].beatMidiSliders[j]);
+
+
+
             }
 
             //initialize the mute buttons
@@ -250,9 +252,7 @@ void PolyGnomeAudioProcessorEditor::initializeMachineComponents() {
     }
 }
 
-PolyGnomeAudioProcessorEditor::~PolyGnomeAudioProcessorEditor()
-{
-}
+
 
 void PolyGnomeAudioProcessorEditor::resized()
 {
@@ -289,14 +289,14 @@ void PolyGnomeAudioProcessorEditor::paint(juce::Graphics& g)
 {
     g.fillAll(BACKGROUND_COLOUR);
 
-    g.drawImageAt(logo, 0, 0);
     auto visualArea = getVisualArea();
+    g.drawImageAt(logo, 0, 0);
     g.drawImageAt(sustainIcon, visualArea.getX() - 190, 8);
     g.drawImageAt(velocityIcon, visualArea.getX() - 105, 8);
     g.drawImageAt(enableIcon, visualArea.getX() - 50, 8);
-
     g.drawImageAt(trackIcon, visualArea.getX() + visualArea.getWidth() + 35, 5);
     g.drawImageAt(keyboardIcon, visualArea.getX() + visualArea.getWidth() + 155, 5);
+
 
     if (audioProcessor.apvts.getRawParameterValue("ON/OFF")->load() == true) {
         menu.playButton.setColour(juce::TextButton::ColourIds::buttonColourId, MAIN_COLOUR);
@@ -304,6 +304,7 @@ void PolyGnomeAudioProcessorEditor::paint(juce::Graphics& g)
     else {
         menu.playButton.setColour(juce::TextButton::ColourIds::buttonColourId, DISABLED_COLOUR);
     }
+
 
     if (audioProcessor.apvts.getRawParameterValue("AUTO_LOOP")->load() == true) {
         menu.autoLoopButton.setColour(juce::TextButton::ColourIds::buttonColourId, MAIN_COLOUR);
@@ -332,7 +333,9 @@ void PolyGnomeAudioProcessorEditor::paint(juce::Graphics& g)
         }
     }
     
-    //handle notes being input by user
+    //handle notes being input by user through the MIDI text editor
+
+    //check if a midi texteditor is selected, and save that information in our apvts
     int isMidiSelected = false;
     for (int i = 0; i < MAX_TRACKS; i++) {
         if (bars[selectedBar].tracks[i].midiTextEditor.isFocussed) {
@@ -345,11 +348,13 @@ void PolyGnomeAudioProcessorEditor::paint(juce::Graphics& g)
         audioProcessor.apvts.getRawParameterValue("SELECTED_MIDI_TRACK")->store(-1);
     }
     
+    //if the user has entered a MIDI note, update the UI accordingly
     int selectedMidi = audioProcessor.apvts.getRawParameterValue("SELECTED_MIDI_TRACK")->load();
     if (audioProcessor.storedMidiFromKeyboard != -1 && selectedMidi != -1) {
         bars[selectedBar].tracks[selectedMidi].midiTextEditor.setText(midiIntToString(audioProcessor.storedMidiFromKeyboard) + " | " + to_string(audioProcessor.storedMidiFromKeyboard));
         bars[selectedBar].tracks[selectedMidi].midiSlider.setValue(audioProcessor.storedMidiFromKeyboard);
         audioProcessor.storedMidiFromKeyboard = -1;
+        //give focus to the next MIDI texteditor in the queue
         if (selectedMidi < MAX_TRACKS - 1) {
             audioProcessor.apvts.getRawParameterValue("SELECTED_MIDI_TRACK")->store(selectedMidi+1);
             bars[selectedBar].tracks[selectedMidi + 1].midiTextEditor.grabKeyboardFocus();
@@ -404,6 +409,8 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
     int X = visualArea.getX(); //top left corner X
     int Y = visualArea.getY(); //top left corner  Y
 
+
+
     int width = visualArea.getWidth();
     int height = visualArea.getHeight();
     auto ON = audioProcessor.apvts.getRawParameterValue("ON/OFF")->load();
@@ -427,6 +434,11 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
             }
         }
     }
+
+
+
+
+
     //main loop to draw the tracks and all of its components
     for (int i = 0; i < MAX_TRACKS; i++) {
 
@@ -542,7 +554,10 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
         }
     }
 
-
+    juce::Rectangle<int> beatMenuBounds(X,  height, 300, 300);
+    bars[selectedBar].tracks[0].beatMidiSliders[0].setBounds(beatMenuBounds);
+    bars[selectedBar].tracks[0].beatMidiSliders[0].setVisible(true);
+    bars[selectedBar].tracks[0].beatMidiSliders[0].setAlwaysOnTop(true);
 
 
 }
@@ -633,6 +648,7 @@ std::vector<juce::Component*> PolyGnomeAudioProcessorEditor::getHiddenComps() {
 
             for (int j = 0; j < MAX_SUBDIVISIONS; j++) {
                 comps.push_back(&bars[k].tracks[i].beatButtons[j]);
+                comps.push_back(&bars[k].tracks[i].beatMidiSliders[j]);
             }
         }
         comps.push_back(&menu.barSelectButtons[k]);
@@ -678,6 +694,7 @@ void PolyGnomeAudioProcessorEditor::colorTextEditor(juce::TextEditor& textEditor
 }
 
 juce::String PolyGnomeAudioProcessorEditor::getCurrentMouseOverText() {
+    //TODO: this seems incredibly inifficient, probably something in the framework I can find to deal with this
     juce::String   reminderText = "";
 
     if (menu.playButton.isHoveredOver == true) {
@@ -728,6 +745,11 @@ juce::String PolyGnomeAudioProcessorEditor::getCurrentMouseOverText() {
                             reminderText = bars[j].tracks[i].beatButtons[k].getHelpText();
                             break;
                         }
+                        if (bars[j].tracks[i].beatMidiSliders[k].isHoveredOver == true) {
+                            reminderText = bars[j].tracks[i].beatMidiSliders[k].getHelpText();
+                            break;
+                        }
+
                     }
                 }
             }

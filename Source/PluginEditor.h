@@ -29,7 +29,9 @@
 class TrackComponent {
 public:
     //MIDDLE COMPONENTS
-    CustomTextButton beatButtons[MAX_SUBDIVISIONS];
+    BeatButton beatButtons[MAX_SUBDIVISIONS];
+    CustomSlider beatMidiSliders[MAX_SUBDIVISIONS];
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> beatMidiSliderAttachments[MAX_SUBDIVISIONS];
 
     //RIGHT COMPONENTS
     CustomSlider subdivisionSlider;
@@ -53,9 +55,10 @@ public:
 
 class BarComponent {
 public:
-    TrackComponent tracks[MAX_TRACKS];
+    TrackComponent tracks[MAX_TRACKS] ;
 
 };
+
 
 class MenuComponent : public virtual juce::Component {
 public:
@@ -71,6 +74,7 @@ public:
     CustomTextButton autoLoopButton;
 
 };
+
 
 
 
@@ -115,7 +119,8 @@ public:
     void initializeImages();
     void initializeMenuComponents();
     void initializeMachineComponents();
-
+    void loadPreset();
+    void savePreset();
 private:
     PolyGnomeAudioProcessor& audioProcessor;
 
@@ -124,8 +129,7 @@ private:
     std::vector<juce::Component*> getAllComps();
     std::vector<juce::Component*> getTrackComps(int barIndex, int trackIndex);
 
-    void loadPreset();
-    void savePreset();
+
     std::unique_ptr<juce::FileChooser> fileChooser;
 
     juce::Image logo, keyboardIcon, trackIcon, enableIcon, sustainIcon, velocityIcon;
