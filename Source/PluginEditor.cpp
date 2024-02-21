@@ -158,6 +158,7 @@ void PolyGnomeAudioProcessorEditor::initializeMenuComponents() {
 }
 
 void PolyGnomeAudioProcessorEditor::initializeMachineComponents() {
+    prevBeatID.setbeatID(1, 1, 1);
     for (int k = 0; k < MAX_BARS; k++) {
         for (int i = 0; i < MAX_TRACKS; i++) {
             for (int j = 0; j < MAX_SUBDIVISIONS; j++)
@@ -169,7 +170,11 @@ void PolyGnomeAudioProcessorEditor::initializeMachineComponents() {
 
                 //initialize their submenus
                 bars[k].tracks[i].beatMidiSliderAttachments[j] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, getBeatMidiString(k, i, j), bars[k].tracks[i].beatMidiSliders[j]);
-
+                
+                bars[k].tracks[i].beatButtons[j].onClick = [this, k, i, j ]() {
+                    //initialize these values which get checked in paint to determine which slider to paint
+                    selectedBeatID.setbeatID(k, i, j);
+                    };
 
 
             }
@@ -395,6 +400,23 @@ void PolyGnomeAudioProcessorEditor::paint(juce::Graphics& g)
     }
     
     paintPolyRhythmMachine(g);
+
+    if (selectedBeatID._barID != prevBeatID._barID || selectedBeatID._trackID != prevBeatID._trackID || selectedBeatID._beatID != prevBeatID._beatID) {
+        DBG("clicked");
+        DBG(to_string(selectedBeatID._barID));
+        DBG(to_string(selectedBeatID._trackID));
+        DBG(to_string(selectedBeatID._beatID));
+        DBG("old");
+        DBG(to_string(prevBeatID._barID));
+        DBG(to_string(prevBeatID._trackID));
+        DBG(to_string(prevBeatID._beatID));
+
+        bars[prevBeatID._barID].tracks[prevBeatID._trackID].beatMidiSliders[prevBeatID._beatID].setVisible(false);
+        bars[selectedBeatID._barID].tracks[selectedBeatID._trackID].beatMidiSliders[selectedBeatID._beatID].setVisible(true);
+        prevBeatID._barID = selectedBeatID._barID;
+        prevBeatID._trackID = selectedBeatID._trackID;
+        prevBeatID._beatID = selectedBeatID._beatID;
+    }
 }
 
 void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
@@ -473,7 +495,12 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
         //draw the buttons for each note of the track
         for (int j = 0; j < subdivisions; j++) {
             //TODO: make this text fit the button properly
-            bars[selectedBar].tracks[i].beatButtons[j].setButtonText(juce::String(midiIntToString((audioProcessor.apvts.getRawParameterValue(getMidiValueString(selectedBar, i))->load()))).retainCharacters("ABCDEFG#"));
+            bars[selectedBar].tracks[i].beatButtons[j].setButtonText(juce::String(midiIntToString((audioProcessor.apvts.getRawParameterValue(getBeatMidiString(selectedBar, i, j))->load()))).retainCharacters("ABCDEFG#"));
+
+            //TODO: probably should be in the constructor
+            juce::Rectangle<int> beatMenuBounds(X, height, 300, 300);
+            bars[selectedBar].tracks[i].beatMidiSliders[j].setBounds(beatMenuBounds);
+
 
             float distanceOnPath = (width / subdivisions) * j;
             juce::Rectangle<int> pointBounds(X + distanceOnPath, Y + spacing * i - 10, 22, 22);
@@ -550,15 +577,12 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
         for (int k = 0; k < MAX_SUBDIVISIONS; k++) {
             if (k >= subdivisions) {
                 bars[selectedBar].tracks[i].beatButtons[k].setVisible(false);
+
             }
+
+
         }
     }
-
-    juce::Rectangle<int> beatMenuBounds(X,  height, 300, 300);
-    bars[selectedBar].tracks[0].beatMidiSliders[0].setBounds(beatMenuBounds);
-    bars[selectedBar].tracks[0].beatMidiSliders[0].setVisible(true);
-    bars[selectedBar].tracks[0].beatMidiSliders[0].setAlwaysOnTop(true);
-
 
 }
 

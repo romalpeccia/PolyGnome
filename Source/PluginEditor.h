@@ -75,7 +75,29 @@ public:
 
 };
 
+class beatID {
+public:
+    beatID() {
+        _barID = 0;
+        _trackID = 0;
+        _beatID = 0;
+    }
+    beatID(int k, int i, int j) {
+        _barID = k;
+        _trackID = i;
+        _beatID = j;
+    }
+    void setbeatID(int k, int i, int j) {
+        _barID = k;
+        _trackID = i;
+        _beatID = j;
+    };
+    int _barID;
+    int _trackID;
+    int _beatID;
+    //bool operator==(beatID const&)  ;
 
+};
 
 
 //==============================================================================
@@ -123,6 +145,7 @@ public:
     void savePreset();
 private:
     PolyGnomeAudioProcessor& audioProcessor;
+    
 
     std::vector<juce::Component*> getVisibleComps();
     std::vector<juce::Component*> getHiddenComps();
@@ -139,7 +162,8 @@ private:
     BarComponent bars[MAX_BARS];
 
     CustomKeyboardComponent keyboard;
-
+    beatID selectedBeatID;
+    beatID prevBeatID;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PolyGnomeAudioProcessorEditor)
 };
 

@@ -203,7 +203,6 @@ public:
     //commented out code is for potential CallOutBox implementation: need a way to keep the components from getting deleted in memory when the calloutBox closes. 
     BeatButton() {
 
-
     }
 
     void mouseEnter(const juce::MouseEvent& event) override {
@@ -217,7 +216,7 @@ public:
     {
 
         if (event.mods.isRightButtonDown()) {
-
+  
             /*
             auto content = std::make_unique<BeatMenu>(tempSliderValue);
             content->setSize(300, 300);
@@ -225,7 +224,7 @@ public:
                 getScreenBounds(),
                 nullptr);
                 */
-
+            triggerClick();
         }
         else if (event.mods.isLeftButtonDown()) {
             triggerClick();
@@ -233,9 +232,10 @@ public:
     }
     bool isHoveredOver = false;
 
+
 private:
     //int tempSliderValue = 0;
-
+    
 };
 
 
