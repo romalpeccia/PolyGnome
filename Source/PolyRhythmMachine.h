@@ -28,11 +28,13 @@ using namespace std;
 //==============================================================================
 /*
 */
-
+struct Beat {
+    int midiValue = DEFAULT_MIDI_VALUE;
+};
 struct Track {
     int samplesPerInterval = 0; //samples per subdivided beat, updated when user changes a param. samplesPerInterval =  4 * ((60.0 / bpm) * sampleRate) / tracks[i].subdivisions;
-    
     int beatCounter = 0; // counts by 1 after each subdivided beat has been played (from 0 to num subdivisions) then resets to 0. 
+    Beat beats[MAX_SUBDIVISIONS];
 
     //user adjustable values
     int subdivisions = DEFAULT_SUBDIVISIONS;

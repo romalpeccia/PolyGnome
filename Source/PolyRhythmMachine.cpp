@@ -71,16 +71,19 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
             float samplesAfterBeat = (((bars[j].tracks[i].beatCounter - 1) * bars[j].tracks[i].samplesPerInterval) + 
                 ((bars[j].tracks[i].sustain / 100) * bars[j].tracks[i].samplesPerInterval)); // the amount of samples for all intervals that have happened + the amount of samples after the latest interval
             if (j == barCounter) {
+                //turn off any queued notes
                 if (samplesProcessed >= samplesAfterBeat && bars[j].tracks[i].noteOffQueued == true) {
-                    auto messageOff = juce::MidiMessage::noteOff(MIDI_CHANNEL, bars[j].tracks[i].midiValue + MIDI_STANDARD_OFFSET);
+                    int noteOffIndex = (bars[j].tracks[i].beatCounter - 1 >= 0) ? bars[j].tracks[i].beatCounter - 1 :0 ;
+                    auto messageOff = juce::MidiMessage::noteOff(MIDI_CHANNEL, bars[j].tracks[i].beats[noteOffIndex].midiValue + MIDI_STANDARD_OFFSET);
                     midiBuffer.addEvent(messageOff, samplesProcessed - samplesAfterBeat);
                     bars[j].tracks[i].noteOffQueued = false;
                 }
             }
             float samplesCountedSinceBarStart = bars[j].tracks[i].samplesPerInterval * (bars[j].tracks[i].beatCounter);
             if (samplesProcessed >= samplesCountedSinceBarStart) {
-
+                //place the correct MIDI on the buffer 
                 if (j == barCounter) {
+
                     if (bars[j].tracks[i].beatCounter < MAX_SUBDIVISIONS) {
                         if (apvts->getRawParameterValue(getBeatToggleString(barCounter, i, bars[j].tracks[i].beatCounter))->load() == true) {
 
@@ -98,11 +101,11 @@ void PolyRhythmMachine::getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce
                                 
                             }
                             if (apvts->getRawParameterValue(getTrackEnableString(barCounter, i))->load() == true) {
-                                if ((isDawConnected && isDawPlaying) || !isDawConnected) {
+                                //if ((isDawConnected && isDawPlaying) || !isDawConnected) {
                                     //send the MIDI note that triggered
-                                    handleNoteTrigger(midiBuffer, bars[j].tracks[i].midiValue, bars[j].tracks[i].velocity, bufferPosition);
+                                    handleNoteTrigger(midiBuffer, bars[j].tracks[i].beats[bars[j].tracks[i].beatCounter].midiValue, bars[j].tracks[i].velocity, bufferPosition);
                                     bars[j].tracks[i].noteOffQueued = true;
-                                }
+                               // }
                             }
                         }
                     }
@@ -188,9 +191,21 @@ void PolyRhythmMachine::resetAll()
 void PolyRhythmMachine::resetParams(juce::MidiBuffer& midiBuffer)
 {  //this should be called when slider params change in UI to reflect changes in logic
    //this overloaded version allows you to send note offs for any notes currently playing, which is needed if the user changes a MIDI value while the app is running 
-  
-    for (int i = 0; i < MAX_TRACKS; i++) {
+  //TODO: split these into onChange type functions for each parameter value? maybe apvts has some listener mechanism I can use
+  //TODO: split MIDI handling function into seperate function
 
+
+    for (int i = 0; i < MAX_TRACKS; i++) {
+        for (int j = 0; j < MAX_SUBDIVISIONS; j++) {
+            int newMidiValue = apvts->getRawParameterValue(getBeatMidiString(barCounter, i, j))->load();
+            if (bars[barCounter].tracks[i].beats[j].midiValue != newMidiValue)
+            {
+                auto messageOff = juce::MidiMessage::noteOff(MIDI_CHANNEL, bars[barCounter].tracks[i].beats[j].midiValue + MIDI_STANDARD_OFFSET);
+                midiBuffer.addEvent(messageOff, 0);
+                bars[barCounter].tracks[i].beats[j].midiValue = newMidiValue;
+            }
+        }
+        /*
         int newMidiValue = apvts->getRawParameterValue(getMidiValueString(barCounter, i))->load();
         if (bars[barCounter].tracks[i].midiValue != newMidiValue)
         {
@@ -198,12 +213,15 @@ void PolyRhythmMachine::resetParams(juce::MidiBuffer& midiBuffer)
             midiBuffer.addEvent(messageOff, 0);
             bars[barCounter].tracks[i].midiValue = newMidiValue;
         }
-
+        */
         int selectedBar = apvts->getRawParameterValue("SELECTED_BAR")->load();
         int newSubdivisionValue = apvts->getRawParameterValue(getSubdivisionsString(selectedBar, i))->load();
         if (newSubdivisionValue != bars[selectedBar].tracks[i].subdivisions) {
-            auto messageOff = juce::MidiMessage::noteOff(MIDI_CHANNEL, bars[selectedBar].tracks[i].midiValue + MIDI_STANDARD_OFFSET);
-            midiBuffer.addEvent(messageOff, 0);
+            for (int j = 0; j < MAX_SUBDIVISIONS; j++) {
+                auto messageOff = juce::MidiMessage::noteOff(MIDI_CHANNEL, bars[selectedBar].tracks[i].beats[j].midiValue + MIDI_STANDARD_OFFSET);
+                midiBuffer.addEvent(messageOff, 0);
+            }
+
         }
         
     }
@@ -213,7 +231,7 @@ void PolyRhythmMachine::resetParams(juce::MidiBuffer& midiBuffer)
 void PolyRhythmMachine::resetParams()
 {  //this should be called when params change in UI to reflect changes in logic
    //the variables keeping track of time should be reset to reflect the new track
-
+    //TODO: split these into onChange type functions for each parameter value? maybe apvts has some listener mechanism I can use
     bpm = apvts->getRawParameterValue("BPM")->load();
     samplesPerBar = 4 * (60.0 / bpm) * sampleRate;
     for (int barNum = 0; barNum < MAX_BARS; barNum++) {

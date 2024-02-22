@@ -267,7 +267,7 @@ void PolyGnomeAudioProcessorEditor::resized()
     
     juce::FlexBox flexBox;
     flexBox.flexWrap = juce::FlexBox::Wrap::wrap;
-    //flexBox.items.add(juce::FlexItem(MENU_WIDTH, 50, menu.playButton));
+    flexBox.items.add(juce::FlexItem(MENU_WIDTH, 50, menu.playButton));
     flexBox.items.add(juce::FlexItem(MENU_WIDTH, 25, menu.loadPresetButton));
     flexBox.items.add(juce::FlexItem(MENU_WIDTH, 25, menu.savePresetButton));
     flexBox.items.add(juce::FlexItem(MENU_WIDTH, 200, menu.reminderTextEditor));
@@ -577,10 +577,7 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
         for (int k = 0; k < MAX_SUBDIVISIONS; k++) {
             if (k >= subdivisions) {
                 bars[selectedBar].tracks[i].beatButtons[k].setVisible(false);
-
             }
-
-
         }
     }
 
