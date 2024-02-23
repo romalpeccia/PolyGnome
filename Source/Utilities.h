@@ -163,79 +163,96 @@ class CustomToggleButton : public juce::ToggleButton {
 
 class BeatMenu : public juce::Component {
 
-public:
-    BeatMenu() {
-        setSize(400, 400);
-        //beatMidiSlider.setValue(tempSliderValue);
-        addAndMakeVisible(beatMidiSlider);
-        addAndMakeVisible(arpButton);
-        flexBox.flexWrap = juce::FlexBox::Wrap::wrap;
-        flexBox.items.add(juce::FlexItem(300, 100, beatMidiSlider));
-        flexBox.items.add(juce::FlexItem(300, 100, arpButton));
-        flexBox.performLayout(getBounds());
+    public:
+        BeatMenu() {
+            //setSize(400, 400);
 
-    }
-    ~BeatMenu() {
+            /*
+            flexBox.flexWrap = juce::FlexBox::Wrap::wrap;
+            flexBox.items.add(juce::FlexItem(300, 100, beatMidiSlider));
+            flexBox.items.add(juce::FlexItem(300, 100, arpButton));
+            flexBox.performLayout(getBounds());
+            */
+        }
+        ~BeatMenu() {
 
-    }
+        }
 
     
-    CustomSlider beatMidiSlider;
+        CustomSlider beatMidiSlider;
+        juce::Label label;
+        CustomTextButton arpButton;
+    private:
+        /*
+        midi slider
+            Arp toggle
+            Num arps
+            Speed
+                Type
+            Root note
+            Major minor toggle
+        */
 
-private:
-    /*
-    midi slider
-        Arp toggle
-        Num arps
-        Speed
-            Type
-        Root note
-        Major minor toggle
-    */
 
-    CustomTextButton arpButton;
-    juce::FlexBox flexBox;
+
+        juce::FlexBox flexBox;
 };
 
+class beatID {
+    public:
+        beatID() {
+            _barID = 0;
+            _trackID = 0;
+            _beatID = 0;
+        }
+        beatID(int k, int i, int j) {
+            _barID = k;
+            _trackID = i;
+            _beatID = j;
+        }
+        void setbeatID(int k, int i, int j) {
+            _barID = k;
+            _trackID = i;
+            _beatID = j;
+        };
+        int _barID;
+        int _trackID;
+        int _beatID;
+        //bool operator==(beatID const&)  ;
+
+};
 
 class BeatButton : public  juce::TextButton {
-public:
-    //commented out code is for potential CallOutBox implementation: need a way to keep the components from getting deleted in memory when the calloutBox closes. 
-    BeatButton() {
+    public:
+        //commented out code is for potential CallOutBox implementation: need a way to keep the components from getting deleted in memory when the calloutBox closes.
+        BeatButton() {
+            apvts = NULL;
+            selectedBeatPtr = NULL;
+        }
+        void mouseEnter(const juce::MouseEvent& event) override {
+            isHoveredOver = true;
+        }
+        void mouseExit(const juce::MouseEvent& event) override {
+            isHoveredOver = false;
+        }
 
-    }
-
-    void mouseEnter(const juce::MouseEvent& event) override {
-        isHoveredOver = true;
-    }
-    void mouseExit(const juce::MouseEvent& event) override {
-        isHoveredOver = false;
-    }
-
-    void mouseUp(const juce::MouseEvent& event) override
-    {
-
-        if (event.mods.isRightButtonDown()) {
+        void mouseUp(const juce::MouseEvent& event) override
+        {
+            selectedBeatPtr->setbeatID(beatId._barID, beatId._trackID, beatId._beatID);
+            if (event.mods.isRightButtonDown()) {
   
-            /*
-            auto content = std::make_unique<BeatMenu>(tempSliderValue);
-            content->setSize(300, 300);
-            auto& myBox = juce::CallOutBox::launchAsynchronously(std::move(content),
-                getScreenBounds(),
-                nullptr);
-                */
-            triggerClick();
+            }
+            else if (event.mods.isLeftButtonDown()) {
+                triggerClick();
+            }
         }
-        else if (event.mods.isLeftButtonDown()) {
-            triggerClick();
-        }
-    }
-    bool isHoveredOver = false;
+        bool isHoveredOver = false;
 
 
-private:
-    //int tempSliderValue = 0;
-    
+        beatID beatId;
+        juce::AudioProcessorValueTreeState* apvts;
+        beatID* selectedBeatPtr;
+    private:
 };
 
 

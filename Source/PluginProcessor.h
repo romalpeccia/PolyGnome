@@ -33,73 +33,73 @@
 */
 class PolyGnomeAudioProcessor  : public juce::AudioProcessor
 {
-public:
-    //==============================================================================
-    PolyGnomeAudioProcessor();
-    ~PolyGnomeAudioProcessor() override;
+    public:
+        //==============================================================================
+        PolyGnomeAudioProcessor();
+        ~PolyGnomeAudioProcessor() override;
 
-    //==============================================================================
-    void prepareToPlay (double sampleRate, int samplesPerBlock) override;
-    void releaseResources() override;
+        //==============================================================================
+        void prepareToPlay (double sampleRate, int samplesPerBlock) override;
+        void releaseResources() override;
 
-   #ifndef JucePlugin_PreferredChannelConfigurations
-    bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
-   #endif
+       #ifndef JucePlugin_PreferredChannelConfigurations
+        bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
+       #endif
 
-    void processBlock (juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
+        void processBlock (juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
 
-    //==============================================================================
-    juce::AudioProcessorEditor* createEditor() override;
-    bool hasEditor() const override;
+        //==============================================================================
+        juce::AudioProcessorEditor* createEditor() override;
+        bool hasEditor() const override;
 
-    //==============================================================================
-    const juce::String getName() const override;
+        //==============================================================================
+        const juce::String getName() const override;
 
-    bool acceptsMidi() const override;
-    bool producesMidi() const override;
-    bool isMidiEffect() const override;
-    double getTailLengthSeconds() const override;
+        bool acceptsMidi() const override;
+        bool producesMidi() const override;
+        bool isMidiEffect() const override;
+        double getTailLengthSeconds() const override;
 
-    //==============================================================================
-    int getNumPrograms() override;
-    int getCurrentProgram() override;
-    void setCurrentProgram (int index) override;
-    const juce::String getProgramName (int index) override;
-    void changeProgramName (int index, const juce::String& newName) override;
+        //==============================================================================
+        int getNumPrograms() override;
+        int getCurrentProgram() override;
+        void setCurrentProgram (int index) override;
+        const juce::String getProgramName (int index) override;
+        void changeProgramName (int index, const juce::String& newName) override;
 
-    //==============================================================================
-    void getStateInformation (juce::MemoryBlock& destData) override;
-    void setStateInformation (const void* data, int sizeInBytes) override;
-
-
+        //==============================================================================
+        void getStateInformation (juce::MemoryBlock& destData) override;
+        void setStateInformation (const void* data, int sizeInBytes) override;
 
 
-    //==============================================================================
-    //non default processor code
+
+
+        //==============================================================================
+        //non default processor code
  
-    static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
-    juce::AudioProcessorValueTreeState apvts{ *this, nullptr, "Parameters", createParameterLayout() };
+        static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+        juce::AudioProcessorValueTreeState apvts{ *this, nullptr, "Parameters", createParameterLayout() };
 
     
 
-    PolyRhythmMachine polyRhythmMachine{ &apvts };
+        PolyRhythmMachine polyRhythmMachine{ &apvts };
 
 
-    // set to false when the 
-    bool resetBarAfterPause = false;
+        // set to false when the 
+        bool resetBarAfterPause = false;
 
-    //midiNeedsClearing = true when the machine is turned on, which then triggers all midi notes to be cleared once the machine is turned off, then midiNeedsClearing = false
-    bool midiNeedsClearing = false;
+        //midiNeedsClearing = true when the machine is turned on, which then triggers all midi notes to be cleared once the machine is turned off, then midiNeedsClearing = false
+        bool midiNeedsClearing = false;
 
-    //this keyboardState holds all the notes being played by the machine, which is then copied into the keyboardState of the keyboardComponent in the pluginEditor
-    juce::MidiKeyboardState keyboardState;
+        //this keyboardState holds all the notes being played by the machine, which is then copied into the keyboardState of the keyboardComponent in the pluginEditor
+        juce::MidiKeyboardState keyboardState;
 
-    //holds the last note pressed by the user on their MIDI instrument. set to -1 when a MIDI textEditor isn't selected
-    int storedMidiFromKeyboard = -1;
+        //holds the last note pressed by the user on their MIDI instrument. set to -1 when a MIDI textEditor isn't selected
+        int storedMidiFromKeyboard = -1;
 
-private:
+    private:
 
 
-    //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PolyGnomeAudioProcessor)
+        //==============================================================================
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PolyGnomeAudioProcessor)
 };

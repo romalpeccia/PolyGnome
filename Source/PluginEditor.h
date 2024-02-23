@@ -27,144 +27,121 @@
 #include "CustomKeyboardComponent.h"
 
 class TrackComponent {
-public:
-    //MIDDLE COMPONENTS
-    BeatButton beatButtons[MAX_SUBDIVISIONS];
-    CustomSlider beatMidiSliders[MAX_SUBDIVISIONS];
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> beatMidiSliderAttachments[MAX_SUBDIVISIONS];
+    private:
+    public:
+        //MIDDLE COMPONENTS
+        BeatButton beatButtons[MAX_SUBDIVISIONS];
+        CustomSlider beatMidiSliders[MAX_SUBDIVISIONS];
+        std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> beatMidiSliderAttachments[MAX_SUBDIVISIONS];
 
-    //RIGHT COMPONENTS
-    CustomSlider subdivisionSlider;
-    CustomSlider midiSlider;
-    CustomTextEditor midiTextEditor;
+        //RIGHT COMPONENTS
+        CustomSlider subdivisionSlider;
+        CustomSlider midiSlider;
+        CustomTextEditor midiTextEditor;
 
-    //LEFT COMPONENTS
-    CustomToggleButton muteButton;
-    CustomSlider velocitySlider;
-    CustomSlider sustainSlider;
+        //LEFT COMPONENTS
+        CustomToggleButton muteButton;
+        CustomSlider velocitySlider;
+        CustomSlider sustainSlider;
 
-    //ATTACHMENTS
-    std::unique_ptr <juce::AudioProcessorValueTreeState::ButtonAttachment> muteButtonAttachment;
-    std::unique_ptr <juce::AudioProcessorValueTreeState::ButtonAttachment> beatButtonAttachments[MAX_SUBDIVISIONS];
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> subdivisionSliderAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> midiSliderAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> velocitySliderAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> sustainSliderAttachment;
+        //ATTACHMENTS
+        std::unique_ptr <juce::AudioProcessorValueTreeState::ButtonAttachment> muteButtonAttachment;
+        std::unique_ptr <juce::AudioProcessorValueTreeState::ButtonAttachment> beatButtonAttachments[MAX_SUBDIVISIONS];
+        std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> subdivisionSliderAttachment;
+        std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> midiSliderAttachment;
+        std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> velocitySliderAttachment;
+        std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> sustainSliderAttachment;
 };
 
 
 class BarComponent {
-public:
-    TrackComponent tracks[MAX_TRACKS] ;
+    private:
+    public:
+        TrackComponent tracks[MAX_TRACKS];
 
 };
 
 
 class MenuComponent : public virtual juce::Component {
-public:
+    public:
 
-    CustomTextButton playButton;
-    CustomTextButton loadPresetButton;
-    CustomTextButton savePresetButton;
-    CustomTextEditor reminderTextEditor;
-    CustomTextButton barSelectButtons[MAX_BARS];
-    CustomTextButton barCopyButtons[MAX_BARS];
-    CustomSlider barSlider;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> barSliderAttachment;
-    CustomTextButton autoLoopButton;
-
-};
-
-class beatID {
-public:
-    beatID() {
-        _barID = 0;
-        _trackID = 0;
-        _beatID = 0;
-    }
-    beatID(int k, int i, int j) {
-        _barID = k;
-        _trackID = i;
-        _beatID = j;
-    }
-    void setbeatID(int k, int i, int j) {
-        _barID = k;
-        _trackID = i;
-        _beatID = j;
-    };
-    int _barID;
-    int _trackID;
-    int _beatID;
-    //bool operator==(beatID const&)  ;
+        CustomTextButton playButton;
+        CustomTextButton loadPresetButton;
+        CustomTextButton savePresetButton;
+        CustomTextEditor reminderTextEditor;
+        CustomTextButton barSelectButtons[MAX_BARS];
+        CustomTextButton barCopyButtons[MAX_BARS];
+        CustomSlider barSlider;
+        std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> barSliderAttachment;
+        CustomTextButton autoLoopButton;
 
 };
-
 
 //==============================================================================
 /**
 */
 class PolyGnomeAudioProcessorEditor : public juce::AudioProcessorEditor, juce::Timer
 {
-public:
-    PolyGnomeAudioProcessorEditor(PolyGnomeAudioProcessor&);
-    ~PolyGnomeAudioProcessorEditor() override;
+    public:
+        PolyGnomeAudioProcessorEditor(PolyGnomeAudioProcessor&);
+        ~PolyGnomeAudioProcessorEditor() override;
 
-    //==============================================================================
-    void paint(juce::Graphics&) override;
-    void paintPolyRhythmMachine(juce::Graphics& g);
+        //==============================================================================
+        void paint(juce::Graphics&) override;
+        void paintPolyRhythmMachine(juce::Graphics& g);
 
-    juce::Rectangle<int> getVisualArea();
+        juce::Rectangle<int> getVisualArea();
 
-    void resized() override;
-    void timerCallback() override {
-        repaint();
-    };
-
-
+        void resized() override;
+        void timerCallback() override {
+            repaint();
+        };
 
 
 
-    //play state functions TODO: (potentially obsolete in some cases, since menu.playButton was removed. keep it hidden for now in case it is helpful for standalone mode)
-    void toggleAudioProcessorChildrenStates();
-    void togglePlayState();
-    void togglePlayStateOff();
-    void togglePlayStateOn();
 
 
-    juce::String getCurrentMouseOverText();
+        //play state functions TODO: (potentially obsolete in some cases, since menu.playButton was removed. keep it hidden for now in case it is helpful for standalone mode)
+        void toggleAudioProcessorChildrenStates();
+        void togglePlayState();
+        void togglePlayStateOff();
+        void togglePlayStateOn();
 
-    void colorSlider(juce::Slider &slider, juce::Colour thumbColour, juce::Colour textBoxTextColour, juce::Colour textBoxBackgroundColour, juce::Colour textBoxOutlineColour, bool trackEnabled);
-    void colorTextEditor(juce::TextEditor &textEditor, juce::Colour textColour, juce::Colour focusedOutlineColour, juce::Colour outlineColour, juce::Colour backgroundColour, bool trackEnabled);
-    //void colorTextButton(juce::TextButton& textButton, juce::Colour buttonColour, bool buttonEnabled, bool trackEnabled);
 
-    //component initializations 
-    void initializeImages();
-    void initializeMenuComponents();
-    void initializeMachineComponents();
-    void loadPreset();
-    void savePreset();
-private:
-    PolyGnomeAudioProcessor& audioProcessor;
+        juce::String getCurrentMouseOverText();
+
+        void colorSlider(juce::Slider &slider, juce::Colour thumbColour, juce::Colour textBoxTextColour, juce::Colour textBoxBackgroundColour, juce::Colour textBoxOutlineColour, bool trackEnabled);
+        void colorTextEditor(juce::TextEditor &textEditor, juce::Colour textColour, juce::Colour focusedOutlineColour, juce::Colour outlineColour, juce::Colour backgroundColour, bool trackEnabled);
+        //void colorTextButton(juce::TextButton& textButton, juce::Colour buttonColour, bool buttonEnabled, bool trackEnabled);
+
+        //component initializations 
+        void initializeImages();
+        void initializeMenuComponents();
+        void initializeMachineComponents();
+        void loadPreset();
+        void savePreset();
+    private:
+        PolyGnomeAudioProcessor& audioProcessor;
     
 
-    std::vector<juce::Component*> getVisibleComps();
-    std::vector<juce::Component*> getHiddenComps();
-    std::vector<juce::Component*> getAllComps();
-    std::vector<juce::Component*> getTrackComps(int barIndex, int trackIndex);
+        std::vector<juce::Component*> getVisibleComps();
+        std::vector<juce::Component*> getHiddenComps();
+        std::vector<juce::Component*> getAllComps();
+        std::vector<juce::Component*> getTrackComps(int barIndex, int trackIndex);
 
 
-    std::unique_ptr<juce::FileChooser> fileChooser;
+        std::unique_ptr<juce::FileChooser> fileChooser;
 
-    juce::Image logo, keyboardIcon, trackIcon, enableIcon, sustainIcon, velocityIcon;
+        juce::Image logo, keyboardIcon, trackIcon, enableIcon, sustainIcon, velocityIcon;
 
-    MenuComponent menu;
+        MenuComponent menu;
 
-    BarComponent bars[MAX_BARS];
+        BarComponent bars[MAX_BARS];
 
-    CustomKeyboardComponent keyboard;
-    beatID selectedBeatID;
-    beatID prevBeatID;
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PolyGnomeAudioProcessorEditor)
+        CustomKeyboardComponent keyboard;
+        beatID selectedBeatID;
+        beatID prevBeatID;
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PolyGnomeAudioProcessorEditor)
 };
 
 

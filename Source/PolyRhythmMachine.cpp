@@ -205,15 +205,7 @@ void PolyRhythmMachine::resetParams(juce::MidiBuffer& midiBuffer)
                 bars[barCounter].tracks[i].beats[j].midiValue = newMidiValue;
             }
         }
-        /*
-        int newMidiValue = apvts->getRawParameterValue(getMidiValueString(barCounter, i))->load();
-        if (bars[barCounter].tracks[i].midiValue != newMidiValue)
-        {
-            auto messageOff = juce::MidiMessage::noteOff(MIDI_CHANNEL, bars[barCounter].tracks[i].midiValue + MIDI_STANDARD_OFFSET);
-            midiBuffer.addEvent(messageOff, 0);
-            bars[barCounter].tracks[i].midiValue = newMidiValue;
-        }
-        */
+
         int selectedBar = apvts->getRawParameterValue("SELECTED_BAR")->load();
         int newSubdivisionValue = apvts->getRawParameterValue(getSubdivisionsString(selectedBar, i))->load();
         if (newSubdivisionValue != bars[selectedBar].tracks[i].subdivisions) {

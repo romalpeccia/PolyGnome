@@ -170,13 +170,9 @@ void PolyGnomeAudioProcessorEditor::initializeMachineComponents() {
 
                 //initialize their submenus
                 bars[k].tracks[i].beatMidiSliderAttachments[j] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, getBeatMidiString(k, i, j), bars[k].tracks[i].beatMidiSliders[j]);
-                
-                bars[k].tracks[i].beatButtons[j].onClick = [this, k, i, j ]() {
-                    //initialize these values which get checked in paint to determine which slider to paint
-                    selectedBeatID.setbeatID(k, i, j);
-                    };
-
-
+                bars[k].tracks[i].beatButtons[j].beatId.setbeatID(k, i, j);
+                bars[k].tracks[i].beatButtons[j].apvts = &audioProcessor.apvts;
+                bars[k].tracks[i].beatButtons[j].selectedBeatPtr = &selectedBeatID;
             }
 
             //initialize the mute buttons
