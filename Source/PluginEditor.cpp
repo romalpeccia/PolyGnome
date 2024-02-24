@@ -292,6 +292,7 @@ void PolyGnomeAudioProcessorEditor::resized()
 
 void PolyGnomeAudioProcessorEditor::paint(juce::Graphics& g)
 {
+    //TODO look into only calling redraws of specific elements if needed
     g.fillAll(BACKGROUND_COLOUR);
 
     auto visualArea = getVisualArea();
@@ -382,10 +383,6 @@ void PolyGnomeAudioProcessorEditor::paint(juce::Graphics& g)
             }
 
         }
-
-
-
-
         audioProcessor.storedMidiFromKeyboard = -1;
 
     }
@@ -434,8 +431,7 @@ void PolyGnomeAudioProcessorEditor::paint(juce::Graphics& g)
 
 void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
 
-    //TODO look into only calling redraws of specific elements if needed
-    auto visualArea = getVisualArea();
+    auto visualArea = getVisualArea(); //area of the tracks
 
     //for debugging purposes
     //g.setColour(juce::Colours::white);
@@ -450,7 +446,7 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
     int height = visualArea.getHeight();
     auto ON = audioProcessor.apvts.getRawParameterValue("ON/OFF")->load();
 
-    int spacing = height / MAX_TRACKS;
+    int spacing = height / MAX_TRACKS; // space between each track
     Y = Y + spacing + 15;
   
 
@@ -505,6 +501,7 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
         bool isBarEnabled = (selectedBar == activeBar);
         bool isBeatEnabled = (isTrackEnabled && (isBarEnabled || !isProccessorOn));
         int subdivisions = audioProcessor.apvts.getRawParameterValue(getSubdivisionsString(selectedBar, i))->load();
+        int sustain = audioProcessor.apvts.getRawParameterValue(getSustainString(selectedBar, i))->load();
         //draw the buttons for each note of the track
         for (int j = 0; j < subdivisions; j++) {
             //TODO: make this text fit the button properly
@@ -517,7 +514,7 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
             bars[selectedBar].tracks[i].beatLabels[j].setBounds(beatLabelBounds);
 
             float distanceOnPath = (width / subdivisions) * j;
-            juce::Rectangle<int> pointBounds(X + distanceOnPath, Y + spacing * i - 10, 22, 22);
+            juce::Rectangle<int> pointBounds(X + distanceOnPath, Y + spacing * i - 10, (width / subdivisions) * sustain / 100, 22);
             bars[selectedBar].tracks[i].beatButtons[j].setBounds(pointBounds);
             bars[selectedBar].tracks[i].beatButtons[j].setVisible(true);
 
