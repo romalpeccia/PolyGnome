@@ -352,19 +352,39 @@ void PolyGnomeAudioProcessorEditor::paint(juce::Graphics& g)
     
     //if the user has entered a MIDI note, update the UI accordingly
     int selectedMidi = audioProcessor.apvts.getRawParameterValue("SELECTED_MIDI_TRACK")->load();
-    if (audioProcessor.storedMidiFromKeyboard != -1 && selectedMidi != -1) {
-        bars[selectedBar].tracks[selectedMidi].midiTextEditor.setText(midiIntToString(audioProcessor.storedMidiFromKeyboard) + " | " + to_string(audioProcessor.storedMidiFromKeyboard));
-        bars[selectedBar].tracks[selectedMidi].midiSlider.setValue(audioProcessor.storedMidiFromKeyboard);
-        audioProcessor.storedMidiFromKeyboard = -1;
-        //give focus to the next MIDI texteditor in the queue
-        if (selectedMidi < MAX_TRACKS - 1) {
-            audioProcessor.apvts.getRawParameterValue("SELECTED_MIDI_TRACK")->store(selectedMidi+1);
-            bars[selectedBar].tracks[selectedMidi + 1].midiTextEditor.grabKeyboardFocus();
+    if (audioProcessor.storedMidiFromKeyboard != -1 ) {
+        DBG("TEST");
+        //if a midiTextEditor is selected, change that note, otherwise, change the currently selected beat's note
+        if (selectedMidi != -1) {
+            bars[selectedBar].tracks[selectedMidi].midiTextEditor.setText(midiIntToString(audioProcessor.storedMidiFromKeyboard) + " | " + to_string(audioProcessor.storedMidiFromKeyboard));
+            bars[selectedBar].tracks[selectedMidi].midiSlider.setValue(audioProcessor.storedMidiFromKeyboard);
+            //give focus to the next MIDI texteditor in the queue
+            if (selectedMidi < MAX_TRACKS - 1) {
+                audioProcessor.apvts.getRawParameterValue("SELECTED_MIDI_TRACK")->store(selectedMidi + 1);
+                bars[selectedBar].tracks[selectedMidi + 1].midiTextEditor.grabKeyboardFocus();
+            }
+            else {
+                audioProcessor.apvts.getRawParameterValue("SELECTED_MIDI_TRACK")->store(0);
+                bars[selectedBar].tracks[0].midiTextEditor.grabKeyboardFocus();
+            }
         }
         else {
-            audioProcessor.apvts.getRawParameterValue("SELECTED_MIDI_TRACK")->store(0);
-            bars[selectedBar].tracks[0].midiTextEditor.grabKeyboardFocus();
+            int numSubdivisions = audioProcessor.apvts.getRawParameterValue(getSubdivisionsString(selectedBar, selectedBeatID._trackID))->load();
+            bars[selectedBar].tracks[selectedBeatID._trackID].beatMidiSliders[selectedBeatID._beatID].setValue(audioProcessor.storedMidiFromKeyboard);
+            if (selectedBeatID._beatID < numSubdivisions - 1) {
+                selectedBeatID._beatID += 1;
+            }
+            else {
+                selectedBeatID._beatID = 0;
+            }
+
         }
+
+
+
+
+        audioProcessor.storedMidiFromKeyboard = -1;
+
     }
 
     //draw all the buttons related to bar selection/copying
@@ -399,15 +419,6 @@ void PolyGnomeAudioProcessorEditor::paint(juce::Graphics& g)
     paintPolyRhythmMachine(g);
 
     if (selectedBeatID._barID != prevBeatID._barID || selectedBeatID._trackID != prevBeatID._trackID || selectedBeatID._beatID != prevBeatID._beatID) {
-        DBG("clicked");
-        DBG(to_string(selectedBeatID._barID));
-        DBG(to_string(selectedBeatID._trackID));
-        DBG(to_string(selectedBeatID._beatID));
-        DBG("old");
-        DBG(to_string(prevBeatID._barID));
-        DBG(to_string(prevBeatID._trackID));
-        DBG(to_string(prevBeatID._beatID));
-
         bars[prevBeatID._barID].tracks[prevBeatID._trackID].beatMidiSliders[prevBeatID._beatID].setVisible(false);
         bars[selectedBeatID._barID].tracks[selectedBeatID._trackID].beatMidiSliders[selectedBeatID._beatID].setVisible(true);
         bars[prevBeatID._barID].tracks[prevBeatID._trackID].beatLabels[prevBeatID._beatID].setVisible(false);

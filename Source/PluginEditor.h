@@ -136,12 +136,11 @@ class PolyGnomeAudioProcessorEditor : public juce::AudioProcessorEditor, juce::T
         juce::Image logo, keyboardIcon, trackIcon, enableIcon, sustainIcon, velocityIcon;
 
         MenuComponent menu;
-
         BarComponent bars[MAX_BARS];
 
         CustomKeyboardComponent keyboard;
-        beatID selectedBeatID;
-        beatID prevBeatID;
+        beatID selectedBeatID; // ID of the beat that was most recently clicked
+        beatID prevBeatID;    // ID of the beat that was clicked before the most recent click
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PolyGnomeAudioProcessorEditor)
 };
 

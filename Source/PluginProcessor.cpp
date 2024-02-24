@@ -109,18 +109,15 @@ void PolyGnomeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
 
 
 
-    //process incoming notes from keyboard for active miditexteditor
-    int selectedMidi = apvts.getRawParameterValue("SELECTED_MIDI_TRACK")->load();
-
-    if (selectedMidi != -1){
-        juce::MidiBuffer::Iterator iterator(midiMessages);
-        juce::MidiMessage currentMessage;
-        int samplePos;
-        if (iterator.getNextEvent(currentMessage, samplePos)) {
-            if (currentMessage.isNoteOn()) {
-                DBG(currentMessage.getDescription());
-                storedMidiFromKeyboard = currentMessage.getNoteNumber();
-            }
+    //process incoming notes from keyboard 
+    //NOTE: does not work in standalone mode
+    juce::MidiBuffer::Iterator iterator(midiMessages);
+    juce::MidiMessage currentMessage;
+    int samplePos;
+    if (iterator.getNextEvent(currentMessage, samplePos)) {
+        if (currentMessage.isNoteOn()) {
+            DBG(currentMessage.getDescription());
+            storedMidiFromKeyboard = currentMessage.getNoteNumber();
         }
     }
 
