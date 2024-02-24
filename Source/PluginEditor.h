@@ -33,6 +33,7 @@ class TrackComponent {
         BeatButton beatButtons[MAX_SUBDIVISIONS];
         CustomSlider beatMidiSliders[MAX_SUBDIVISIONS];
         std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> beatMidiSliderAttachments[MAX_SUBDIVISIONS];
+        juce::Label beatLabels[MAX_SUBDIVISIONS];
 
         //RIGHT COMPONENTS
         CustomSlider subdivisionSlider;

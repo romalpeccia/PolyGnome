@@ -173,6 +173,7 @@ void PolyGnomeAudioProcessorEditor::initializeMachineComponents() {
                 bars[k].tracks[i].beatButtons[j].beatId.setbeatID(k, i, j);
                 bars[k].tracks[i].beatButtons[j].apvts = &audioProcessor.apvts;
                 bars[k].tracks[i].beatButtons[j].selectedBeatPtr = &selectedBeatID;
+                bars[k].tracks[i].beatLabels[j].setText("Bar " + to_string(k + 1) + " Track " + to_string(i + 1) + " Beat " + to_string(j + 1), juce::NotificationType::dontSendNotification);
             }
 
             //initialize the mute buttons
@@ -409,6 +410,8 @@ void PolyGnomeAudioProcessorEditor::paint(juce::Graphics& g)
 
         bars[prevBeatID._barID].tracks[prevBeatID._trackID].beatMidiSliders[prevBeatID._beatID].setVisible(false);
         bars[selectedBeatID._barID].tracks[selectedBeatID._trackID].beatMidiSliders[selectedBeatID._beatID].setVisible(true);
+        bars[prevBeatID._barID].tracks[prevBeatID._trackID].beatLabels[prevBeatID._beatID].setVisible(false);
+        bars[selectedBeatID._barID].tracks[selectedBeatID._trackID].beatLabels[selectedBeatID._beatID].setVisible(true);
         prevBeatID._barID = selectedBeatID._barID;
         prevBeatID._trackID = selectedBeatID._trackID;
         prevBeatID._beatID = selectedBeatID._beatID;
@@ -494,9 +497,10 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
             bars[selectedBar].tracks[i].beatButtons[j].setButtonText(juce::String(midiIntToString((audioProcessor.apvts.getRawParameterValue(getBeatMidiString(selectedBar, i, j))->load()))).retainCharacters("ABCDEFG#"));
 
             //TODO: probably should be in the constructor
-            juce::Rectangle<int> beatMenuBounds(X, height, 300, 300);
-            bars[selectedBar].tracks[i].beatMidiSliders[j].setBounds(beatMenuBounds);
-
+            juce::Rectangle<int> beatMidiSliderBounds(X, height, 300, 300);
+            bars[selectedBar].tracks[i].beatMidiSliders[j].setBounds(beatMidiSliderBounds);
+            juce::Rectangle<int> beatLabelBounds(X, height - 50, 300, 300);
+            bars[selectedBar].tracks[i].beatLabels[j].setBounds(beatLabelBounds);
 
             float distanceOnPath = (width / subdivisions) * j;
             juce::Rectangle<int> pointBounds(X + distanceOnPath, Y + spacing * i - 10, 22, 22);
@@ -666,6 +670,7 @@ std::vector<juce::Component*> PolyGnomeAudioProcessorEditor::getHiddenComps() {
             for (int j = 0; j < MAX_SUBDIVISIONS; j++) {
                 comps.push_back(&bars[k].tracks[i].beatButtons[j]);
                 comps.push_back(&bars[k].tracks[i].beatMidiSliders[j]);
+                comps.push_back(&bars[k].tracks[i].beatLabels[j]);
             }
         }
         comps.push_back(&menu.barSelectButtons[k]);
@@ -806,19 +811,19 @@ void PolyGnomeAudioProcessorEditor::savePreset() {
 
 void PolyGnomeAudioProcessorEditor::loadPreset() {
     
-        fileChooser = std::make_unique<juce::FileChooser>("Select a .pgnome preset file",
-            juce::File::getCurrentWorkingDirectory(),
-            "*.pgnome");
+    fileChooser = std::make_unique<juce::FileChooser>("Select a .pgnome preset file",
+        juce::File::getCurrentWorkingDirectory(),
+        "*.pgnome");
 
-        auto folderChooserFlags = juce::FileBrowserComponent::openMode ;
+    auto folderChooserFlags = juce::FileBrowserComponent::openMode ;
 
-        fileChooser->launchAsync(folderChooserFlags, [this](const juce::FileChooser& chooser)
-            {
-                auto gnomeFile = chooser.getResult();
-                if (gnomeFile != juce::File{}) {
-                    audioProcessor.apvts.replaceState(juce::ValueTree::fromXml(*juce::XmlDocument::parse(gnomeFile)));
-                }
-            });
+    fileChooser->launchAsync(folderChooserFlags, [this](const juce::FileChooser& chooser)
+        {
+            auto gnomeFile = chooser.getResult();
+            if (gnomeFile != juce::File{}) {
+                audioProcessor.apvts.replaceState(juce::ValueTree::fromXml(*juce::XmlDocument::parse(gnomeFile)));
+            }
+        });
             
 }
 
