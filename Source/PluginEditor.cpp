@@ -216,6 +216,9 @@ void PolyGnomeAudioProcessorEditor::initializeMachineComponents() {
             bars[k].tracks[i].midiSlider.onValueChange = [this, k, i]() {
                 int sliderInt = bars[k].tracks[i].midiSlider.getValue();
                 bars[k].tracks[i].midiTextEditor.setText(midiIntToString(sliderInt) + " | " + to_string(sliderInt));
+                for (int z = 0; z < MAX_SUBDIVISIONS; z++) {
+                    bars[k].tracks[i].beatMidiSliders[z].setValue(sliderInt);
+                }
             };
             //initialize the MIDITextEditor's text entry function
             bars[k].tracks[i].midiTextEditor.onReturnKey = [this, k, i]() {
