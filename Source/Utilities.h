@@ -64,21 +64,22 @@ const juce::Colour DISABLED_DARK_COLOUR = juce::Colours::darkgrey;
 const juce::Colour ENABLED_COLOUR = juce::Colours::green; //default green
 
 //reminder texts
-const string BEAT_BUTTON_REMINDER = "Toggle Beat";
-const string MUTE_BUTTON_REMINDER = "mute all beats for this track";
-const string SUBDIVISION_SLIDER_REMINDER = "change the number of subdivisions per bar for this track";
-const string MIDI_SLIDER_REMINDER = "change the MIDI value";
-const string MIDI_TEXTEDITOR_REMINDER = "enter a valid MIDI string: <NOTE LETTER><optional #><-2 - 9> or integer: 0-127";
-const string VELOCITY_SLIDER_REMINDER = "change velocity 0-128";
-const string SUSTAIN_SLIDER_REMINDER = "change sustain 0-100%";
+const string BEAT_BUTTON_REMINDER = "Toggle Beat ON/OFF";
+const string MUTE_BUTTON_REMINDER = "Mute all beats for this track";
+const string SUBDIVISION_SLIDER_REMINDER = "Change the number of subdivisions per bar for this track";
+const string MIDI_SLIDER_REMINDER = "Change the MIDI value for all beats on this track";
+const string MIDI_TEXTEDITOR_REMINDER = "change all MIDI values for all beats on this track. Use your MIDI instrument or enter a valid MIDI string: <NOTE LETTER><optional #><-2 - 9> or integer: 0-127";
+const string VELOCITY_SLIDER_REMINDER = "Change MIDI Velocity from 0-128";
+const string SUSTAIN_SLIDER_REMINDER = "Change sustain (MIDI note length) from 0-100%";
 const string PLAY_BUTTON_REMINDER = "start/stop polygnome";
-const string LOAD_PRESET_BUTTON_REMINDER = "load a .pgnome file";
-const string SAVE_PRESET_BUTTON_REMINDER = "save a .pgnome file";
-const string BPM_SLIDER_REMINDER = "change bpm";
-const string BAR_SLIDER_REMINDER = "adjust how many bars per loop";
-const string BAR_SELECT_BUTTON_REMINDER = "select a bar of the loop";
-const string AUTO_LOOP_REMINDER = "automatically switch to page cooresponding to currently playing bar";
-const string BAR_COPY_BUTTON_REMINDER = "copy currently selected page to different bar";
+const string LOAD_PRESET_BUTTON_REMINDER = "Load a .pgnome file";
+const string SAVE_PRESET_BUTTON_REMINDER = "Save a .pgnome file";
+const string BPM_SLIDER_REMINDER = "Change BPM";
+const string BAR_SLIDER_REMINDER = "Adjust how many bars per loop";
+const string BAR_SELECT_BUTTON_REMINDER = "Select a bar of the loop";
+const string AUTO_LOOP_REMINDER = "Automatically show the next bar when the currently selected bar finishes playing";
+const string BAR_COPY_BUTTON_REMINDER = "Copy the currently selected page to a different bar";
+const string BEAT_MIDI_REMINDER = "Change the MIDI value for the currently highlighted beat using the slider or your MIDI instrument";
 
 //conversion from MIDI strings like C#4 to integers like 37
 string midiIntToString(int midiValue);

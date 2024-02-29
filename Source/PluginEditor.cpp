@@ -174,6 +174,7 @@ void PolyGnomeAudioProcessorEditor::initializeMachineComponents() {
                 bars[k].tracks[i].beatButtons[j].apvts = &audioProcessor.apvts;
                 bars[k].tracks[i].beatButtons[j].selectedBeatPtr = &selectedBeatID;
                 bars[k].tracks[i].beatLabels[j].setText("Bar " + to_string(k + 1) + " Track " + to_string(i + 1) + " Beat " + to_string(j + 1), juce::NotificationType::dontSendNotification);
+                bars[k].tracks[i].beatButtons[j].setHelpText(BEAT_MIDI_REMINDER);
             }
 
             //initialize the mute buttons
@@ -267,7 +268,7 @@ void PolyGnomeAudioProcessorEditor::resized()
     
     juce::FlexBox flexBox;
     flexBox.flexWrap = juce::FlexBox::Wrap::wrap;
-    flexBox.items.add(juce::FlexItem(MENU_WIDTH, 50, menu.playButton));
+    //flexBox.items.add(juce::FlexItem(MENU_WIDTH, 50, menu.playButton));
     flexBox.items.add(juce::FlexItem(MENU_WIDTH, 25, menu.loadPresetButton));
     flexBox.items.add(juce::FlexItem(MENU_WIDTH, 25, menu.savePresetButton));
     flexBox.items.add(juce::FlexItem(MENU_WIDTH, 200, menu.reminderTextEditor));
@@ -372,7 +373,7 @@ void PolyGnomeAudioProcessorEditor::paint(juce::Graphics& g)
                 bars[selectedBar].tracks[0].midiTextEditor.grabKeyboardFocus();
             }
         }
-        else {
+        else {//change the currently selected beat's note
             int numSubdivisions = audioProcessor.apvts.getRawParameterValue(getSubdivisionsString(selectedBar, selectedBeatID._trackID))->load();
             bars[selectedBar].tracks[selectedBeatID._trackID].beatMidiSliders[selectedBeatID._beatID].setValue(audioProcessor.storedMidiFromKeyboard);
             if (selectedBeatID._beatID < numSubdivisions - 1) {
@@ -418,15 +419,21 @@ void PolyGnomeAudioProcessorEditor::paint(juce::Graphics& g)
     
     paintPolyRhythmMachine(g);
 
+
+    
     if (selectedBeatID._barID != prevBeatID._barID || selectedBeatID._trackID != prevBeatID._trackID || selectedBeatID._beatID != prevBeatID._beatID) {
-        bars[prevBeatID._barID].tracks[prevBeatID._trackID].beatMidiSliders[prevBeatID._beatID].setVisible(false);
+
         bars[selectedBeatID._barID].tracks[selectedBeatID._trackID].beatMidiSliders[selectedBeatID._beatID].setVisible(true);
+        bars[selectedBeatID._barID].tracks[selectedBeatID._trackID].beatMidiSliders[selectedBeatID._beatID].toFront(true);
+        bars[prevBeatID._barID].tracks[prevBeatID._trackID].beatMidiSliders[prevBeatID._beatID].setVisible(false);
+
         bars[prevBeatID._barID].tracks[prevBeatID._trackID].beatLabels[prevBeatID._beatID].setVisible(false);
         bars[selectedBeatID._barID].tracks[selectedBeatID._trackID].beatLabels[selectedBeatID._beatID].setVisible(true);
         prevBeatID._barID = selectedBeatID._barID;
         prevBeatID._trackID = selectedBeatID._trackID;
         prevBeatID._beatID = selectedBeatID._beatID;
     }
+    
 }
 
 void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
@@ -504,21 +511,31 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
         int sustain = audioProcessor.apvts.getRawParameterValue(getSustainString(selectedBar, i))->load();
         //draw the buttons for each note of the track
         for (int j = 0; j < subdivisions; j++) {
-            //TODO: make this text fit the button properly
-            bars[selectedBar].tracks[i].beatButtons[j].setButtonText(juce::String(midiIntToString((audioProcessor.apvts.getRawParameterValue(getBeatMidiString(selectedBar, i, j))->load()))).retainCharacters("ABCDEFG#"));
 
             //TODO: probably should be in the constructor
+            //draw the beatButtons
+            float distanceOnPath = (width / subdivisions) * j;
+            juce::Rectangle<int> pointBounds(X + distanceOnPath, Y + spacing * i - 10, (width / subdivisions) * sustain / 100, 22);
+            bars[selectedBar].tracks[i].beatButtons[j].setBounds(pointBounds);
+            bars[selectedBar].tracks[i].beatButtons[j].setButtonText(juce::String(midiIntToString((audioProcessor.apvts.getRawParameterValue(getBeatMidiString(selectedBar, i, j))->load()))).retainCharacters("ABCDEFG#")); //TODO: make this text fit the button properly
+            bars[selectedBar].tracks[i].beatButtons[j].setVisible(true);
+            if (selectedBeatID._barID == selectedBar && selectedBeatID._trackID == i && selectedBeatID._beatID == j) {
+                g.setColour(ACCENT_COLOUR);
+                juce::Rectangle<int> borderBounds(X + distanceOnPath, Y + spacing * i - 10, (width / subdivisions) * sustain / 100 + 1, 22 + 1);
+                juce::Path borderPath;
+                borderPath.addRectangle(borderBounds);
+                g.fillPath(borderPath);
+            }
+
+
+
+            //draw the beatButton menu options
             juce::Rectangle<int> beatMidiSliderBounds(X, height, 300, 300);
             bars[selectedBar].tracks[i].beatMidiSliders[j].setBounds(beatMidiSliderBounds);
             juce::Rectangle<int> beatLabelBounds(X, height - 50, 300, 300);
             bars[selectedBar].tracks[i].beatLabels[j].setBounds(beatLabelBounds);
 
-            float distanceOnPath = (width / subdivisions) * j;
-            juce::Rectangle<int> pointBounds(X + distanceOnPath, Y + spacing * i - 10, (width / subdivisions) * sustain / 100, 22);
-            bars[selectedBar].tracks[i].beatButtons[j].setBounds(pointBounds);
-            bars[selectedBar].tracks[i].beatButtons[j].setVisible(true);
-
-            //TODO : clean this?
+            //TODO : clean this
             //set the colors of the buttons based on their state
             if (audioProcessor.apvts.getRawParameterValue(getBeatToggleString(selectedBar, i, j))->load() == true) {
                 if (j == audioProcessor.polyRhythmMachine.bars[selectedBar].tracks[i].beatCounter - 1) {
@@ -581,8 +598,6 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
         colorSlider(bars[selectedBar].tracks[i].velocitySlider, ACCENT_COLOUR, ACCENT_COLOUR, SECONDARY_COLOUR, ACCENT_COLOUR, isTrackEnabled);
         colorSlider(bars[selectedBar].tracks[i].sustainSlider, ACCENT_COLOUR, ACCENT_COLOUR, SECONDARY_COLOUR, ACCENT_COLOUR, isTrackEnabled);
         colorTextEditor(bars[selectedBar].tracks[i].midiTextEditor, ACCENT_COLOUR, ACCENT_COLOUR, ACCENT_COLOUR, MAIN_COLOUR, isTrackEnabled);
-
-
 
         //hide any hidden track components 
         for (int k = 0; k < MAX_SUBDIVISIONS; k++) {
