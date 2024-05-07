@@ -91,7 +91,7 @@ class PolyGnomeAudioProcessorEditor : public juce::AudioProcessorEditor, juce::T
         void paint(juce::Graphics&) override;
         void paintPolyRhythmMachine(juce::Graphics& g);
 
-        juce::Rectangle<int> getVisualArea();
+        juce::Rectangle<int> getTrackArea();
 
         void resized() override;
         void timerCallback() override {

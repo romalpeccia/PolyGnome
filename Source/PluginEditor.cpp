@@ -296,13 +296,13 @@ void PolyGnomeAudioProcessorEditor::paint(juce::Graphics& g)
     //TODO look into only calling redraws of specific elements if needed
     g.fillAll(BACKGROUND_COLOUR);
 
-    auto visualArea = getVisualArea();
+    auto trackArea = getTrackArea();
     g.drawImageAt(logo, 0, 0);
-    g.drawImageAt(sustainIcon, visualArea.getX() - 190, 8);
-    g.drawImageAt(velocityIcon, visualArea.getX() - 105, 8);
-    g.drawImageAt(enableIcon, visualArea.getX() - 50, 8);
-    g.drawImageAt(trackIcon, visualArea.getX() + visualArea.getWidth() + 35, 5);
-    g.drawImageAt(keyboardIcon, visualArea.getX() + visualArea.getWidth() + 155, 5);
+    g.drawImageAt(sustainIcon, trackArea.getX() - 190, 8);
+    g.drawImageAt(velocityIcon, trackArea.getX() - 105, 8);
+    g.drawImageAt(enableIcon, trackArea.getX() - 50, 8);
+    g.drawImageAt(trackIcon, trackArea.getX() + trackArea.getWidth() + 35, 5);
+    g.drawImageAt(keyboardIcon, trackArea.getX() + trackArea.getWidth() + 155, 5);
 
 
     if (audioProcessor.apvts.getRawParameterValue("ON/OFF")->load() == true) {
@@ -358,7 +358,6 @@ void PolyGnomeAudioProcessorEditor::paint(juce::Graphics& g)
     //if the user has entered a MIDI note, update the UI accordingly
     int selectedMidi = audioProcessor.apvts.getRawParameterValue("SELECTED_MIDI_TRACK")->load();
     if (audioProcessor.storedMidiFromKeyboard != -1 ) {
-        DBG("TEST");
         //if a midiTextEditor is selected, change that note, otherwise, change the currently selected beat's note
         if (selectedMidi != -1) {
             bars[selectedBar].tracks[selectedMidi].midiTextEditor.setText(midiIntToString(audioProcessor.storedMidiFromKeyboard) + " | " + to_string(audioProcessor.storedMidiFromKeyboard));
@@ -438,19 +437,19 @@ void PolyGnomeAudioProcessorEditor::paint(juce::Graphics& g)
 
 void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
 
-    auto visualArea = getVisualArea(); //area of the tracks
+    auto trackArea = getTrackArea(); //area of the tracks
 
     //for debugging purposes
     //g.setColour(juce::Colours::white);
-    //g.drawRect(visualArea);
+    //g.drawRect(trackArea);
 
-    int X = visualArea.getX(); //top left corner X
-    int Y = visualArea.getY(); //top left corner  Y
+    int X = trackArea.getX(); //top left corner X
+    int Y = trackArea.getY(); //top left corner  Y
 
 
 
-    int width = visualArea.getWidth();
-    int height = visualArea.getHeight();
+    int width = trackArea.getWidth();
+    int height = trackArea.getHeight();
     auto ON = audioProcessor.apvts.getRawParameterValue("ON/OFF")->load();
 
     int spacing = height / MAX_TRACKS; // space between each track
@@ -609,15 +608,15 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
 
 }
 
-juce::Rectangle<int> PolyGnomeAudioProcessorEditor::getVisualArea()
+juce::Rectangle<int> PolyGnomeAudioProcessorEditor::getTrackArea()
 {
     auto bounds = getLocalBounds();
     //visual area consists of middle third of top third of area 
-    auto visualArea = bounds.removeFromTop(bounds.getHeight() * 0.66);
-    visualArea.removeFromLeft(visualArea.getWidth() * 0.33);
-    visualArea.removeFromRight(visualArea.getWidth() * 0.5);
-    visualArea.setWidth(432); // common multiple of 9, 12, 16 
-    return visualArea;
+    auto trackArea = bounds.removeFromTop(bounds.getHeight() * 0.66);
+    trackArea.removeFromLeft(trackArea.getWidth() * 0.33);
+    trackArea.removeFromRight(trackArea.getWidth() * 0.5);
+    trackArea.setWidth(432); // common multiple of 9, 12, 16 
+    return trackArea;
 }
 
 
@@ -741,75 +740,44 @@ void PolyGnomeAudioProcessorEditor::colorTextEditor(juce::TextEditor& textEditor
     textEditor.setColour(juce::TextEditor::ColourIds::backgroundColourId, backgroundColour);
 }
 
+//TODO: framework might have this built in? not super important
 juce::String PolyGnomeAudioProcessorEditor::getCurrentMouseOverText() {
-    //TODO: this seems incredibly inifficient, probably something in the framework I can find to deal with this
-    juce::String   reminderText = "";
+    juce::String reminderText;
 
-    if (menu.playButton.isHoveredOver == true) {
-        reminderText = menu.playButton.getHelpText();
-    }
-    else  if (menu.loadPresetButton.isHoveredOver == true) {
-        reminderText = menu.loadPresetButton.getHelpText();
-    }
-    else  if (menu.savePresetButton.isHoveredOver == true) {
-        reminderText = menu.savePresetButton.getHelpText();
-    }
-    else if (menu.barSlider.isHoveredOver == true) {
-        reminderText = menu.barSlider.getHelpText();
-    }
-    else if (menu.autoLoopButton.isHoveredOver == true) {
-        reminderText = menu.autoLoopButton.getHelpText();
-    }
-    else {
-        for (int j = 0; j < MAX_BARS; j++) {
-            for (int i = 0; i < MAX_TRACKS; i++) {
-                if (bars[j].tracks[i].muteButton.isHoveredOver == true) {
-                    reminderText = bars[j].tracks[i].muteButton.getHelpText();
-                    break;
-                }
-                else if (bars[j].tracks[i].subdivisionSlider.isHoveredOver == true) {
-                    reminderText = bars[j].tracks[i].subdivisionSlider.getHelpText();
-                    break;
-                }
-                else if (bars[j].tracks[i].midiSlider.isHoveredOver == true) {
-                    reminderText = bars[j].tracks[i].midiSlider.getHelpText();
-                    break;
-                }
-                else if (bars[j].tracks[i].midiTextEditor.isHoveredOver == true) {
-                    reminderText = bars[j].tracks[i].midiTextEditor.getHelpText();
-                    break;
-                }
-                else if (bars[j].tracks[i].velocitySlider.isHoveredOver == true) {
-                    reminderText = bars[j].tracks[i].velocitySlider.getHelpText();
-                    break;
-                }
-                else if (bars[j].tracks[i].sustainSlider.isHoveredOver == true) {
-                    reminderText = bars[j].tracks[i].sustainSlider.getHelpText();
-                    break;
-                }
-                else {
-                    for (int k = 0; k < MAX_SUBDIVISIONS; k++) {
-                        if (bars[j].tracks[i].beatButtons[k].isHoveredOver == true) {
-                            reminderText = bars[j].tracks[i].beatButtons[k].getHelpText();
-                            break;
-                        }
-                        if (bars[j].tracks[i].beatMidiSliders[k].isHoveredOver == true) {
-                            reminderText = bars[j].tracks[i].beatMidiSliders[k].getHelpText();
-                            break;
-                        }
+    auto checkHovered = [&](auto& component) {
+        if (component.isHoveredOver) {
+            reminderText = component.getHelpText();
+            return true;
+        }
+        return false;
+        };
 
-                    }
-                }
-            }
-            if (menu.barSelectButtons[j].isHoveredOver == true) {
-                reminderText = menu.barSelectButtons[j].getHelpText();
-                break;
-            }
-            if (menu.barCopyButtons[j].isHoveredOver == true) {
-                reminderText = menu.barCopyButtons[j].getHelpText();
-                break;
+    // Check menu buttons
+    if (checkHovered(menu.playButton)) return reminderText;
+    if (checkHovered(menu.loadPresetButton)) return reminderText;
+    if (checkHovered(menu.savePresetButton)) return reminderText;
+    if (checkHovered(menu.barSlider)) return reminderText;
+    if (checkHovered(menu.autoLoopButton)) return reminderText;
+
+    // Check bar and track components
+    for (int j = 0; j < MAX_BARS; j++) {
+        for (int i = 0; i < MAX_TRACKS; i++) {
+            if (checkHovered(bars[j].tracks[i].muteButton)) return reminderText;
+            if (checkHovered(bars[j].tracks[i].subdivisionSlider)) return reminderText;
+            if (checkHovered(bars[j].tracks[i].midiSlider)) return reminderText;
+            if (checkHovered(bars[j].tracks[i].midiTextEditor)) return reminderText;
+            if (checkHovered(bars[j].tracks[i].velocitySlider)) return reminderText;
+            if (checkHovered(bars[j].tracks[i].sustainSlider)) return reminderText;
+
+            // Check beat buttons and sliders
+            for (int k = 0; k < MAX_SUBDIVISIONS; k++) {
+                if (checkHovered(bars[j].tracks[i].beatButtons[k])) return reminderText;
+                if (checkHovered(bars[j].tracks[i].beatMidiSliders[k])) return reminderText;
             }
         }
+        // Check bar select and copy buttons
+        if (checkHovered(menu.barSelectButtons[j])) return reminderText;
+        if (checkHovered(menu.barCopyButtons[j])) return reminderText;
     }
     return reminderText;
 }
