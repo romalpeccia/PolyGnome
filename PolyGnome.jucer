@@ -6,6 +6,11 @@
               companyName="Romal">
   <MAINGROUP id="PkQ1Xo" name="PolyGnome">
     <GROUP id="{C6B4A32D-9EBD-62FC-20B1-EDF06920B470}" name="Source">
+      <FILE id="EaU5om" name="TrackComponent.h" compile="0" resource="0"
+            file="Source/TrackComponent.h"/>
+      <FILE id="klGWez" name="MenuComponent.cpp" compile="1" resource="0"
+            file="Source/MenuComponent.cpp"/>
+      <FILE id="tLxRu1" name="MenuComponent.h" compile="0" resource="0" file="Source/MenuComponent.h"/>
       <FILE id="DhsYi5" name="CustomKeyboardComponent.cpp" compile="1" resource="0"
             file="Source/CustomKeyboardComponent.cpp"/>
       <FILE id="TUxePa" name="CustomKeyboardComponent.h" compile="0" resource="0"

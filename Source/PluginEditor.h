@@ -24,57 +24,15 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 #include "Utilities.h"
+#include "MenuComponent.h"
+#include "TrackComponent.h"
 #include "CustomKeyboardComponent.h"
-
-class TrackComponent {
-    private:
-    public:
-        //MIDDLE COMPONENTS
-        BeatButton beatButtons[MAX_SUBDIVISIONS];
-        CustomSlider beatMidiSliders[MAX_SUBDIVISIONS];
-        std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> beatMidiSliderAttachments[MAX_SUBDIVISIONS];
-        juce::Label beatLabels[MAX_SUBDIVISIONS];
-
-        //RIGHT COMPONENTS
-        CustomSlider subdivisionSlider;
-        CustomSlider midiSlider;
-        CustomTextEditor midiTextEditor;
-
-        //LEFT COMPONENTS
-        CustomToggleButton muteButton;
-        CustomSlider velocitySlider;
-        CustomSlider sustainSlider;
-
-        //ATTACHMENTS
-        std::unique_ptr <juce::AudioProcessorValueTreeState::ButtonAttachment> muteButtonAttachment;
-        std::unique_ptr <juce::AudioProcessorValueTreeState::ButtonAttachment> beatButtonAttachments[MAX_SUBDIVISIONS];
-        std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> subdivisionSliderAttachment;
-        std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> midiSliderAttachment;
-        std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> velocitySliderAttachment;
-        std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> sustainSliderAttachment;
-};
 
 
 class BarComponent {
     private:
     public:
         TrackComponent tracks[MAX_TRACKS];
-
-};
-
-
-class MenuComponent : public virtual juce::Component {
-    public:
-
-        CustomTextButton playButton;
-        CustomTextButton loadPresetButton;
-        CustomTextButton savePresetButton;
-        CustomTextEditor reminderTextEditor;
-        CustomTextButton barSelectButtons[MAX_BARS];
-        CustomTextButton barCopyButtons[MAX_BARS];
-        CustomSlider barSlider;
-        std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> barSliderAttachment;
-        CustomTextButton autoLoopButton;
 
 };
 
@@ -98,16 +56,11 @@ class PolyGnomeAudioProcessorEditor : public juce::AudioProcessorEditor, juce::T
             repaint();
         };
 
-
-
-
-
         //play state functions TODO: (potentially obsolete in some cases, since menu.playButton was removed. keep it hidden for now in case it is helpful for standalone mode)
         void toggleAudioProcessorChildrenStates();
         void togglePlayState();
         void togglePlayStateOff();
         void togglePlayStateOn();
-
 
         juce::String getCurrentMouseOverText();
 
@@ -116,7 +69,6 @@ class PolyGnomeAudioProcessorEditor : public juce::AudioProcessorEditor, juce::T
         //void colorTextButton(juce::TextButton& textButton, juce::Colour buttonColour, bool buttonEnabled, bool trackEnabled);
 
         //component initializations 
-        void initializeImages();
         void initializeMenuComponents();
         void initializeMachineComponents();
         void loadPreset();
@@ -124,12 +76,10 @@ class PolyGnomeAudioProcessorEditor : public juce::AudioProcessorEditor, juce::T
     private:
         PolyGnomeAudioProcessor& audioProcessor;
     
-
         std::vector<juce::Component*> getVisibleComps();
         std::vector<juce::Component*> getHiddenComps();
         std::vector<juce::Component*> getAllComps();
         std::vector<juce::Component*> getTrackComps(int barIndex, int trackIndex);
-
 
         std::unique_ptr<juce::FileChooser> fileChooser;
 

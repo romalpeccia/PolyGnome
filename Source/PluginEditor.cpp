@@ -56,37 +56,21 @@ PolyGnomeAudioProcessorEditor::~PolyGnomeAudioProcessorEditor()
 
 void PolyGnomeAudioProcessorEditor::initializeMenuComponents() {
 
-    //initialize the playButton (currently defunct, may reintroduce it again for standalone mode)
-    menu.playButton.onClick = [this]() {
-        togglePlayState();
-        toggleAudioProcessorChildrenStates();
-        };
-    menu.playButton.setButtonText("Play");
-    menu.playButton.setColour(juce::TextButton::ColourIds::buttonColourId, SECONDARY_COLOUR);
-    menu.playButton.setHelpText(PLAY_BUTTON_REMINDER);
-
+   
     //initialize the load/save preset buttons
     menu.loadPresetButton.onClick = [this]() {
         loadPreset();
         };
-    menu.loadPresetButton.setButtonText("Load Preset");
-    menu.loadPresetButton.setHelpText(LOAD_PRESET_BUTTON_REMINDER);
-    
     menu.savePresetButton.onClick = [this]() {
         savePreset();
         };
-    menu.savePresetButton.setButtonText("Save Preset");
-    menu.savePresetButton.setHelpText(SAVE_PRESET_BUTTON_REMINDER);
-    
+
     //initialize  barSlider
     colorSlider(menu.barSlider, MAIN_COLOUR, MAIN_COLOUR, SECONDARY_COLOUR, MAIN_COLOUR, true);
     menu.barSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "NUM_BARS", menu.barSlider);
-    menu.barSlider.setHelpText(BAR_SLIDER_REMINDER);
-    menu.barSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxRight, false, 25, 25);
 
     //initialize reminderTextEditor
     colorTextEditor(menu.reminderTextEditor, REMINDER_COLOUR, juce::Colours::white, juce::Colours::white, BACKGROUND_COLOUR, true);
-    menu.reminderTextEditor.setMultiLine(true);
 
     //initialize autoloop button
     menu.autoLoopButton.onClick = [this]() {
@@ -96,21 +80,16 @@ void PolyGnomeAudioProcessorEditor::initializeMenuComponents() {
         else {
             audioProcessor.apvts.getRawParameterValue("AUTO_LOOP")->store(true);
         }
-        };
-    menu.autoLoopButton.setHelpText(AUTO_LOOP_REMINDER);
-    menu.autoLoopButton.setButtonText("Auto-Loop");
+     };
 
     //initialize the bar buttons
-    for (int i = 0; i < MAX_BARS; i++)
+    for (int k = 0; k < MAX_BARS; k++)
     {
-        menu.barSelectButtons[i].onClick = [this, i]() {
-            audioProcessor.apvts.getRawParameterValue("SELECTED_BAR")->store(i);
+        menu.barSelectButtons[k].onClick = [this, k]() {
+            audioProcessor.apvts.getRawParameterValue("SELECTED_BAR")->store(k);
             audioProcessor.apvts.getRawParameterValue("AUTO_LOOP")->store(false);
             };
-        menu.barSelectButtons[i].setHelpText(BAR_SELECT_BUTTON_REMINDER);
-        menu.barSelectButtons[i].setButtonText(to_string(i + 1));
     }
-
     //initialize the copy bar to other bar buttons
     for (int k = 0; k < MAX_BARS; k++)
     {
@@ -142,8 +121,6 @@ void PolyGnomeAudioProcessorEditor::initializeMenuComponents() {
                 }
             }
         };
-        menu.barCopyButtons[k].setHelpText(BAR_COPY_BUTTON_REMINDER);
-        menu.barCopyButtons[k].setButtonText(to_string(k + 1));
     }
 }
 
@@ -153,55 +130,46 @@ void PolyGnomeAudioProcessorEditor::initializeMachineComponents() {
         for (int i = 0; i < MAX_TRACKS; i++) {
             for (int j = 0; j < MAX_SUBDIVISIONS; j++)
             { //initialize the track buttons
-                juce::Font buttonFont = juce::Font(8);
-                bars[k].tracks[i].beatButtons[j].setClickingTogglesState(true);
-                bars[k].tracks[i].beatButtonAttachments[j] = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.apvts, getBeatToggleString(k, i, j) , bars[k].tracks[i].beatButtons[j]);
-                bars[k].tracks[i].beatButtons[j].setHelpText(BEAT_BUTTON_REMINDER);
+                juce::Font buttonFont = juce::Font(8); //????: is this doing anything?
 
-                //initialize their submenus
+                //initialize their beat submenus
                 bars[k].tracks[i].beatMidiSliderAttachments[j] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, getBeatMidiString(k, i, j), bars[k].tracks[i].beatMidiSliders[j]);
                 bars[k].tracks[i].beatButtons[j].beatId.setbeatID(k, i, j);
-                bars[k].tracks[i].beatButtons[j].apvts = &audioProcessor.apvts;
+                bars[k].tracks[i].beatButtons[j].apvts = &audioProcessor.apvts; //????: why does each beatbutton have an aptvs reference??
                 bars[k].tracks[i].beatButtons[j].selectedBeatPtr = &selectedBeatID;
                 bars[k].tracks[i].beatLabels[j].setText("Bar " + to_string(k + 1) + " Track " + to_string(i + 1) + " Beat " + to_string(j + 1), juce::NotificationType::dontSendNotification);
-                bars[k].tracks[i].beatButtons[j].setHelpText(BEAT_MIDI_REMINDER);
+
             }
 
             //initialize the mute buttons
-            bars[k].tracks[i].muteButton.setClickingTogglesState(true);
             bars[k].tracks[i].muteButtonAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.apvts, getTrackEnableString(k, i), bars[k].tracks[i].muteButton);
-            bars[k].tracks[i].muteButton.setHelpText(MUTE_BUTTON_REMINDER);
+   
 
             //initialize the subdivision sliders
-            bars[k].tracks[i].subdivisionSlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
             colorSlider(bars[k].tracks[i].subdivisionSlider, ACCENT_COLOUR, ACCENT_COLOUR, SECONDARY_COLOUR, ACCENT_COLOUR, true);
             bars[k].tracks[i].subdivisionSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, getSubdivisionsString(k, i), bars[k].tracks[i].subdivisionSlider);
-            bars[k].tracks[i].subdivisionSlider.setHelpText(SUBDIVISION_SLIDER_REMINDER);
+
 
             //initialize the velocity sliders
-            bars[k].tracks[i].velocitySlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
             colorSlider(bars[k].tracks[i].velocitySlider, ACCENT_COLOUR, ACCENT_COLOUR, SECONDARY_COLOUR, ACCENT_COLOUR, true);
             bars[k].tracks[i].velocitySliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, getVelocityString(k, i), bars[k].tracks[i].velocitySlider);
-            bars[k].tracks[i].velocitySlider.setHelpText(VELOCITY_SLIDER_REMINDER);
+
 
             //initialize the sustain sliders
             colorSlider(bars[k].tracks[i].sustainSlider, ACCENT_COLOUR, ACCENT_COLOUR, SECONDARY_COLOUR, ACCENT_COLOUR, true);
             bars[k].tracks[i].sustainSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, getSustainString(k, i), bars[k].tracks[i].sustainSlider);
-            bars[k].tracks[i].sustainSlider.setHelpText(SUSTAIN_SLIDER_REMINDER);
+            
 
 
             //initialize the MIDI control slider    
-            bars[k].tracks[i].midiSlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
             colorSlider(bars[k].tracks[i].midiSlider, MAIN_COLOUR, ACCENT_COLOUR, SECONDARY_COLOUR, ACCENT_COLOUR, true);
             bars[k].tracks[i].midiSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, getMidiValueString(k, i), bars[k].tracks[i].midiSlider);
-            bars[k].tracks[i].midiSlider.setHelpText(MIDI_SLIDER_REMINDER);
+            
 
             //initialize the text entry logic and UI for MIDI Values
             int currentIntValue = audioProcessor.apvts.getRawParameterValue(getMidiValueString(k, i))->load();
             bars[k].tracks[i].midiTextEditor.setText(midiIntToString(currentIntValue) + " | " + to_string(currentIntValue));
-            bars[k].tracks[i].midiTextEditor.setReadOnly(false);
-            colorTextEditor(bars[k].tracks[i].midiTextEditor, ACCENT_COLOUR, ACCENT_COLOUR, ACCENT_COLOUR, MAIN_COLOUR, true);
-            bars[k].tracks[i].midiTextEditor.setHelpText(MIDI_TEXTEDITOR_REMINDER);
+
 
             //add control of textbox value to MIDI slider
             bars[k].tracks[i].midiSlider.onValueChange = [this, k, i]() {
@@ -461,9 +429,6 @@ void PolyGnomeAudioProcessorEditor::paintPolyRhythmMachine(juce::Graphics& g) {
             }
         }
     }
-
-
-
 
 
     //main loop to draw the tracks and all of its components
