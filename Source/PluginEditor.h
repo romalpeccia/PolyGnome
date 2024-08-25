@@ -133,7 +133,12 @@ class PolyGnomeAudioProcessorEditor : public juce::AudioProcessorEditor, juce::T
 
         std::unique_ptr<juce::FileChooser> fileChooser;
 
-        juce::Image logo, keyboardIcon, trackIcon, enableIcon, sustainIcon, velocityIcon;
+        juce::Image logo = juce::ImageCache::getFromMemory(BinaryData::OSRS_gnome_png, BinaryData::OSRS_gnome_pngSize);
+        juce::Image keyboardIcon = juce::ImageCache::getFromMemory(BinaryData::keyboard_png, BinaryData::keyboard_pngSize);
+        juce::Image trackIcon = juce::ImageCache::getFromMemory(BinaryData::track_png, BinaryData::track_pngSize);
+        juce::Image sustainIcon = juce::ImageCache::getFromMemory(BinaryData::sustain_png, BinaryData::sustain_pngSize);
+        juce::Image velocityIcon = juce::ImageCache::getFromMemory(BinaryData::velocity_png, BinaryData::velocity_pngSize);
+        juce::Image enableIcon = juce::ImageCache::getFromMemory(BinaryData::enable_png, BinaryData::enable_pngSize);
 
         MenuComponent menu;
         BarComponent bars[MAX_BARS];

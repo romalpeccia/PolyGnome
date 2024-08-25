@@ -28,7 +28,7 @@ using namespace std;
 PolyGnomeAudioProcessorEditor::PolyGnomeAudioProcessorEditor(PolyGnomeAudioProcessor& p)
     : AudioProcessorEditor(&p), audioProcessor(p)
 {
-    initializeImages();
+
     initializeMenuComponents();
     initializeMachineComponents();
 
@@ -51,16 +51,6 @@ PolyGnomeAudioProcessorEditor::~PolyGnomeAudioProcessorEditor()
 }
 
 
-void PolyGnomeAudioProcessorEditor::initializeImages()
-{
-    //images are stored in binary using projucer
-    logo = juce::ImageCache::getFromMemory(BinaryData::OSRS_gnome_png, BinaryData::OSRS_gnome_pngSize);
-    keyboardIcon = juce::ImageCache::getFromMemory(BinaryData::keyboard_png, BinaryData::keyboard_pngSize);
-    trackIcon = juce::ImageCache::getFromMemory(BinaryData::track_png, BinaryData::track_pngSize);
-    sustainIcon = juce::ImageCache::getFromMemory(BinaryData::sustain_png, BinaryData::sustain_pngSize);
-    velocityIcon = juce::ImageCache::getFromMemory(BinaryData::velocity_png, BinaryData::velocity_pngSize);
-    enableIcon = juce::ImageCache::getFromMemory(BinaryData::enable_png, BinaryData::enable_pngSize);
-}
 
 
 
