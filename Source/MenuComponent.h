@@ -12,7 +12,7 @@
 #include "Utilities.h"
 #include <JuceHeader.h>
 
-class MenuComponent : public virtual juce::Component { //#does inheriting juce component do anything?
+class MenuComponent : public virtual juce::Component { 
 
     public:
         MenuComponent() {

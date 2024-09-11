@@ -30,10 +30,9 @@
 
 
 class BarComponent {
-    private:
     public:
         TrackComponent tracks[MAX_TRACKS];
-
+    private:
 };
 
 //==============================================================================

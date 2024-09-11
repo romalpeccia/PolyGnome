@@ -122,16 +122,19 @@ void PolyGnomeAudioProcessorEditor::initializeMenuComponents() {
             }
         };
     }
+
+
 }
 
 void PolyGnomeAudioProcessorEditor::initializeMachineComponents() {
     prevBeatID.setbeatID(1, 1, 1);
+    juce::Font buttonFont = juce::Font(4); //TODO: is this doing anything?
     for (int k = 0; k < MAX_BARS; k++) {
         for (int i = 0; i < MAX_TRACKS; i++) {
             for (int j = 0; j < MAX_SUBDIVISIONS; j++)
-            { //initialize the track buttons
-                juce::Font buttonFont = juce::Font(8); //????: is this doing anything?
-
+            { 
+                //initialize the track buttons
+                bars[k].tracks[i].beatButtonAttachments[j] = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.apvts, getBeatToggleString(k, i, j), bars[k].tracks[i].beatButtons[j]);
                 //initialize their beat submenus
                 bars[k].tracks[i].beatMidiSliderAttachments[j] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, getBeatMidiString(k, i, j), bars[k].tracks[i].beatMidiSliders[j]);
                 bars[k].tracks[i].beatButtons[j].beatId.setbeatID(k, i, j);
@@ -140,36 +143,25 @@ void PolyGnomeAudioProcessorEditor::initializeMachineComponents() {
                 bars[k].tracks[i].beatLabels[j].setText("Bar " + to_string(k + 1) + " Track " + to_string(i + 1) + " Beat " + to_string(j + 1), juce::NotificationType::dontSendNotification);
 
             }
+            // Lambda function to initialize sliders and their attachments
+            auto initializeSliderAndAttachment = [&](juce::Slider& slider, const juce::String& valueTreeKey, juce::Colour sliderColor, std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>& sliderAttachment) {
+                colorSlider(slider, sliderColor, sliderColor, SECONDARY_COLOUR, sliderColor, true);
+                sliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, valueTreeKey, slider);
+                };
 
-            //initialize the mute buttons
+            // Use the lambda function to initialize the sliders and attachments
+            initializeSliderAndAttachment(bars[k].tracks[i].subdivisionSlider, getSubdivisionsString(k, i), ACCENT_COLOUR, bars[k].tracks[i].subdivisionSliderAttachment);
+            initializeSliderAndAttachment(bars[k].tracks[i].velocitySlider, getVelocityString(k, i), ACCENT_COLOUR, bars[k].tracks[i].velocitySliderAttachment);
+            initializeSliderAndAttachment(bars[k].tracks[i].sustainSlider, getSustainString(k, i), ACCENT_COLOUR, bars[k].tracks[i].sustainSliderAttachment);
+            initializeSliderAndAttachment(bars[k].tracks[i].midiSlider, getMidiValueString(k, i), MAIN_COLOUR, bars[k].tracks[i].midiSliderAttachment);
+
+            // Mute button attachment remains the same
             bars[k].tracks[i].muteButtonAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.apvts, getTrackEnableString(k, i), bars[k].tracks[i].muteButton);
-   
-
-            //initialize the subdivision sliders
-            colorSlider(bars[k].tracks[i].subdivisionSlider, ACCENT_COLOUR, ACCENT_COLOUR, SECONDARY_COLOUR, ACCENT_COLOUR, true);
-            bars[k].tracks[i].subdivisionSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, getSubdivisionsString(k, i), bars[k].tracks[i].subdivisionSlider);
-
-
-            //initialize the velocity sliders
-            colorSlider(bars[k].tracks[i].velocitySlider, ACCENT_COLOUR, ACCENT_COLOUR, SECONDARY_COLOUR, ACCENT_COLOUR, true);
-            bars[k].tracks[i].velocitySliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, getVelocityString(k, i), bars[k].tracks[i].velocitySlider);
-
-
-            //initialize the sustain sliders
-            colorSlider(bars[k].tracks[i].sustainSlider, ACCENT_COLOUR, ACCENT_COLOUR, SECONDARY_COLOUR, ACCENT_COLOUR, true);
-            bars[k].tracks[i].sustainSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, getSustainString(k, i), bars[k].tracks[i].sustainSlider);
-            
-
-
-            //initialize the MIDI control slider    
-            colorSlider(bars[k].tracks[i].midiSlider, MAIN_COLOUR, ACCENT_COLOUR, SECONDARY_COLOUR, ACCENT_COLOUR, true);
-            bars[k].tracks[i].midiSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, getMidiValueString(k, i), bars[k].tracks[i].midiSlider);
-            
 
             //initialize the text entry logic and UI for MIDI Values
             int currentIntValue = audioProcessor.apvts.getRawParameterValue(getMidiValueString(k, i))->load();
             bars[k].tracks[i].midiTextEditor.setText(midiIntToString(currentIntValue) + " | " + to_string(currentIntValue));
-
+            colorTextEditor(bars[k].tracks[i].midiTextEditor, ACCENT_COLOUR, ACCENT_COLOUR, ACCENT_COLOUR, MAIN_COLOUR, true);
 
             //add control of textbox value to MIDI slider
             bars[k].tracks[i].midiSlider.onValueChange = [this, k, i]() {

@@ -14,7 +14,6 @@
 #include <JuceHeader.h>
 
 class TrackComponent {
-    private:
     public:
         TrackComponent() {
 
@@ -34,6 +33,7 @@ class TrackComponent {
 
             midiTextEditor.setReadOnly(false);
 
+            midiTextEditor.setHelpText(MIDI_TEXTEDITOR_REMINDER);
             for (int j = 0; j < MAX_SUBDIVISIONS; j++) {
                 beatButtons[j].setClickingTogglesState(true);
                 beatButtons[j].setHelpText(BEAT_BUTTON_REMINDER);
@@ -66,4 +66,6 @@ class TrackComponent {
         std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> midiSliderAttachment;
         std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> velocitySliderAttachment;
         std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> sustainSliderAttachment;
+
+    private:
 };

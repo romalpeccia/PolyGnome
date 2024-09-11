@@ -254,3 +254,16 @@ int midiStringToInt(string midiValue) {
     }
 
 }
+
+
+CustomSlider::CustomSlider() {
+
+}
+
+CustomSlider::~CustomSlider() {
+
+}
+
+APVTSComponent::APVTSComponent() {
+
+}
