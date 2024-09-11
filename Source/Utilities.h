@@ -94,10 +94,22 @@ juce::String getMidiValueString(int barNum, int trackNum);
 juce::String getSustainString(int barNum, int trackNum);
 juce::String getTrackEnableString(int barNum, int trackNum);
 
+class APVTSComponent {
+    //any component that needs the Processor or the APVTS to function
+public:
+    APVTSComponent();
+    APVTSComponent(juce::AudioProcessorValueTreeState* _apvts) {
+        apvts = _apvts;
+    };
+    //apvts of caller that created this component
+    juce::AudioProcessorValueTreeState* apvts;
 
+};
 
-class CustomSlider : public  juce::Slider {
+class CustomSlider : public  juce::Slider, public APVTSComponent {
     public:
+        CustomSlider();
+        ~CustomSlider();
         void mouseEnter(const juce::MouseEvent& event) override {
             isHoveredOver = true;
         }

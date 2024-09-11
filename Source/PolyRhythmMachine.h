@@ -48,12 +48,12 @@ struct Bar {
     Track tracks[MAX_TRACKS];
 };
 
-class PolyRhythmMachine : public juce::Component
+class PolyRhythmMachine 
 {
     public:
         PolyRhythmMachine();
         PolyRhythmMachine(juce::AudioProcessorValueTreeState* _apvts);
-        ~PolyRhythmMachine() override;
+        ~PolyRhythmMachine() ;
 
         void prepareToPlay(double _sampleRate, int samplesPerBlock);
         void getNextAudioBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiBuffer);
