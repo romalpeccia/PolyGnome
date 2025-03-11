@@ -106,55 +106,53 @@ public:
 
 };
 
-class CustomSlider : public  juce::Slider, public APVTSComponent {
-    public:
-        CustomSlider();
-        ~CustomSlider();
-        void mouseEnter(const juce::MouseEvent& event) override {
-            isHoveredOver = true;
-        }
-        void mouseExit(const juce::MouseEvent& event) override {
-            isHoveredOver = false;
-        }
-        bool isHoveredOver = false;
-    private:
+// Base class with common mouseEnter and mouseExit functionality
+class HoverableComponent : public juce::Component {
+public:
+    void mouseEnter(const juce::MouseEvent& event) override {
+        isHoveredOver = true;
+    }
+
+    void mouseExit(const juce::MouseEvent& event) override {
+        isHoveredOver = false;
+    }
+
+protected:
+    bool isHoveredOver = false;
 };
 
-class CustomTextEditor : public  juce::TextEditor {
-    public:
+// CustomSlider class, now inherits from HoverableComponent
+class CustomSlider : public HoverableComponent, public juce::Slider {
+public:
+    CustomSlider();
+    ~CustomSlider();
 
-
-        void mouseEnter(const juce::MouseEvent& event) override {
-            isHoveredOver = true;
-        }
-        void mouseExit(const juce::MouseEvent& event) override {
-            isHoveredOver = false;
-        }
-        void focusGained(FocusChangeType cause) override {
-            isFocussed = true;
-        }
-        void focusLost(FocusChangeType cause) override {
-            isFocussed = false;
-        }
-
-        bool isFocussed = false;
-        bool isHoveredOver = false;
-    private:
+private:
 };
 
-class CustomTextButton : public  juce::TextButton {
-    public:
-        void mouseEnter(const juce::MouseEvent& event) override {
-            isHoveredOver = true;
-        }
-        void mouseExit(const juce::MouseEvent& event) override {
-            isHoveredOver = false;
-        }
+// CustomTextEditor class, now inherits from HoverableComponent
+class CustomTextEditor : public HoverableComponent, public juce::TextEditor {
+public:
+    CustomTextEditor();
 
-        bool isHoveredOver = false;
+    void focusGained(FocusChangeType cause) override {
+        isFocused = true;
+    }
 
-    private:    
- 
+    void focusLost(FocusChangeType cause) override {
+        isFocused = false;
+    }
+
+private:
+    bool isFocused = false;
+};
+
+// CustomTextButton class, now inherits from HoverableComponent
+class CustomTextButton : public HoverableComponent, public juce::TextButton {
+public:
+    CustomTextButton();
+
+private:
 };
 
 
